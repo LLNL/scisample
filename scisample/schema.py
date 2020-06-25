@@ -43,6 +43,15 @@ LIST_SCHEMA =  {
     },
 }
 
+# Built-in schema
+COLUMN_LIST_SCHEMA =  {
+    'type': 'object',
+    'properties': {
+        'type': {'type': 'string'},
+        'constants': {'type': 'object'},
+        'parameters': {'type': 'string'},
+    },
+}
 
 CROSS_PRODUCT_SCHEMA =  {
     'type': 'object',
@@ -79,6 +88,7 @@ CUSTOM_SCHEMA =  {
 
 SAMPLER_SCHEMA = {
     'list': LIST_SCHEMA,
+    'column_list': COLUMN_LIST_SCHEMA,
     'cross_product': CROSS_PRODUCT_SCHEMA,
     'csv': CSV_SCHEMA,
     'custom': CUSTOM_SCHEMA,
