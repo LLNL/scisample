@@ -10,29 +10,22 @@ Welcome to scisample's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: scisample.samples
+.. automodule:: scisample.samplers
     :members:
     :undoc-members:
 
-.. automodule:: scisample.list
+.. automodule:: scisample.interface
     :members:
     :undoc-members:
        
-.. automodule:: scisample.column_list
-    :members:
-    :undoc-members:
-
-.. automodule:: scisample.cross_product
-    :members:
-    :undoc-members:
-       
-.. automodule:: scisample.best_candidate
+.. automodule:: scisample.schema
     :members:
     :undoc-members:
 
 .. automodule:: scisample.utils
     :members:
     :undoc-members:
+       
    
 
 Indices and tables
