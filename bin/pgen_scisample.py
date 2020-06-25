@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 """This file implements several sampling methods"""
 
 import logging
 
-from scisample.samples import Samples
+from scisample.samplers import new_sampler
 
 LOGGER = logging.getLogger(__name__)
 
@@ -31,10 +30,4 @@ def get_custom_generator(env, **kwargs):
         raise Exception("this pgen code requires SAMPLE_DICTIONARY " +
                         "to be defined in the yaml specification")
 
-    return Samples(SAMPLE_DICTIONARY).maestro_pgen()
-
-def main():
-    print("This script is used by maestro")
-
-if __name__ == "__main__":
-    main()
+    return new_sampler(SAMPLE_DICTIONARY).maestro_pgen
