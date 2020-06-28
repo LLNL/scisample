@@ -2,12 +2,13 @@
 Module defining different sampler objects.
 """
 
-import logging
-from contextlib import suppress
-import itertools
-from pathlib import Path
-import importlib
 import sys
+import random
+import logging
+import itertools
+import importlib
+from pathlib import Path
+from contextlib import suppress
 
 from jsonschema import ValidationError
 
@@ -53,7 +54,7 @@ def new_sampler(sampler_data):
     """
 
     # SAMPLE_FUNCTIONS_DICT is defined below class definitions
-
+    LOG.info("Entering new_sampler")
     if 'type' not in sampler_data:
         raise ValueError(f"No type entry in sampler data {sampler_data}")
 
@@ -61,9 +62,20 @@ def new_sampler(sampler_data):
         sampler = BaseSampler.SAMPLE_FUNCTIONS_DICT[sampler_data['type']]
     except KeyError:
         raise KeyError(f"{sampler_data['type']} is not a recognized sampler type")
+    LOG.info("Sampler type: " + str(sampler_data['type']))
+    LOG.info("Sampler: " + str(
+        BaseSampler.SAMPLE_FUNCTIONS_DICT[sampler_data['type']]))
 
-    return sampler(sampler_data)
+    if sampler(sampler_data).is_valid():
+        return sampler(sampler_data)
+    else:
+        msg = "Sampler is invalid, cannot create the maestro specification"
+        LOG.error(msg)                                                                                                 
+        raise Error(msg)
 
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
 
 class BaseSampler(SamplerInterface):
     """
@@ -105,6 +117,7 @@ class BaseSampler(SamplerInterface):
 
         :returns: True if the schema is valid, False otherwise.
         """
+        LOG.info("BaseSampler.is_valid()")
         try:
             validate_sampler(self.data)
             return True
@@ -116,6 +129,22 @@ class BaseSampler(SamplerInterface):
             LOG.exception("Sampler data is invalid")
 
         return False
+
+    def _check_parameters_constants_existence(self):
+        if 'constants' not in self.data and 'parameters' not in self.data:
+            msg = ("Either constants or parameters must be included in the " +
+                   "sampler data")
+            LOG.error(msg)
+            raise Error(msg)
+
+    def _check_parameters_constants_for_dups(self):
+        LOG.info("testing for duplicates")
+        if len(self.parameters) != len(set(self.parameters)):
+            dupes = set(find_duplicates(self.parameters))
+            msg = ("The following constants or parameters are defined more" +
+                   "than once: " + str(dupes))
+            LOG.error(msg)
+            raise Error(msg)
 
     @property
     def parameter_block(self):
@@ -203,31 +232,17 @@ class ListSampler(BaseSampler):
 
         test_length = None
 
+        self._check_parameters_constants_existence()
+        self._check_parameters_constants_for_dups()
+
         with suppress(KeyError):
             for key, value in self.data['parameters'].items():
                 if test_length is None:
                     test_length = len(value)
                 if len(value) != test_length:
-                    LOG.error(
-                        "All parameters must have the same nuumber of entries"
-                        )
-                    return False
-
-        if 'constants' not in self.data and 'parameters' not in self.data:
-            LOG.error(
-                "Either constants or parameters must be included in the "
-                "sampler data"
-                )
-            return False
-        LOG.info("testing for duplicates")
-        if len(self.parameters) != len(set(self.parameters)):
-            dupes = set(find_duplicates(self.parameters))
-            LOG.error(
-                "The following constants or parameters are defined more"
-                "than once: " + str(dupes)
-                )
-            return False
-
+                    msg = "All parameters must have the same nuumber of entries"
+                    LOG.error(msg)
+                    raise Error(msg)    
         return True
 
     @property
