@@ -14,7 +14,8 @@ from jsonschema import ValidationError
 from scisample.interface import SamplerInterface
 from scisample.schema import validate_sampler
 from scisample.utils import (
-    read_csv, transpose_tabular, list_to_csv, _convert_dict_to_maestro_params )
+    read_csv, transpose_tabular, list_to_csv, _convert_dict_to_maestro_params,
+    find_duplicates)
 
 MAESTROWF = False
 with suppress(ModuleNotFoundError):
@@ -87,7 +88,7 @@ class BaseSampler(SamplerInterface):
         Sampler data block.
         """
         return self._data
-    
+
     def is_valid(self):
         """
         Check if the sampler is valid.
@@ -188,6 +189,7 @@ class ListSampler(BaseSampler):
 
         :returns: True if the schema is valid, False otherwise.
         """
+        LOG.info("ListSampler.is_valid()")
         if not super(ListSampler, self).is_valid():
             return False
 
@@ -207,6 +209,14 @@ class ListSampler(BaseSampler):
             LOG.error(
                 "Either constants or parameters must be included in the "
                 "sampler data"
+                )
+            return False
+        LOG.info("testing for duplicates")
+        if len(self.parameters) != len(set(self.parameters)):
+            dupes = set(find_duplicates(self.parameters))
+            LOG.error(
+                "The following constants or parameters are defined more"
+                "than once: " + str(dupes)
                 )
             return False
 
@@ -237,7 +247,7 @@ class ListSampler(BaseSampler):
 
             [{'b': 0.89856, 'a': 1}, {'b': 0.923223, 'a': 1}, ... ]
         """
-
+        LOG.info("ListSampler.get_samples()")
         if self._samples is not None:
             return self._samples
 

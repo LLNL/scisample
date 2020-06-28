@@ -32,6 +32,7 @@ def list_to_csv(row):
 
     return format_string.format(*row)
 
+
 def _convert_dict_to_maestro_params(samples):
     keys = list(samples[0].keys())
     parameters = {}
@@ -41,3 +42,24 @@ def _convert_dict_to_maestro_params(samples):
         values = [sample[key] for sample in samples]
         parameters[key]["values"] = values
     return parameters
+
+
+def find_duplicates(lst):
+    """
+    Takes a list and returns a list of any duplicate items.
+
+    If there are no duplicates, return an empty list.
+    Code taken from:
+    https://stackoverflow.com/questions/9835762/how-do-i-find-the-duplicates-in-a-list-and-create-another-list-with-them
+    """
+    seen = {}
+    dupes = []
+
+    for x in lst:
+        if x not in seen:
+            seen[x] = 1
+        else:
+            if seen[x] == 1:
+                dupes.append(x)
+            seen[x] += 1
+    return dupes
