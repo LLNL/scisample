@@ -2,6 +2,7 @@ import logging
 import random
 
 from contextlib import suppress
+from scisample
 
 PANDAS_PLUS = False
 with suppress(ModuleNotFoundError):
@@ -13,27 +14,27 @@ with suppress(ModuleNotFoundError):
 LOG = logging.getLogger(__name__)
 
 
-def _validate_best_candidate_dictionary(sampling_dict):
-    _validate_constants_parameters(sampling_dict)
-    _validate_parameters_dict(sampling_dict)
-    _log_assert(
-        type(sampling_dict["num_samples"]) == int,
-        "'num_samples' must exist and be an integer")
-    _log_assert(
-        isinstance(sampling_dict["parameters"], dict),
-        "'parameters' must exist and be a dictionary")
-    if 'previous_samples' in sampling_dict.keys():
-        pass
-        # TTD: validate that file exists and that it
-        # contains same parameters as `parameters`
-    for key, value in sampling_dict["parameters"].items():
-        _log_assert(type(key) == str, "parameter labels must be strings")
-        _log_assert(
-            str(value["min"]).isnumeric(),
-            "parameter must have a numeric minimum")
-        _log_assert(
-            str(value["max"]).isnumeric(),
-            "parameter must have a numeric maximum")
+# def _validate_best_candidate_dictionary(sampling_dict):
+#     _validate_constants_parameters(sampling_dict)
+#     _validate_parameters_dict(sampling_dict)
+#     _log_assert(
+#         type(sampling_dict["num_samples"]) == int,
+#         "'num_samples' must exist and be an integer")
+#     _log_assert(
+#         isinstance(sampling_dict["parameters"], dict),
+#         "'parameters' must exist and be a dictionary")
+#     if 'previous_samples' in sampling_dict.keys():
+#         pass
+#         # TTD: validate that file exists and that it
+#         # contains same parameters as `parameters`
+#     for key, value in sampling_dict["parameters"].items():
+#         _log_assert(type(key) == str, "parameter labels must be strings")
+#         _log_assert(
+#             str(value["min"]).isnumeric(),
+#             "parameter must have a numeric minimum")
+#         _log_assert(
+#             str(value["max"]).isnumeric(),
+#             "parameter must have a numeric maximum")
 
 class RandomSampler(BaseSampler):
     """
@@ -69,7 +70,24 @@ class RandomSampler(BaseSampler):
         [{X1: 20, X2: 5.632222227306036, X3: 6.633392173916806},
          {X1: 20, X2: 7.44369755967992, X3: 8.941266067294213}]
     """
-    pass
+
+    def is_valid(self):
+        """
+        Check if the sampler is valid.
+
+        Checks the sampler data against the built-in schema.
+
+        Checks that all entries in ``parameters`` have the same
+        length.
+
+        :returns: True if the schema is valid, False otherwise.
+        """
+        if not super(ListSampler, self).is_valid():
+            return False
+
+        test_length = None
+        pass
+
 
 def downselect(samples, sampling_dict):
     """

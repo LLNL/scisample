@@ -30,7 +30,7 @@ def get_custom_generator(env, **kwargs):
         raise Exception("this pgen code requires SAMPLE_DICTIONARY " +
                         "to be defined in the yaml specification")
 
-    return new_samplerd(SAMPLE_DICTIONARY).maestro_pgen
+    return new_sampler(SAMPLE_DICTIONARY).maestro_pgen
 
 def main():
     print("This script needs to be used by maestrowf.")

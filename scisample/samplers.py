@@ -24,6 +24,17 @@ with suppress(ModuleNotFoundError):
 
 LOG = logging.getLogger(__name__)
 
+def define_sample_functions_dict_and_keys():
+    BaseSampler.SAMPLE_FUNCTIONS_DICT = {
+        # 'best_candidate': BestCandidateSampler,
+        'column_list': ColumnListSampler,
+        'list': ListSampler,
+        'cross_product': CrossProductSampler,
+        'csv': CsvSampler,
+        'custom': CustomSampler
+    }
+
+    BaseSampler.SAMPLE_FUNCTIONS_KEYS = BaseSampler.SAMPLE_FUNCTIONS_DICT.keys()
 
 def new_sampler(sampler_data):
     """
@@ -47,29 +58,26 @@ def new_sampler(sampler_data):
         raise ValueError(f"No type entry in sampler data {sampler_data}")
 
     try:
-        sampler = SAMPLE_FUNCTIONS_DICT[sampler_data['type']]
+        sampler = BaseSampler.SAMPLE_FUNCTIONS_DICT[sampler_data['type']]
     except KeyError:
         raise KeyError(f"{sampler_data['type']} is not a recognized sampler type")
 
     return sampler(sampler_data)
-
-    # if sampler_data['type'] == 'list':
-    #     return ListSampler(sampler_data)
-
-    # if sampler_data['type'] == 'cross_product':
-    #     return CrossProductSampler(sampler_data)
-
-    # if sampler_data['type'] == 'csv':
-    #     return CsvSampler(sampler_data)
-
-    # if sampler_data['type'] == 'custom':
-    #     return CustomSampler(sampler_data)
 
 
 class BaseSampler(SamplerInterface):
     """
     Base sampler class.
     """
+    # @TODO: define SAMPLE_FUNCTIONS_DICT automatically:
+    # https://stackoverflow.com/questions/3862310/how-to-find-all-the-subclasses-of-a-class-given-its-namedefine keywords
+    # def all_subclasses(cls):
+    #     return set(cls.__subclasses__()).union(
+    #         [s for c in cls.__subclasses__() for s in all_subclasses(c)])  
+      
+    SAMPLE_FUNCTIONS_DICT = {}
+    SAMPLE_FUNCTIONS_KEYS = []
+    """list: List of available sampling methods."""
 
     def __init__(self, data):
         """
@@ -712,16 +720,6 @@ class CustomSampler(BaseSampler):
 
         return self._samples
 
+define_sample_functions_dict_and_keys()
 
-SAMPLE_FUNCTIONS_DICT = {
-    # 'best_candidate': BestCandidateSampler,
-    'column_list': ColumnListSampler,
-    'list': ListSampler,
-    'cross_product': CrossProductSampler,
-    'csv': CsvSampler,
-    'custom': CustomSampler
-}
-
-SAMPLE_FUNCTIONS_KEYS = SAMPLE_FUNCTIONS_DICT.keys()
-"""list: List of available sampling methods."""
 
