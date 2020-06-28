@@ -3,9 +3,6 @@ import random
 
 from contextlib import suppress
 
-from scisample.utils import (
-    _log_assert, _validate_constants_parameters, _validate_parameters_dict)
-
 PANDAS_PLUS = False
 with suppress(ModuleNotFoundError):
     import pandas as pd
@@ -13,7 +10,7 @@ with suppress(ModuleNotFoundError):
     import scipy.spatial as spatial
     PANDAS_PLUS = True
 
-LOGGER = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def _validate_best_candidate_dictionary(sampling_dict):
@@ -38,6 +35,41 @@ def _validate_best_candidate_dictionary(sampling_dict):
             str(value["max"]).isnumeric(),
             "parameter must have a numeric maximum")
 
+class RandomSampler(BaseSampler):
+    """
+    Class defining basic random sampling.
+
+    This is similar to the ``csv`` functionality of ``codepy setup``
+    and ``codepy run``.  Its sampler data takes two blocks:
+    ``constants`` and ``parameters``:
+
+    .. code:: yaml
+
+        sampler:
+            type: random
+            num_samples: 30
+            previous_samples: samples.csv # optional
+            constants:
+                X1: 20
+            parameters:
+                X2:
+                    min: 5
+                    max: 10
+                X3:
+                    min: 5
+                    max: 10
+
+    A total of ``num_samples`` will be generated. Entries in the ``constants``
+    dictionary will be added to all samples. Entries in the ``parameters``
+    block will be selected from a range of ``min`` to ``max``.  The result of
+    the above block would something like:
+
+    .. code:: python
+
+        [{X1: 20, X2: 5.632222227306036, X3: 6.633392173916806},
+         {X1: 20, X2: 7.44369755967992, X3: 8.941266067294213}]
+    """
+    pass
 
 def downselect(samples, sampling_dict):
     """
