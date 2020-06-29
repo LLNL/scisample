@@ -115,6 +115,12 @@ class RandomSampler(BaseSampler):
                 min: 5
                 max: 10
         """
+        LOG.info("Entering ColumnListSampler.get_samples()")
+        if self._samples is not None:
+            return self._samples
+
+        self._samples = []
+
         random_list = []
         min_dict = {}
         range_dict = {}
@@ -127,6 +133,18 @@ class RandomSampler(BaseSampler):
                 random_dictionary[key] = (
                     min_dict[key] + random.random() * range_dict[key])
             random_list.append(random_dictionary)
+        LOG.info("random.get_samples samples: \n" + str(random_list))
 
-        self._samples = random_list
-        return(self._samples)
+        for i in range(len(random_list)):
+            new_sample = {}
+
+            with suppress(KeyError):
+                new_sample.update(self.data['constants'])
+
+            with suppress(KeyError):
+                for key, value in random_list[i].items():
+                    new_sample[key] = value
+
+            self._samples.append(new_sample)
+
+        return self._samples
