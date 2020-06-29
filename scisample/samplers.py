@@ -14,6 +14,8 @@ from jsonschema import ValidationError
 
 from scisample.interface import SamplerInterface
 from scisample.schema import validate_sampler
+# from scisample.foo import bar
+# from scisample.best_candidate import RandomSampler
 from scisample.utils import (
     read_csv, transpose_tabular, list_to_csv, _convert_dict_to_maestro_params,
     find_duplicates)
@@ -32,6 +34,7 @@ def define_sample_functions_dict_and_keys():
         'list': ListSampler,
         'cross_product': CrossProductSampler,
         'csv': CsvSampler,
+        # 'random': RandomSampler,
         'custom': CustomSampler
     }
 
@@ -75,6 +78,7 @@ def new_sampler(sampler_data):
 
 class Error(Exception):
     """Base class for exceptions in this module."""
+    # @TODO confirm that scisample exceptions are labelled clearly
     pass
 
 class BaseSampler(SamplerInterface):

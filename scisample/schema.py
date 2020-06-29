@@ -41,6 +41,7 @@ LIST_SCHEMA =  {
             'additionalProperties': {'type': 'array'}
         },
     },
+    'required': ['type'],
 }
 
 # Built-in schema
@@ -51,6 +52,7 @@ COLUMN_LIST_SCHEMA =  {
         'constants': {'type': 'object'},
         'parameters': {'type': 'string'},
     },
+    'required': ['type'],
 }
 
 CROSS_PRODUCT_SCHEMA =  {
@@ -63,6 +65,7 @@ CROSS_PRODUCT_SCHEMA =  {
             'additionalProperties': {'type': 'array'}
         },
     },
+    'required': ['type'],
 }
 
 CSV_SCHEMA =  {
@@ -86,10 +89,26 @@ CUSTOM_SCHEMA =  {
     'required': ['type','function','module', 'args'],
 }
 
+RANDOM_SCHEMA =  {
+    'type': 'object',
+    'properties': {
+        'type': {'type': 'string'},
+        'num_samples': {'type': 'integer'},
+        'previous_samples': {'type': 'string'},
+        'constants': {'type': 'object'},
+        'parameters': {
+            'type': 'object',
+            'additionalProperties': {'type': 'array'}
+        },
+    },
+    'required': ['type','num_samples'],
+}
+
 SAMPLER_SCHEMA = {
     'list': LIST_SCHEMA,
     'column_list': COLUMN_LIST_SCHEMA,
     'cross_product': CROSS_PRODUCT_SCHEMA,
     'csv': CSV_SCHEMA,
     'custom': CUSTOM_SCHEMA,
+    'random': RANDOM_SCHEMA
 }
