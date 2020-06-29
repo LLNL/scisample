@@ -21,10 +21,12 @@ with suppress(ModuleNotFoundError):
 
 LOG = logging.getLogger(__name__)
 
+
 class Error(Exception):
     """Base class for exceptions in this module."""
     # @TODO confirm that scisample exceptions are labelled clearly
     pass
+
 
 class BaseSampler(SamplerInterface):
     """
@@ -34,8 +36,8 @@ class BaseSampler(SamplerInterface):
     # https://stackoverflow.com/questions/3862310/how-to-find-all-the-subclasses-of-a-class-given-its-namedefine keywords
     # def all_subclasses(cls):
     #     return set(cls.__subclasses__()).union(
-    #         [s for c in cls.__subclasses__() for s in all_subclasses(c)])  
-      
+    #         [s for c in cls.__subclasses__() for s in all_subclasses(c)])
+
     SAMPLE_FUNCTIONS_DICT = {}
     SAMPLE_FUNCTIONS_KEYS = []
     """list: List of available sampling methods."""
