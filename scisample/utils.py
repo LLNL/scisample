@@ -2,8 +2,20 @@
 Helper functions for ``scisample``.
 """
 
-import os
 import yaml
+import logging
+
+LOG = logging.getLogger(__name__)
+
+
+class SamplingError(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+
+def log_and_raise_exception(msg):
+    LOG.error(msg)
+    raise(SamplingError(msg))
 
 
 def read_yaml(filename):

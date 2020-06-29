@@ -1,5 +1,5 @@
 """
-Module defining BaseSampler class.
+Module defining the BaseSampler class.
 """
 
 import logging
@@ -10,7 +10,8 @@ from contextlib import suppress
 from scisample.interface import SamplerInterface
 from scisample.schema import validate_sampler
 from scisample.utils import (
-    list_to_csv, find_duplicates, _convert_dict_to_maestro_params
+    list_to_csv, find_duplicates, _convert_dict_to_maestro_params,
+    log_and_raise_exception
     )
 
 # @TODO: can this duplicate code be removed?
@@ -19,13 +20,14 @@ with suppress(ModuleNotFoundError):
     from maestrowf.datastructures.core import ParameterGenerator
     MAESTROWF = True
 
+PANDAS_PLUS = False
+with suppress(ModuleNotFoundError):
+    import pandas as pd
+    import numpy as np
+    import scipy.spatial as spatial
+    PANDAS_PLUS = True
+
 LOG = logging.getLogger(__name__)
-
-
-class Error(Exception):
-    """Base class for exceptions in this module."""
-    # @TODO confirm that scisample exceptions are labelled clearly
-    pass
 
 
 class BaseSampler(SamplerInterface):
@@ -81,21 +83,118 @@ class BaseSampler(SamplerInterface):
 
         return False
 
-    def _check_parameters_constants_existence(self):
-        if 'constants' not in self.data and 'parameters' not in self.data:
-            msg = ("Either constants or parameters must be included in the " +
-                   "sampler data")
-            LOG.error(msg)
-            raise Error(msg)
+    def _check_variables(self):
+        self._check_variables_strings()
+        self._check_variables_existence()
+        self._check_variables_for_dups()
 
-    def _check_parameters_constants_for_dups(self):
-        LOG.info("testing for duplicates")
+    def _check_variables_strings(self):
+        for parameter in self.parameters:
+            if not isinstance(parameter, str):
+                log_and_raise_exception(
+                    "Either constants or parameters must be included in the " +
+                    "sampler data")
+
+    def _check_variables_existence(self):
+        if len(self.parameters) == 0:
+            log_and_raise_exception(
+                "Either constants or parameters must be included in the " +
+                "sampler data")
+
+    def _check_variables_for_dups(self):
         if len(self.parameters) != len(set(self.parameters)):
             dupes = set(find_duplicates(self.parameters))
-            msg = ("The following constants or parameters are defined more " +
-                   "than once: " + str(dupes))
-            LOG.error(msg)
-            raise Error(msg)
+            log_and_raise_exception(
+                "The following constants or parameters are defined more " +
+                "than once: " + str(dupes))
+
+    # def downselect(samples):
+    #     """
+    #     Downselect samples based on specification in sampling_dict.
+
+    #     Prototype dictionary::
+
+    #        num_samples: 30
+    #        previous_samples: samples.csv # optional
+    #        parameters:
+    #            X1:
+    #                min: 10
+    #                max: 50
+    #            X2:
+    #                min: 10
+    #                max: 50
+    #     """
+    #     if not PANDAS_PLUS:
+    #         log_and_raise_exception(
+    #             "This function requires pandas, numpy, scipy & sklearn packages")
+
+    #     df = pd.DataFrame.from_dict(samples)
+    #     columns = sampling_dict["parameters"].keys()
+    #     ndims = len(columns)
+    #     candidates = df[columns].values.tolist()
+    #     num_points = sampling_dict["num_samples"]
+
+    #     if not('previous_samples' in sampling_dict.keys()):
+    #         sample_points = []
+    #         sample_points.append(candidates[0])
+    #         new_sample_points = []
+    #         new_sample_points.append(candidates[0])
+    #         new_sample_ids = []
+    #         new_sample_ids.append(0)
+    #         n0 = 1
+    #     else:
+    #         try:
+    #             previous_samples = pd.read_csv(sampling_dict["previous_samples"])
+    #         except ValueError:
+    #             raise Exception("Error opening previous_samples datafile:" +
+    #                             sampling_dict["previous_samples"])
+    #         sample_points = previous_samples[columns].values.tolist()
+    #         new_sample_points = []
+    #         new_sample_ids = []
+    #         n0 = 0
+
+    #     mins = np.zeros(ndims)
+    #     maxs = np.zeros(ndims)
+
+    #     first = True
+    #     for i in range(len(candidates)):
+    #         ppi = candidates[i]
+    #         for j in range(ndims):
+    #             if first:
+    #                 mins[j] = ppi[j]
+    #                 maxs[j] = ppi[j]
+    #                 first = False
+    #             else:
+    #                 mins[j] = min(ppi[j], mins[j])
+    #                 maxs[j] = max(ppi[j], maxs[j])
+    #     print("extrema for new input_labels: ", mins, maxs)
+    #     print("down sampling to %d best candidates from %d total points." % (
+    #         num_points, len(candidates)))
+    #     bign = len(candidates)
+
+    #     for n in range(n0, num_points):
+    #         px = np.asarray(sample_points)
+    #         tree = spatial.KDTree(px)
+    #         j = bign
+    #         d = 0.0
+    #         for i in range(1, bign):
+    #             pos = candidates[i]
+    #             dist = tree.query(pos)[0]
+    #             if dist > d:
+    #                 j = i
+    #                 d = dist
+    #         if j == bign:
+    #             raise Exception("Something went wrong!")
+    #         else:
+    #             new_sample_points.append(candidates[j])
+    #             sample_points.append(candidates[j])
+    #             new_sample_ids.append(j)
+
+    #     new_samples_df = pd.DataFrame(columns=df.keys().tolist())
+    #     for n in range(len(new_sample_ids)):
+    #         new_samples_df = new_samples_df.append(df.iloc[new_sample_ids[n]])
+
+    #     return new_samples_df.to_dict(orient='records')
 
     @property
     def parameter_block(self):

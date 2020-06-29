@@ -1,5 +1,5 @@
 """
-Module defining different sampler objects.
+Module defining the custom sampler object.
 """
 
 import importlib

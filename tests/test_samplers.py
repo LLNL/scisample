@@ -11,7 +11,7 @@ import pytest
 
 from dirsetup.main import DirSetup, parse_paths
 
-from scisample.base_sampler import Error
+from scisample.utils import SamplingError
 from scisample.samplers import (
     new_sampler,
     ListSampler,
@@ -111,7 +111,7 @@ class TestListSampler(unittest.TestCase):
         del self.sampler.data['constants']
         self.assertTrue(self.sampler.is_valid())
         del self.sampler.data['parameters']
-        with pytest.raises(Error) as excinfo:
+        with pytest.raises(SamplingError) as excinfo:
             self.sampler.is_valid()
         assert ("Either constants or parameters must be included" 
             in str(excinfo.value))
@@ -122,14 +122,10 @@ class TestListSampler(unittest.TestCase):
         del self.sampler.data['parameters']
         self.assertTrue(self.sampler.is_valid())
         del self.sampler.data['constants']
-        with pytest.raises(Error) as excinfo:
+        with pytest.raises(SamplingError) as excinfo:
             self.sampler.is_valid()
         assert ("Either constants or parameters must be included" 
             in str(excinfo.value))
-
-    def test_zero_division(self):
-        with pytest.raises(ZeroDivisionError):
-            1 / 0
 
     def test_samples(self):
         samples = self.sampler.get_samples()

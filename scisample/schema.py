@@ -30,8 +30,9 @@ def validate_sampler(sampler_data):
         SAMPLER_SCHEMA[sampler_data['type']]
         )
 
+
 # Built-in schema
-LIST_SCHEMA =  {
+LIST_SCHEMA = {
     'type': 'object',
     'properties': {
         'type': {'type': 'string'},
@@ -45,7 +46,7 @@ LIST_SCHEMA =  {
 }
 
 # Built-in schema
-COLUMN_LIST_SCHEMA =  {
+COLUMN_LIST_SCHEMA = {
     'type': 'object',
     'properties': {
         'type': {'type': 'string'},
@@ -55,7 +56,7 @@ COLUMN_LIST_SCHEMA =  {
     'required': ['type'],
 }
 
-CROSS_PRODUCT_SCHEMA =  {
+CROSS_PRODUCT_SCHEMA = {
     'type': 'object',
     'properties': {
         'type': {'type': 'string'},
@@ -68,17 +69,17 @@ CROSS_PRODUCT_SCHEMA =  {
     'required': ['type'],
 }
 
-CSV_SCHEMA =  {
+CSV_SCHEMA = {
     'type': 'object',
     'properties': {
         'type': {'type': 'string'},
         'csv_file': {'type': 'string'},
         'row_headers': {'type': 'boolean'},
     },
-    'required': ['type','csv_file','row_headers'],
+    'required': ['type', 'csv_file', 'row_headers'],
 }
 
-CUSTOM_SCHEMA =  {
+CUSTOM_SCHEMA = {
     'type': 'object',
     'properties': {
         'type': {'type': 'string'},
@@ -86,11 +87,11 @@ CUSTOM_SCHEMA =  {
         'module': {'type': 'string'},
         'args': {'type': 'object'},
     },
-    'required': ['type','function','module', 'args'],
+    'required': ['type', 'function', 'module', 'args'],
 }
 
 # @TODO: be more specific about parameters min/max
-RANDOM_SCHEMA =  {
+RANDOM_SCHEMA = {
     'type': 'object',
     'properties': {
         'type': {'type': 'string'},
@@ -101,7 +102,7 @@ RANDOM_SCHEMA =  {
             'type': 'object'
         },
     },
-    'required': ['type','num_samples'],
+    'required': ['type', 'num_samples'],
 }
 
 SAMPLER_SCHEMA = {

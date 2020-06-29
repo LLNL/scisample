@@ -1,5 +1,5 @@
 """
-Module defining column list object.
+Module defining the column list object.
 """
 
 import logging

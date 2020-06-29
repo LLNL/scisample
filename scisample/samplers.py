@@ -6,14 +6,16 @@ Module defining different sampler interfaces.
 
 import logging
 
-from scisample.base_sampler import (BaseSampler, Error)
+from scisample.base_sampler import BaseSampler
 
-from scisample.best_candidate import RandomSampler
+from scisample.utils import log_and_raise_exception
+
 from scisample.column_list import ColumnListSampler
 from scisample.cross_product import CrossProductSampler
 from scisample.csv import CsvSampler
 from scisample.custom import CustomSampler
 from scisample.list import ListSampler
+from scisample.random import RandomSampler
 
 LOG = logging.getLogger(__name__)
 
@@ -64,6 +66,6 @@ def new_sampler(sampler_data):
     if sampler(sampler_data).is_valid():
         return sampler(sampler_data)
     else:
-        msg = "Sampler is invalid, cannot create the maestro specification"
-        LOG.error(msg)
-        raise Error(msg)
+        log_and_raise_exception(
+            "Sampler is invalid, cannot create the maestro specification")
+

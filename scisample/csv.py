@@ -1,5 +1,5 @@
 """
-Module defining different csv sampler object.
+Module defining the custom csv sampler object.
 """
 
 import logging

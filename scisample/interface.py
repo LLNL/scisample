@@ -25,7 +25,7 @@ class SamplerInterface(abc.ABC):
     def get_samples(self):
         """
         Get samples from the sampler.
-        
+
         This should return samples as a list of dictionaries, with the
         sample variables as the keys:
 

@@ -1,12 +1,13 @@
 """
-Module defining different list sampler object.
+Module defining the list sampler object.
 """
 
 import logging
 
 from contextlib import suppress
 
-from scisample.base_sampler import (BaseSampler, Error)
+from scisample.base_sampler import BaseSampler
+from scisample.utils import log_and_raise_exception
 
 
 LOG = logging.getLogger(__name__)
@@ -56,18 +57,17 @@ class ListSampler(BaseSampler):
 
         test_length = None
 
-        self._check_parameters_constants_existence()
-        self._check_parameters_constants_for_dups()
+        self._check_variables_existence()
+        self._check_variables_for_dups()
 
         with suppress(KeyError):
             for key, value in self.data['parameters'].items():
                 if test_length is None:
                     test_length = len(value)
                 if len(value) != test_length:
-                    msg = ("All parameters must have the " +
+                    log_and_raise_exception("All parameters must have the " +
                            "same number of entries")
-                    LOG.error(msg)
-                    raise Error(msg)
+
         return True
 
     @property

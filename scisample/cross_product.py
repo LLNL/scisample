@@ -1,5 +1,5 @@
 """
-Module defining different cross product sampler object.
+Module defining the cross product sampler object.
 """
 
 import itertools
