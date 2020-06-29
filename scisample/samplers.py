@@ -10,6 +10,7 @@ from scisample.base_sampler import BaseSampler
 
 from scisample.utils import log_and_raise_exception
 
+from scisample.best_candidate import BestCandidateSampler
 from scisample.column_list import ColumnListSampler
 from scisample.cross_product import CrossProductSampler
 from scisample.csv import CsvSampler
@@ -21,7 +22,7 @@ LOG = logging.getLogger(__name__)
 
 
 BaseSampler.SAMPLE_FUNCTIONS_DICT = {
-    # 'best_candidate': BestCandidateSampler,
+    'best_candidate': BestCandidateSampler,
     'column_list': ColumnListSampler,
     'list': ListSampler,
     'cross_product': CrossProductSampler,
@@ -50,7 +51,6 @@ def new_sampler(sampler_data):
     """
 
     # SAMPLE_FUNCTIONS_DICT is defined below class definitions
-    LOG.info("Entering new_sampler")
     if 'type' not in sampler_data:
         raise ValueError(f"No type entry in sampler data {sampler_data}")
 
@@ -59,9 +59,6 @@ def new_sampler(sampler_data):
     except KeyError:
         raise KeyError(f"{sampler_data['type']} " +
                        "  s not a recognized sampler type")
-    LOG.info("Sampler type: " + str(sampler_data['type']))
-    LOG.info("Sampler: " + str(
-        BaseSampler.SAMPLE_FUNCTIONS_DICT[sampler_data['type']]))
 
     if sampler(sampler_data).is_valid():
         return sampler(sampler_data)

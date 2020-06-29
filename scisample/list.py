@@ -51,7 +51,6 @@ class ListSampler(BaseSampler):
 
         :returns: True if the schema is valid, False otherwise.
         """
-        LOG.info("ListSampler.is_valid()")
         if not super(ListSampler, self).is_valid():
             return False
 
@@ -95,7 +94,6 @@ class ListSampler(BaseSampler):
 
             [{'b': 0.89856, 'a': 1}, {'b': 0.923223, 'a': 1}, ... ]
         """
-        LOG.info("ListSampler.get_samples()")
         if self._samples is not None:
             return self._samples
 

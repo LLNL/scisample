@@ -105,11 +105,14 @@ RANDOM_SCHEMA = {
     'required': ['type', 'num_samples'],
 }
 
+BEST_CANDIDATE_SCHEMA = RANDOM_SCHEMA
+
 SAMPLER_SCHEMA = {
     'list': LIST_SCHEMA,
     'column_list': COLUMN_LIST_SCHEMA,
     'cross_product': CROSS_PRODUCT_SCHEMA,
     'csv': CSV_SCHEMA,
     'custom': CUSTOM_SCHEMA,
-    'random': RANDOM_SCHEMA
+    'random': RANDOM_SCHEMA,
+    'best_candidate': BEST_CANDIDATE_SCHEMA
 }

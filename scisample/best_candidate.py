@@ -3,52 +3,100 @@ Module defining the custom sampler object.
 """
 
 import logging
-import random
 
-from contextlib import suppress
-from scisample.base_sampler import BaseSampler
-
-PANDAS_PLUS = False
-with suppress(ModuleNotFoundError):
-    import pandas as pd
-    import numpy as np
-    import scipy.spatial as spatial
-    PANDAS_PLUS = True
+from scisample.random import RandomSampler
+from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
 
-# def best_candidate_sample(sampling_dict, over_sample_rate=10):
-#     """
-#     Return set of best candidate samples based
-#     on specification in sampling_dict.
 
-#     Prototype dictionary:
+class BestCandidateSampler(RandomSampler):
+    """
+    Class defining basic random sampling.
 
-#     sample_type: best_candidate
-#     num_samples: 30
-#     # previous_samples: samples.csv
-#     constants:
-#         X3: 20
-#     parameters:
-#         X1:
-#             min: 10
-#             max: 50
-#         X2:
-#             min: 10
-#             max: 50
-#     """
-#     _log_assert(
-#         PANDAS_PLUS,
-#         "This function requires pandas, numpy, scipy & sklearn packages")
-#     _validate_best_candidate_dictionary(sampling_dict)
-#     new_sampling_dict = sampling_dict.copy()
-#     new_sampling_dict["num_samples"] *= over_sample_rate
-#     new_random_sample = random_sample(new_sampling_dict)
+    This is similar to the ``csv`` functionality of ``codepy setup``
+    and ``codepy run``.  Its sampler data takes two blocks:
+    ``constants`` and ``parameters``:
 
-#     samples = downselect(new_random_sample, sampling_dict)
-#     if "constants" in sampling_dict.keys():
-#         for sample in samples:
-#             for key, value in sampling_dict["constants"].items():
-#                 sample[key] = value
+    .. code:: yaml
 
-#     return samples
+        sampler:
+            type: random
+            num_samples: 30
+            previous_samples: samples.csv # optional
+            constants:
+                X1: 20
+            parameters:
+                X2:
+                    min: 5
+                    max: 10
+                X3:
+                    min: 5
+                    max: 10
+
+    A total of ``num_samples`` will be generated. Entries in the ``constants``
+    dictionary will be added to all samples. Entries in the ``parameters``
+    block will be selected from a range of ``min`` to ``max``.  The result of
+    the above block would something like:
+
+    .. code:: python
+
+        [{X1: 20, X2: 5.632222227306036, X3: 6.633392173916806},
+         {X1: 20, X2: 7.44369755967992, X3: 8.941266067294213}]
+    """
+
+    def is_valid(self):
+        """
+        Check if the sampler is valid.
+
+        Checks the sampler data against the built-in schema.
+
+        Checks that all entries in ``parameters`` have the same
+        length.
+
+        :returns: True if the schema is valid, False otherwise.
+        """
+        LOG.info("entering BestCandidateSampler.is_valid()")
+        if not super(BestCandidateSampler, self).is_valid():
+            return False
+
+        return True
+
+    def get_samples(self, over_sample_rate=10):
+        """
+        Return set of best candidate samples based
+        on specification in sampling_dict.
+
+        Prototype dictionary:
+
+        sample_type: best_candidate
+        num_samples: 30
+        # previous_samples: samples.csv
+        constants:
+            X3: 20
+        parameters:
+            X1:
+                min: 10
+                max: 50
+            X2:
+                min: 10
+                max: 50
+        """
+        LOG.info("entering BestCandidateSampler.get_samples()")
+        if self._samples is not None:
+            return self._samples
+
+        self._samples = []
+
+        new_sampling_dict = self.data.copy()
+        new_sampling_dict["num_samples"] *= over_sample_rate
+        new_sampling_dict["type"] = "random"
+        new_random_sample = RandomSampler(new_sampling_dict)
+        LOG.info("random_sample:\n" + str(new_random_sample._samples))
+
+        samples = new_random_sample.downselect(self.data["num_samples"])
+        LOG.info("best_sample:\n" + str(samples._samples))
+
+        self._samples = samples._samples
+
+        return self._samples

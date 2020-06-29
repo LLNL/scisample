@@ -4,7 +4,7 @@ import logging
 
 from scisample.samplers import new_sampler
 
-LOGGER = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def get_custom_generator(env, **kwargs):
@@ -16,11 +16,6 @@ def get_custom_generator(env, **kwargs):
     :params kwargs: A dictionary of keyword arguments this function uses.
     :returns: A ParameterGenerator populated with parameters.
     """
-
-    LOGGER.info("pgen env:\n%s", str(env))
-    LOGGER.info("pgen type(env):\n%s", str(type(env)))
-    LOGGER.info("pgen kwargs:\n%s", str(kwargs))
-    LOGGER.info("pgen type(kwargs):\n%s", str(type(kwargs)))
 
     try:
         SAMPLE_DICTIONARY = kwargs.get(
