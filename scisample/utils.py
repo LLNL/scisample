@@ -2,6 +2,21 @@
 Helper functions for ``scisample``.
 """
 
+import os
+import yaml
+
+
+def read_yaml(filename):
+    """
+    Read a yaml file return it's contents as a dictionary.
+
+    :param filename: Name of file to read.
+    :returns: Dictionary of file contents.
+    """
+    with open(filename, 'r') as _file:
+        content = yaml.safe_load(_file)
+    return content
+
 
 def read_csv(filename):
     """
