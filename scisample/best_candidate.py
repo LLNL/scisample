@@ -2,7 +2,7 @@ import logging
 import random
 
 from contextlib import suppress
-# from scisample.samplers import BaseSampler
+from scisample.base_sampler import (BaseSampler, Error)
 
 PANDAS_PLUS = False
 with suppress(ModuleNotFoundError):
@@ -83,7 +83,8 @@ class RandomSampler(BaseSampler):
 
         :returns: True if the schema is valid, False otherwise.
         """
-        if not super(ListSampler, self).is_valid():
+        LOG.info("entering RandomSampler.is_valid()")
+        if not super(RandomSampler, self).is_valid():
             return False
 
         test_length = None
@@ -144,7 +145,7 @@ class RandomSampler(BaseSampler):
         for key, value in self.data["parameters"].items():
             min_dict[key] = value["min"]
             range_dict[key] = value["max"] - value["min"]
-        for i in range(sampling_dict["num_samples"]):
+        for i in range(self.data["num_samples"]):
             random_dictionary = {}
             for key, value in self.data["parameters"].items():
                 random_dictionary[key] = (

@@ -89,6 +89,7 @@ CUSTOM_SCHEMA =  {
     'required': ['type','function','module', 'args'],
 }
 
+# @TODO: be more specific about parameters min/max
 RANDOM_SCHEMA =  {
     'type': 'object',
     'properties': {
@@ -97,8 +98,7 @@ RANDOM_SCHEMA =  {
         'previous_samples': {'type': 'string'},
         'constants': {'type': 'object'},
         'parameters': {
-            'type': 'object',
-            'additionalProperties': {'type': 'array'}
+            'type': 'object'
         },
     },
     'required': ['type','num_samples'],

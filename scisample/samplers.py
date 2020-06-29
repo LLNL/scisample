@@ -15,7 +15,7 @@ from contextlib import suppress
 # from scisample.interface import SamplerInterface
 # from scisample.schema import validate_sampler
 # from scisample.foo import bar
-# from scisample.best_candidate import RandomSampler
+from scisample.best_candidate import RandomSampler
 from scisample.base_sampler import (BaseSampler, Error)
 from scisample.utils import (
     read_csv, transpose_tabular
@@ -36,7 +36,7 @@ def define_sample_functions_dict_and_keys():
         'list': ListSampler,
         'cross_product': CrossProductSampler,
         'csv': CsvSampler,
-        # 'random': RandomSampler,
+        'random': RandomSampler,
         'custom': CustomSampler
     }
 
