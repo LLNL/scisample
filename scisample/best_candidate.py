@@ -82,7 +82,6 @@ class BestCandidateSampler(RandomSampler):
                 min: 10
                 max: 50
         """
-        LOG.info("entering BestCandidateSampler.get_samples()")
         if self._samples is not None:
             return self._samples
 
@@ -92,11 +91,9 @@ class BestCandidateSampler(RandomSampler):
         new_sampling_dict["num_samples"] *= over_sample_rate
         new_sampling_dict["type"] = "random"
         new_random_sample = RandomSampler(new_sampling_dict)
-        LOG.info("random_sample:\n" + str(new_random_sample._samples))
+        new_random_sample.get_samples()
+        new_random_sample.downselect(self.data["num_samples"])
 
-        samples = new_random_sample.downselect(self.data["num_samples"])
-        LOG.info("best_sample:\n" + str(samples._samples))
-
-        self._samples = samples._samples
+        self._samples = new_random_sample._samples
 
         return self._samples

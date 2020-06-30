@@ -125,7 +125,7 @@ class BaseSampler(SamplerInterface):
         """
         if not PANDAS_PLUS:
             log_and_raise_exception(
-                "This function requires pandas, numpy, scipy & sklearn packages")
+                "This function requires pandas, numpy & scipy packages")
 
         df = pd.DataFrame.from_dict(self._samples)
         columns = self.parameters

@@ -59,7 +59,6 @@ class RandomSampler(BaseSampler):
 
         :returns: True if the schema is valid, False otherwise.
         """
-        LOG.info("entering RandomSampler.is_valid()")
         if not super(RandomSampler, self).is_valid():
             return False
 
@@ -112,7 +111,6 @@ class RandomSampler(BaseSampler):
                 min: 5
                 max: 10
         """
-        LOG.info("entering RandomSampler._get_samples()")
 
         if self._samples is not None:
             return self._samples
