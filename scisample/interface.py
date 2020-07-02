@@ -59,5 +59,5 @@ class SamplerInterface(abc.ABC):
     def parameter_block(self):
         """
         Converts samples to parameter dictionary for ``codepy setup`` and ``codepy run``
-        """
+        """ # noqa
         pass

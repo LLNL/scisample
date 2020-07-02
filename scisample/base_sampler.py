@@ -35,7 +35,8 @@ class BaseSampler(SamplerInterface):
     Base sampler class.
     """
     # @TODO: define SAMPLE_FUNCTIONS_DICT automatically:
-    # https://stackoverflow.com/questions/3862310/how-to-find-all-the-subclasses-of-a-class-given-its-namedefine keywords
+    # https://stackoverflow.com/questions/3862310/how-to-find-all-the-subclasses-of-a-class-given-its-namedefine keywords # noqa
+    # noqa
     # def all_subclasses(cls):
     #     return set(cls.__subclasses__()).union(
     #         [s for c in cls.__subclasses__() for s in all_subclasses(c)])
@@ -91,8 +92,7 @@ class BaseSampler(SamplerInterface):
         for parameter in self.parameters:
             if not isinstance(parameter, str):
                 log_and_raise_exception(
-                    "Either constants or parameters must be included in the " +
-                    "sampler data")
+                    "constants and parameters must be strings")
 
     def _check_variables_existence(self):
         if len(self.parameters) == 0:
@@ -202,7 +202,7 @@ class BaseSampler(SamplerInterface):
 
         The keys are the labels and the values are a string version of the
         list, so it can be easily passed to Jinja.
-        """
+        """ # noqa
         if self._parameter_block is None:
             self._parameter_block = {}
             for sample in self.get_samples():

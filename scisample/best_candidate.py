@@ -5,7 +5,6 @@ Module defining the custom sampler object.
 import logging
 
 from scisample.random import RandomSampler
-from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
 
@@ -56,7 +55,6 @@ class BestCandidateSampler(RandomSampler):
 
         :returns: True if the schema is valid, False otherwise.
         """
-        LOG.info("entering BestCandidateSampler.is_valid()")
         if not super(BestCandidateSampler, self).is_valid():
             return False
 

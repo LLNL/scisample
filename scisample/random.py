@@ -25,7 +25,7 @@ class RandomSampler(BaseSampler):
 
         sampler:
             type: random
-            num_samples: 30
+            num_samples: 5
             previous_samples: samples.csv # optional
             constants:
                 X1: 20

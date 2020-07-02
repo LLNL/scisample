@@ -64,8 +64,9 @@ class ListSampler(BaseSampler):
                 if test_length is None:
                     test_length = len(value)
                 if len(value) != test_length:
-                    log_and_raise_exception("All parameters must have the " +
-                           "same number of entries")
+                    log_and_raise_exception(
+                        "All parameters must have the " +
+                        "same number of entries")
 
         return True
 

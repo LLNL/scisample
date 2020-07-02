@@ -50,19 +50,19 @@ def new_sampler(sampler_data):
     :returns: Sampler object matching the data.
     """
 
-    # SAMPLE_FUNCTIONS_DICT is defined below class definitions
     if 'type' not in sampler_data:
-        raise ValueError(f"No type entry in sampler data {sampler_data}")
+        log_and_raise_exception(
+            f"No type entry in sampler data {sampler_data}")
 
     try:
         sampler = BaseSampler.SAMPLE_FUNCTIONS_DICT[sampler_data['type']]
     except KeyError:
-        raise KeyError(f"{sampler_data['type']} " +
-                       "  s not a recognized sampler type")
+        log_and_raise_exception(
+            f"{sampler_data['type']} " +
+            "  s not a recognized sampler type")
 
     if sampler(sampler_data).is_valid():
         return sampler(sampler_data)
     else:
         log_and_raise_exception(
             "Sampler is invalid, cannot create the maestro specification")
-

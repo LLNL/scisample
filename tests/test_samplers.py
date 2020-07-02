@@ -1,184 +1,139 @@
 """
-Test module for testing code bucket structures.
+Test module for testing scisampling classes and methods.
 """
 
 import os
 import shutil
 import tempfile
 import unittest
-import datetime
 import pytest
-
-from dirsetup.main import DirSetup, parse_paths
+import yaml
 
 from scisample.utils import SamplingError
 from scisample.samplers import (
     new_sampler,
-    ListSampler,
-    CrossProductSampler,
     CsvSampler,
     CustomSampler
     )
 from scisample.utils import read_yaml
 
-LIST_SAMPLER = """
-sampler:
-    type: list
-    constants:
-        X1: 20
-    parameters:
-        X2: [5, 10]
-        X3: [5, 10]
-"""
 
-LIST_SAMPLER_WITH_DUPLICATES = """
-sampler:
-    type: list
-    constants:
-        X1: 20
-    parameters:
-        X1: [5, 10]
-        X3: [5, 10]
-        X3: [5, 10]
-"""
+def new_sampler_from_yaml(yaml_text):
+    return new_sampler(
+        yaml.safe_load(yaml_text))
 
-CROSS_PRODUCT_SAMPLER = """
-sampler:
-    type: cross_product
-    constants:
-        X1: 20
-    parameters:
-        X2: [5, 10]
-        X3: [5, 10]
-"""
 
-CSV_SAMPLER = """
-sampler:
-    type: csv
-    csv_file: {path}/test.csv
-    row_headers: True
-"""
+class TestScisample(unittest.TestCase):
+    """Unit test for testing several samplers."""
 
-CSV1 = """X1,20,20
-X2,5,10
-X3,5,10"""
+    def test_exceptions(self):
+        """Unit test for testing invalid or unusual inputs."""
 
-CUSTOM_SAMPLER = """
-sampler:
-    type: custom
-    function: test_function
-    module: {path}/codepy_sampler_test.py
-    args:
-        num_samples: 2
-"""
-
-CUSTOM_FUNCTION = """
-
-def test_function(num_samples):
-    return [{"X1": 20, "X2": 5, "X3": 5},
-            {"X1": 20, "X2": 10, "X3": 10}][:num_samples]
-
-"""
-
-# @TODO: write BaseTestSampler
-# @TODO: write test for LIST_SAMPLER_WITH_DUPLICATES
-class TestListSampler(unittest.TestCase):
-    """Unit test for testing the kernel bucket."""
-    def setUp(self):
-        self.tmp_dir = tempfile.mkdtemp()
-        self.definitions = LIST_SAMPLER
-        self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
-
-        with open(self.sampler_file,'w') as _file:
-            _file.write(self.definitions)
-
-        self.sample_data = read_yaml(self.sampler_file)
-
-        self.sampler = new_sampler(self.sample_data['sampler'])
-
-    def tearDown(self):
-        shutil.rmtree(self.tmp_dir, ignore_errors=True)
-
-    def test_setup(self):
-        self.assertTrue(os.path.isdir(self.tmp_dir))
-        self.assertTrue(os.path.isfile(self.sampler_file))
-
-    def test_dispatch(self):
-        self.assertTrue(isinstance(self.sampler, ListSampler))
-
-    def test_valid1(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['constants']
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['parameters']
+        yaml_text = """
+            type: list
+            #constants:
+            #    X1: 20
+            #parameters:
+            #   X2: [5, 10]
+            #   X3: [5, 10]
+            """
         with pytest.raises(SamplingError) as excinfo:
-            self.sampler.is_valid()
-        assert ("Either constants or parameters must be included" 
+            sampler = new_sampler_from_yaml(yaml_text)
+            sampler.is_valid()
+        assert ("Either constants or parameters must be included"
+                in str(excinfo.value))
+
+        # @TODO: We can not detect if parameters are defined twice.
+        # @TODO: Fixing this requires a rewrite of read_yaml.
+        yaml_text = """
+            type: list
+            constants:
+                X2: 20
+            parameters:
+                X2: [5, 10]
+                X2: [5, 10]
+                X3: [5, 10]
+                X3: [5, 10]
+             """
+        with pytest.raises(SamplingError) as excinfo:
+            sampler = new_sampler_from_yaml(yaml_text)
+            sampler.is_valid()
+        assert (
+            "The following constants or parameters are defined more than once"
             in str(excinfo.value))
 
-    # scisample test with exception
-    def test_valid2(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['parameters']
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['constants']
-        with pytest.raises(SamplingError) as excinfo:
-            self.sampler.is_valid()
-        assert ("Either constants or parameters must be included" 
-            in str(excinfo.value))
+        yaml_text = """
+            type: list
+            constants:
+                X1: 20
+            #parameters:
+            #    X2: [5, 10]
+            #    X3: [5, 10]
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        samples = sampler.get_samples()
 
-    def test_samples(self):
-        samples = self.sampler.get_samples()
-        self.assertEqual(len(samples), 2)
-
+        self.assertEqual(len(samples), 1)
         for sample in samples:
             self.assertEqual(sample['X1'], 20)
+
+        yaml_text = """
+            type: list
+            #constants:
+            #    X1: 20
+            parameters:
+                X2: [5, 10]
+                X3: [5, 10]
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        samples = sampler.get_samples()
+
+        self.assertEqual(len(samples), 2)
+
         self.assertEqual(samples[0]['X2'], 5)
         self.assertEqual(samples[0]['X3'], 5)
         self.assertEqual(samples[1]['X2'], 10)
         self.assertEqual(samples[1]['X3'], 10)
 
+    def test_list_sampler(self):
+        """Unit test for testing list sampler."""
+        yaml_text = """
+            type: list
+            constants:
+                X1: 20
+            parameters:
+                X2: [5, 10]
+                X3: [5, 10]
+                X4: [5, 10]
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        samples = sampler.get_samples()
 
-class TestCrossProductSampler(unittest.TestCase):
-    """Unit test for testing the kernel bucket."""
-    def setUp(self):
-        self.tmp_dir = tempfile.mkdtemp()
-        self.definitions = CROSS_PRODUCT_SAMPLER
-        self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
+        self.assertEqual(len(samples), 2)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 20)
+        self.assertEqual(samples[0]['X2'], 5)
+        self.assertEqual(samples[0]['X3'], 5)
+        self.assertEqual(samples[0]['X4'], 5)
+        self.assertEqual(samples[1]['X2'], 10)
+        self.assertEqual(samples[1]['X3'], 10)
+        self.assertEqual(samples[1]['X4'], 10)
 
-        with open(self.sampler_file,'w') as _file:
-            _file.write(self.definitions)
+    def test_cross_product_sampler(self):
+        """Unit test for testing cross product sampler."""
+        yaml_text = """
+            # sampler:
+                type: cross_product
+                constants:
+                    X1: 20
+                parameters:
+                    X2: [5, 10]
+                    X3: [5, 10]
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        samples = sampler.get_samples()
 
-        self.sample_data = read_yaml(self.sampler_file)
-
-        self.sampler = new_sampler(self.sample_data['sampler'])
-
-    def tearDown(self):
-        shutil.rmtree(self.tmp_dir, ignore_errors=True)
-
-    def test_setup(self):
-        self.assertTrue(os.path.isdir(self.tmp_dir))
-        self.assertTrue(os.path.isfile(self.sampler_file))
-
-    def test_dispatch(self):
-        self.assertTrue(isinstance(self.sampler, CrossProductSampler))
-
-    def test_valid1(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['constants']
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['parameters']
-        self.assertFalse(self.sampler.is_valid())
-
-    def test_valid2(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['parameters']
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['constants']
-        self.assertFalse(self.sampler.is_valid())
-
-    def test_samples(self):
-        samples = self.sampler.get_samples()
+        self.assertEqual(sampler.parameters, ["X1", "X2", "X3"])
         self.assertEqual(len(samples), 4)
 
         for sample in samples:
@@ -192,18 +147,108 @@ class TestCrossProductSampler(unittest.TestCase):
         self.assertEqual(samples[3]['X2'], 10)
         self.assertEqual(samples[3]['X3'], 10)
 
+    def test_column_list_sampler(self):
+        """Unit test for testing column list sampler."""
+        yaml_text = """
+            type: column_list
+            constants:
+                X1: 20
+            parameters: |
+                X2     X3     X4
+                5      5      5
+                10     10     10
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        samples = sampler.get_samples()
+
+        self.assertEqual(len(samples), 2)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 20)
+        self.assertEqual(samples[0]['X2'], '5')
+        self.assertEqual(samples[0]['X3'], '5')
+        self.assertEqual(samples[0]['X4'], '5')
+        self.assertEqual(samples[1]['X2'], '10')
+        self.assertEqual(samples[1]['X3'], '10')
+        self.assertEqual(samples[1]['X4'], '10')
+
+    def test_random_sampler(self):
+        """Unit test for testing random sampler."""
+        yaml_text = """
+            type: random
+            num_samples: 5
+            #previous_samples: samples.csv # optional
+            constants:
+                X1: 20
+            parameters:
+                X2:
+                    min: 5
+                    max: 10
+                X3:
+                    min: 5
+                    max: 10
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        samples = sampler.get_samples()
+
+        self.assertEqual(len(samples), 5)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 20)
+            self.assertTrue(sample['X2'] > 5)
+            self.assertTrue(sample['X3'] > 5)
+            self.assertTrue(sample['X2'] < 10)
+            self.assertTrue(sample['X3'] < 10)
+
+    def test_best_candidate_sampler(self):
+        """Unit test for testing best candidate sampler."""
+        yaml_text = """
+            type: best_candidate
+            num_samples: 5
+            #previous_samples: samples.csv # optional
+            constants:
+                X1: 20
+            parameters:
+                X2:
+                    min: 5
+                    max: 10
+                X3:
+                    min: 5
+                    max: 10
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        samples = sampler.get_samples()
+
+        self.assertEqual(len(samples), 5)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 20)
+            self.assertTrue(sample['X2'] > 5)
+            self.assertTrue(sample['X3'] > 5)
+            self.assertTrue(sample['X2'] < 10)
+            self.assertTrue(sample['X3'] < 10)
+
 
 class TestCsvSampler(unittest.TestCase):
-    """Unit test for testing the kernel bucket."""
+    """Unit test for testing the csv sampler."""
+    CSV_SAMPLER = """
+    sampler:
+        type: csv
+        csv_file: {path}/test.csv
+        row_headers: True
+    """
+
+    # Note: the csv reader does not ignore blank lines
+    CSV1 = """X1,20,20
+    X2,5,10
+    X3,5,10"""
+
     def setUp(self):
         self.tmp_dir = tempfile.mkdtemp()
-        self.definitions = CSV_SAMPLER.format(path=self.tmp_dir)
-        self.csv_data = CSV1
+        self.definitions = self.CSV_SAMPLER.format(path=self.tmp_dir)
+        self.csv_data = self.CSV1
         self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
         self.csv_file = os.path.join(self.tmp_dir, "test.csv")
-        with open(self.sampler_file,'w') as _file:
+        with open(self.sampler_file, 'w') as _file:
             _file.write(self.definitions)
-        with open(self.csv_file,'w') as _file:
+        with open(self.csv_file, 'w') as _file:
             _file.write(self.csv_data)
 
         self.sample_data = read_yaml(self.sampler_file)
@@ -244,16 +289,34 @@ class TestCsvSampler(unittest.TestCase):
 
 
 class TestCustomSampler(unittest.TestCase):
-    """Unit test for testing the kernel bucket."""
+    """Unit test for testing the custom sampler."""
+
+    CUSTOM_SAMPLER = """
+        sampler:
+            type: custom
+            function: test_function
+            module: {path}/codepy_sampler_test.py
+            args:
+                num_samples: 2
+    """
+
+    CUSTOM_FUNCTION = (
+        """def test_function(num_samples):
+               return [{"X1": 20, "X2": 5, "X3": 5},
+                       {"X1": 20, "X2": 10, "X3": 10}][:num_samples]
+        """)
+
     def setUp(self):
+        print("CUSTOM_FUNCTION:\n" + self.CUSTOM_FUNCTION)
         self.tmp_dir = tempfile.mkdtemp()
-        self.definitions = CUSTOM_SAMPLER.format(path=self.tmp_dir)
-        self.function_data = CUSTOM_FUNCTION
+        self.definitions = self.CUSTOM_SAMPLER.format(path=self.tmp_dir)
+        self.function_data = self.CUSTOM_FUNCTION
         self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
-        self.function_file = os.path.join(self.tmp_dir, "codepy_sampler_test.py")
-        with open(self.sampler_file,'w') as _file:
+        self.function_file = os.path.join(self.tmp_dir,
+                                          "codepy_sampler_test.py")
+        with open(self.sampler_file, 'w') as _file:
             _file.write(self.definitions)
-        with open(self.function_file,'w') as _file:
+        with open(self.function_file, 'w') as _file:
             _file.write(self.function_data)
 
         self.sample_data = read_yaml(self.sampler_file)
