@@ -19,6 +19,7 @@ jsonschema
 pandas
 numpy
 scipy
+pytest-cov
 
 
 
