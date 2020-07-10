@@ -99,7 +99,7 @@ class ColumnListSampler(BaseSampler):
             num_samples = 0
             for row in rows:
                 data = row.split()
-                if len(data) > 0:
+                if data:
                     if len(data) != len(headers):
                         LOG.error(
                             "All parameters must have the " +

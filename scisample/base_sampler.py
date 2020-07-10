@@ -190,10 +190,7 @@ class BaseSampler(SamplerInterface):
 
         new_samples_df = pd.DataFrame(columns=df.keys().tolist())
         for new_sample_id in new_sample_ids:
-            new_samples_df.append(df.iloc[new_sample_id])
-
-        # for n in range(len(new_sample_ids)):
-        #     new_samples_df = new_samples_df.append(df.iloc[new_sample_ids[n]])
+            new_samples_df = new_samples_df.append(df.iloc[new_sample_id])
 
         self._samples = new_samples_df.to_dict(orient='records')
 
@@ -209,14 +206,27 @@ class BaseSampler(SamplerInterface):
             self._parameter_block = {}
             for sample in self.get_samples():
                 for key, value in sample.items():
-                    if key not in self._parameter_block:
-                        self._parameter_block[key] = []
+                    self._parameter_block[key] = (
+                        self._parameter_block.get(key, []))
+                    # if key not in self._parameter_block:
+                    #     self._parameter_block[key] = []
                     self._parameter_block[key].append(value)
 
             for key, value in self._parameter_block.items():
                 self._parameter_block[key] = list_to_csv(value)
 
-        return self._parameter_block
+        return self._parameter_block        # if self._parameter_block is None:
+        #     self._parameter_block = {}
+        #     for sample in self.get_samples():
+        #         for key, value in sample.items():
+        #             if key not in self._parameter_block:
+        #                 self._parameter_block[key] = []
+        #             self._parameter_block[key].append(value)
+
+        #     for key, value in self._parameter_block.items():
+        #         self._parameter_block[key] = list_to_csv(value)
+
+        # return self._parameter_block
 
     @property
     def maestro_pgen(self):

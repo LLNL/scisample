@@ -26,6 +26,25 @@ def new_sampler_from_yaml(yaml_text):
 class TestScisample(unittest.TestCase):
     """Unit test for testing several samplers."""
 
+    def test_interfaces(self):
+        """Unit test for testing list sampler."""
+        yaml_text = """
+            type: list
+            constants:
+                X1: 20
+            parameters:
+                X2: [5, 10]
+                X3: [5, 10]
+                X4: [5, 10]
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        self.assertEqual(
+            sampler.parameter_block,
+            {'X1': '20,20', 'X2': '5,10', 'X3': '5,10', 'X4': '5,10'}
+        )
+        self.assertEqual(sampler.parameters, ['X1', 'X2', 'X3', 'X4'])
+        # assert(False)
+
     def test_exceptions(self):
         """Unit test for testing invalid or unusual inputs."""
 
