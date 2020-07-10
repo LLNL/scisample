@@ -11,7 +11,7 @@ from scisample.interface import SamplerInterface
 from scisample.schema import validate_sampler
 from scisample.utils import (
     list_to_csv, find_duplicates, _convert_dict_to_maestro_params,
-    log_and_raise_exception
+    log_and_raise_exception, log_and_raise_exception
     )
 
 # @TODO: can this duplicate code be removed?
@@ -56,32 +56,24 @@ class BaseSampler(SamplerInterface):
         self._parameter_block = None
         self._pgen = None
 
+        # validate data
+        try:
+            validate_sampler(self.data)
+        except ValueError:
+            log_and_raise_exception(
+                f"No 'type' entry found in sampler data {self.data}")
+        except KeyError:
+            log_and_raise_exception(
+                f"Sampler type {self.data['type']} not found in schema")
+        except ValidationError:
+            log_and_raise_exception("Sampler data is invalid")
+
     @property
     def data(self):
         """
         Sampler data block.
         """
         return self._data
-
-    def is_valid(self):
-        """
-        Check if the sampler is valid.
-
-        Checks the sampler data against the built-in schema.
-
-        :returns: True if the schema is valid, False otherwise.
-        """
-        try:
-            validate_sampler(self.data)
-            return True
-        except ValueError:
-            LOG.error(f"No 'type' entry found in sampler data {self.data}")
-        except KeyError:
-            LOG.error(f"Sampler type {self.data['type']} not found in schema")
-        except ValidationError:
-            LOG.exception("Sampler data is invalid")
-
-        return False
 
     def _check_variables(self):
         self._check_variables_strings()
@@ -208,25 +200,12 @@ class BaseSampler(SamplerInterface):
                 for key, value in sample.items():
                     self._parameter_block[key] = (
                         self._parameter_block.get(key, []))
-                    # if key not in self._parameter_block:
-                    #     self._parameter_block[key] = []
                     self._parameter_block[key].append(value)
 
             for key, value in self._parameter_block.items():
                 self._parameter_block[key] = list_to_csv(value)
 
         return self._parameter_block        # if self._parameter_block is None:
-        #     self._parameter_block = {}
-        #     for sample in self.get_samples():
-        #         for key, value in sample.items():
-        #             if key not in self._parameter_block:
-        #                 self._parameter_block[key] = []
-        #             self._parameter_block[key].append(value)
-
-        #     for key, value in self._parameter_block.items():
-        #         self._parameter_block[key] = list_to_csv(value)
-
-        # return self._parameter_block
 
     @property
     def maestro_pgen(self):

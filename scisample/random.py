@@ -48,19 +48,13 @@ class RandomSampler(BaseSampler):
          {X1: 20, X2: 7.44369755967992, X3: 8.941266067294213}]
     """
 
-    def is_valid(self):
+    def __init__(self, data):
         """
-        Check if the sampler is valid.
+        Initialize the sampler.
 
-        Checks the sampler data against the built-in schema.
-
-        Checks that all entries in ``parameters`` have the same
-        length.
-
-        :returns: True if the schema is valid, False otherwise.
+        :param data: Dictionary of sampler data.
         """
-        if not super(RandomSampler, self).is_valid():
-            return False
+        super().__init__(data)
 
         self._check_variables()
 
@@ -76,8 +70,6 @@ class RandomSampler(BaseSampler):
             if not str(value["max"]).isnumeric():
                 log_and_raise_exception(
                     "parameter must have a numeric maximum")
-
-        return True
 
     @property
     def parameters(self):
