@@ -156,16 +156,15 @@ class BaseSampler(SamplerInterface):
         maxs = np.zeros(ndims)
 
         first = True
-        for i in range(len(candidates)):
-            ppi = candidates[i]
+        for i, candidate in enumerate(candidates):
             for j in range(ndims):
                 if first:
-                    mins[j] = ppi[j]
-                    maxs[j] = ppi[j]
+                    mins[j] = candidate[j]
+                    maxs[j] = candidate[j]
                     first = False
                 else:
-                    mins[j] = min(ppi[j], mins[j])
-                    maxs[j] = max(ppi[j], maxs[j])
+                    mins[j] = min(candidate[j], mins[j])
+                    maxs[j] = max(candidate[j], maxs[j])
         print("extrema for new input_labels: ", mins, maxs)
         print("down sampling to %d best candidates from %d total points." % (
             num_points, len(candidates)))
@@ -190,8 +189,11 @@ class BaseSampler(SamplerInterface):
                 new_sample_ids.append(j)
 
         new_samples_df = pd.DataFrame(columns=df.keys().tolist())
-        for n in range(len(new_sample_ids)):
-            new_samples_df = new_samples_df.append(df.iloc[new_sample_ids[n]])
+        for new_sample_id in new_sample_ids:
+            new_samples_df.append(df.iloc[new_sample_id])
+
+        # for n in range(len(new_sample_ids)):
+        #     new_samples_df = new_samples_df.append(df.iloc[new_sample_ids[n]])
 
         self._samples = new_samples_df.to_dict(orient='records')
 
