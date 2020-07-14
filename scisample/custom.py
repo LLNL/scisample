@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 from scisample.base_sampler import (BaseSampler)
+from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
 
@@ -50,26 +51,16 @@ class CustomSampler(BaseSampler):
     """
 
     def __init__(self, data):
-        super(CustomSampler, self).__init__(data)
+        super().__init__(data)
         self.path = Path(self.data['module'])
         self._sample_function = None
 
-    def is_valid(self):
-        """
-        Check if the sampler is valid.
-
-        Checks the sampler data against the built-in schema.
-
-        :returns: True if the schema is valid, False otherwise.
-        """
-        if not super(CustomSampler, self).is_valid():
-            return False
         if not self.path.exists():
-            LOG.error(f"Unable to find module {self.path}")
-            return False
+            log_and_raise_exception(
+                f"Unable to find module {self.path} for 'custom' sampler")
         if self.sample_function is None:
-            return False
-        return True
+            log_and_raise_exception(
+                "The 'custom' sampler requires a 'sample_function'")
 
     @property
     def sample_function(self):

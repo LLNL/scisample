@@ -39,20 +39,13 @@ class ListSampler(BaseSampler):
 
         [{X1: 20, X2: 5, X3: 5}, {X1: 20, X2: 10, X3: 10}]
     """
-
-    def is_valid(self):
+    def __init__(self, data):
         """
-        Check if the sampler is valid.
+        Initialize the sampler.
 
-        Checks the sampler data against the built-in schema.
-
-        Checks that all entries in ``parameters`` have the same
-        length.
-
-        :returns: True if the schema is valid, False otherwise.
+        :param data: Dictionary of sampler data.
         """
-        if not super(ListSampler, self).is_valid():
-            return False
+        super().__init__(data)
 
         test_length = None
 
@@ -67,8 +60,6 @@ class ListSampler(BaseSampler):
                     log_and_raise_exception(
                         "All parameters must have the " +
                         "same number of entries")
-
-        return True
 
     @property
     def parameters(self):
