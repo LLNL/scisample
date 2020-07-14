@@ -8,7 +8,7 @@ import logging
 
 from scisample.base_sampler import BaseSampler
 
-from scisample.utils import log_and_raise_exception
+from scisample.utils import log_and_raise_exception, SamplingError
 
 from scisample.best_candidate import BestCandidateSampler
 from scisample.column_list import ColumnListSampler
@@ -61,8 +61,7 @@ def new_sampler(sampler_data):
             f"{sampler_data['type']} " +
             "  s not a recognized sampler type")
 
-    if sampler(sampler_data).is_valid():
+    try:
         return sampler(sampler_data)
-    else:
-        log_and_raise_exception(
-            "Sampler is invalid, cannot create the maestro specification")
+    except SamplingError as e:
+        log_and_raise_exception(e)

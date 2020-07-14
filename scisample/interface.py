@@ -35,16 +35,6 @@ class SamplerInterface(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod
-    def is_valid(self):
-        """
-        Check if the sampler is valid.
-
-        Should validate the input data to ensure that the sampler will
-        not produce any errors.
-        """
-        pass
-
     @property
     @abc.abstractmethod
     def parameters(self):

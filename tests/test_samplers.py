@@ -49,6 +49,32 @@ class TestScisample(unittest.TestCase):
         """Unit test for testing invalid or unusual inputs."""
 
         yaml_text = """
+            type: foobar
+            #constants:
+            #    X1: 20
+            #parameters:
+            #   X2: [5, 10]
+            #   X3: [5, 10]
+            """
+        with pytest.raises(SamplingError) as excinfo:
+            sampler = new_sampler_from_yaml(yaml_text)
+        assert ("not a recognized sampler type"
+                in str(excinfo.value))
+
+        yaml_text = """
+            foo: bar
+            #constants:
+            #    X1: 20
+            #parameters:
+            #   X2: [5, 10]
+            #   X3: [5, 10]
+            """
+        with pytest.raises(SamplingError) as excinfo:
+            sampler = new_sampler_from_yaml(yaml_text)
+        assert ("No type entry in sampler data"
+                in str(excinfo.value))
+
+        yaml_text = """
             type: list
             #constants:
             #    X1: 20
@@ -58,7 +84,6 @@ class TestScisample(unittest.TestCase):
             """
         with pytest.raises(SamplingError) as excinfo:
             sampler = new_sampler_from_yaml(yaml_text)
-            sampler.is_valid()
         assert ("Either constants or parameters must be included"
                 in str(excinfo.value))
 
@@ -76,7 +101,6 @@ class TestScisample(unittest.TestCase):
              """
         with pytest.raises(SamplingError) as excinfo:
             sampler = new_sampler_from_yaml(yaml_text)
-            sampler.is_valid()
         assert (
             "The following constants or parameters are defined more than once"
             in str(excinfo.value))
@@ -285,16 +309,6 @@ class TestCsvSampler(unittest.TestCase):
     def test_dispatch(self):
         self.assertTrue(isinstance(self.sampler, CsvSampler))
 
-    def test_valid1(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['csv_file']
-        self.assertFalse(self.sampler.is_valid())
-
-    def test_valid2(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['row_headers']
-        self.assertFalse(self.sampler.is_valid())
-
     def test_samples(self):
         samples = self.sampler.get_samples()
         self.assertEqual(len(samples), 2)
@@ -352,21 +366,6 @@ class TestCustomSampler(unittest.TestCase):
 
     def test_dispatch(self):
         self.assertTrue(isinstance(self.sampler, CustomSampler))
-
-    def test_valid1(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['function']
-        self.assertFalse(self.sampler.is_valid())
-
-    def test_valid2(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['module']
-        self.assertFalse(self.sampler.is_valid())
-
-    def test_valid3(self):
-        self.assertTrue(self.sampler.is_valid())
-        del self.sampler.data['args']
-        self.assertFalse(self.sampler.is_valid())
 
     def test_samples(self):
         samples = self.sampler.get_samples()

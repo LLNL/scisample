@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 
 from scisample.base_sampler import (BaseSampler)
+from scisample.utils import log_and_raise_exception
 
 from scisample.utils import (
     read_csv, transpose_tabular
@@ -34,23 +35,13 @@ class CsvSampler(BaseSampler):
     """
 
     def __init__(self, data):
-        super(CsvSampler, self).__init__(data)
+        super().__init__(data)
         self.path = Path(self.data['csv_file'])
         self._csv_data = None
 
-    def is_valid(self):
-        """
-        Check if the sampler is valid.
-
-        Checks the sampler data against the built-in schema.
-
-        :returns: True if the schema is valid, False otherwise.
-        """
-        if not super(CsvSampler, self).is_valid():
-            return False
         if not self.path.is_file():
-            LOG.error(f"Could not find file {self.path} for CsvSampler")
-            return False
+            log_and_raise_exception(
+                f"Could not find file {self.path} for CsvSampler")
 
         test_length = None
 
@@ -58,11 +49,8 @@ class CsvSampler(BaseSampler):
             if test_length is None:
                 test_length = len(value)
             if len(value) != test_length:
-                LOG.error(
+                log_and_raise_exception(
                     "All parameters must have the same nuumber of entries")
-                return False
-
-        return True
 
     @property
     def csv_data(self):

@@ -38,27 +38,18 @@ class ColumnListSampler(BaseSampler):
         [{X1: 20, X2: 5, X3: 5}, {X1: 20, X2: 10, X3: 10}]
     """
 
-    def is_valid(self):
+    def __init__(self, data):
         """
-        Check if the sampler is valid.
+        Initialize the sampler.
 
-        Checks the sampler data against the built-in schema.
-
-        Checks that all entries in ``parameters`` have the same
-        length.
-
-        :returns: True if the schema is valid, False otherwise.
+        :param data: Dictionary of sampler data.
         """
-        if not super(ColumnListSampler, self).is_valid():
-            return False
+        super().__init__(data)
 
-        if 'constants' not in self.data and 'parameters' not in self.data:
-            LOG.error(
-                "Either constants or parameters must be included in the "
-                "sampler data"
-                )
-            return False
-        return True
+        self._check_variables_existence()
+        self._check_variables_for_dups()
+
+        # @TODO: check to see if every row has the same number of items
 
     @property
     def parameters(self):

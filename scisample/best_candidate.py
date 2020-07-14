@@ -44,21 +44,15 @@ class BestCandidateSampler(RandomSampler):
          {X1: 20, X2: 7.44369755967992, X3: 8.941266067294213}]
     """
 
-    def is_valid(self):
+    def __init__(self, data):
         """
-        Check if the sampler is valid.
+        Initialize the sampler.
 
-        Checks the sampler data against the built-in schema.
-
-        Checks that all entries in ``parameters`` have the same
-        length.
-
-        :returns: True if the schema is valid, False otherwise.
+        :param data: Dictionary of sampler data.
         """
-        if not super(BestCandidateSampler, self).is_valid():
-            return False
+        super().__init__(data)
 
-        return True
+        # @TODO: add more error checking
 
     def get_samples(self, over_sample_rate=10):
         """

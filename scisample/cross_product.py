@@ -42,25 +42,16 @@ class CrossProductSampler(BaseSampler):
         ]
     """
 
-    def is_valid(self):
+    def __init__(self, data):
         """
-        Check if the sampler is valid.
+        Initialize the sampler.
 
-        Checks the sampler data against the built-in schema.
-
-        :returns: True if the schema is valid, False otherwise.
+        :param data: Dictionary of sampler data.
         """
-        if not super(CrossProductSampler, self).is_valid():
-            return False
+        super().__init__(data)
 
-        if 'constants' not in self.data and 'parameters' not in self.data:
-            LOG.error(
-                "Either constants or parameters must be included in the "
-                "sampler data"
-            )
-            return False
-
-        return True
+        self._check_variables_existence()
+        self._check_variables_for_dups()
 
     @property
     def parameters(self):
