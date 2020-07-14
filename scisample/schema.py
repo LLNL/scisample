@@ -30,6 +30,7 @@ def validate_sampler(sampler_data):
         SAMPLER_SCHEMA[sampler_data['type']]
         )
 
+# @TODO: consider moving these schema into sampling files
 
 # Built-in schema
 LIST_SCHEMA = {

@@ -2,8 +2,6 @@
 Module defining different sampler interfaces.
 """
 
-# @TODO: refactor samplers; improve error handling
-
 import logging
 
 from scisample.base_sampler import BaseSampler
@@ -19,7 +17,6 @@ from scisample.list import ListSampler
 from scisample.random import RandomSampler
 
 LOG = logging.getLogger(__name__)
-
 
 BaseSampler.SAMPLE_FUNCTIONS_DICT = {
     'best_candidate': BestCandidateSampler,

@@ -17,8 +17,10 @@ from scisample.samplers import (
     )
 from scisample.utils import read_yaml
 
+# @TODO: improve coverage
 
 def new_sampler_from_yaml(yaml_text):
+    """Returns sampler from yaml text"""
     return new_sampler(
         yaml.safe_load(yaml_text))
 

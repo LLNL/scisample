@@ -20,7 +20,7 @@ def log_and_raise_exception(msg):
 
 def read_yaml(filename):
     """
-    Read a yaml file return it's contents as a dictionary.
+    Read a yaml file; return its contents as a dictionary.
 
     :param filename: Name of file to read.
     :returns: Dictionary of file contents.
@@ -61,6 +61,7 @@ def list_to_csv(row):
 
 
 def _convert_dict_to_maestro_params(samples):
+    """Convert a scisample dictionary to a maestro dictionary"""
     keys = list(samples[0].keys())
     parameters = {}
     for key in keys:
