@@ -11,7 +11,7 @@ from scisample.interface import SamplerInterface
 from scisample.schema import validate_sampler
 from scisample.utils import (
     list_to_csv, find_duplicates, _convert_dict_to_maestro_params,
-    log_and_raise_exception, log_and_raise_exception
+    log_and_raise_exception
     )
 
 # @TODO: can this duplicate code be removed?
