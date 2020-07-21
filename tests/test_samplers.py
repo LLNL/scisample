@@ -9,6 +9,8 @@ import unittest
 import pytest
 import yaml
 
+from contextlib import suppress
+
 from scisample.utils import SamplingError
 from scisample.samplers import (
     new_sampler,
@@ -17,7 +19,15 @@ from scisample.samplers import (
     )
 from scisample.utils import read_yaml
 
+PANDAS_PLUS = False
+with suppress(ModuleNotFoundError):
+    import pandas as pd
+    import numpy as np
+    import scipy.spatial as spatial
+    PANDAS_PLUS = True
+
 # @TODO: improve coverage
+
 
 def new_sampler_from_yaml(yaml_text):
     """Returns sampler from yaml text"""
@@ -259,16 +269,20 @@ class TestScisample(unittest.TestCase):
                     min: 5
                     max: 10
             """
-        sampler = new_sampler_from_yaml(yaml_text)
-        samples = sampler.get_samples()
+        if PANDAS_PLUS:
+            sampler = new_sampler_from_yaml(yaml_text)
+            samples = sampler.get_samples()
 
-        self.assertEqual(len(samples), 5)
-        for sample in samples:
-            self.assertEqual(sample['X1'], 20)
-            self.assertTrue(sample['X2'] > 5)
-            self.assertTrue(sample['X3'] > 5)
-            self.assertTrue(sample['X2'] < 10)
-            self.assertTrue(sample['X3'] < 10)
+            self.assertEqual(len(samples), 5)
+            for sample in samples:
+                self.assertEqual(sample['X1'], 20)
+                self.assertTrue(sample['X2'] > 5)
+                self.assertTrue(sample['X3'] > 5)
+                self.assertTrue(sample['X2'] < 10)
+                self.assertTrue(sample['X3'] < 10)
+        else:
+            # test only works if pandas is installed
+            self.assertTrue(True)
 
 
 class TestCsvSampler(unittest.TestCase):
