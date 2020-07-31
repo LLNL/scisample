@@ -49,10 +49,12 @@ class CrossProductSampler(BaseSampler):
         :param data: Dictionary of sampler data.
         """
         super().__init__(data)
+        self.check_validity()
 
+    def check_validity(self):
         self._check_variables_existence()
         self._check_variables_for_dups()
-
+        
     @property
     def parameters(self):
         """

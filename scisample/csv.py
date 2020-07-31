@@ -38,7 +38,9 @@ class CsvSampler(BaseSampler):
         super().__init__(data)
         self.path = Path(self.data['csv_file'])
         self._csv_data = None
+        self.check_validity()
 
+    def check_validity(self):
         if not self.path.is_file():
             log_and_raise_exception(
                 f"Could not find file {self.path} for CsvSampler")

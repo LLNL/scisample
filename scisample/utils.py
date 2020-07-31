@@ -28,7 +28,7 @@ def read_yaml(filename):
     with open(filename, 'r') as _file:
         content = yaml.safe_load(_file)
     return content
-
+    
 
 def read_csv(filename):
     """

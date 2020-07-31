@@ -51,8 +51,12 @@ class BestCandidateSampler(RandomSampler):
         :param data: Dictionary of sampler data.
         """
         super().__init__(data)
+        self.check_validity()
 
+    def check_validity(self):
         # @TODO: add more error checking
+        # right now, error checking for RandomSampler is sufficient
+        pass
 
     def get_samples(self, over_sample_rate=10):
         """

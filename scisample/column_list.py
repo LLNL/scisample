@@ -45,12 +45,10 @@ class ColumnListSampler(BaseSampler):
         :param data: Dictionary of sampler data.
         """
         super().__init__(data)
-        self.__check_validity__()
+        self.check_validity()
 
-
+    def check_validity(self):
         # @TODO: check to see if every row has the same number of items
-
-    def __check_validity__(self):
         self._check_variables_existence()
         self._check_variables_for_dups()
 

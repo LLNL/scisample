@@ -46,7 +46,9 @@ class ListSampler(BaseSampler):
         :param data: Dictionary of sampler data.
         """
         super().__init__(data)
+        self.check_validity()
 
+    def check_validity(self):
         test_length = None
 
         self._check_variables_existence()
