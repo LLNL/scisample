@@ -14,3 +14,6 @@ scientific computing.
  1. `cd` into the top level scisample directory
  1. `pytest tests`
  1. `pytest --cov=scisample tests/`
+
+# Work in progress
+1. Use git bisect on this branch
