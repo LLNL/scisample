@@ -6,8 +6,9 @@
 --pre
 
 cached-property
-maestrowf==1.1.8
-encorewf==0.1.1
+# needed for initial integration and testing with codepy
+# maestrowf==1.1.8
+# encorewf==0.1.1
 sphinx
 sphinx_rtd_theme
 flake8

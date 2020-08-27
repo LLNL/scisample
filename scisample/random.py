@@ -55,7 +55,9 @@ class RandomSampler(BaseSampler):
         :param data: Dictionary of sampler data.
         """
         super().__init__(data)
+        self.check_validity()
 
+    def check_validity(self):
         self._check_variables()
 
         # @TODO: test that file exists and it contains the right parameters

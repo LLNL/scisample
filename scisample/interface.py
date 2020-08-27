@@ -22,6 +22,15 @@ class SamplerInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def check_validity(self):
+        """
+        Check validity of the sampler. This will raise a
+        `SamplingError` if the sampler is not valid, but return
+        otherwise.
+        """
+        pass
+
+    @abc.abstractmethod
     def get_samples(self):
         """
         Get samples from the sampler.

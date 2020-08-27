@@ -55,7 +55,9 @@ class BaseSampler(SamplerInterface):
         self._samples = None
         self._parameter_block = None
         self._pgen = None
+        self.check_validity()
 
+    def check_validity(self):
         # validate data
         try:
             validate_sampler(self.data)
