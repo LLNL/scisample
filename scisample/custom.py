@@ -5,6 +5,7 @@ Module defining the custom sampler object.
 import importlib
 import logging
 import sys
+import time
 
 from pathlib import Path
 
@@ -54,9 +55,13 @@ class CustomSampler(BaseSampler):
         super().__init__(data)
         self.path = Path(self.data['module'])
         self._sample_function = None
-        self.check_validity()
+        LOG.error(f"path1: {self.path}")
+        LOG.error(f"_sample_function1: {self._sample_function}")
+    #     self.check_validity()
 
-    def check_validity(self):
+    # def check_validity(self):
+        LOG.error(f"path2: {self.path}")
+        LOG.error(f"_sample_function2: {self._sample_function}")
         if not self.path.exists():
             log_and_raise_exception(
                 f"Unable to find module {self.path} for 'custom' sampler")
