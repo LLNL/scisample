@@ -6,6 +6,7 @@ import logging
 
 from contextlib import suppress
 from scisample.base_sampler import (BaseSampler)
+from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
 
@@ -48,9 +49,18 @@ class ColumnListSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
-        # @TODO: check to see if every row has the same number of items
         self._check_variables_existence()
         self._check_variables_for_dups()
+
+        # test_length = None
+        # with suppress(KeyError):
+        #     for key, value in self.data['parameters'].items():
+        #         if test_length is None:
+        #             test_length = len(value)
+        #         if len(value) != test_length:
+        #             log_and_raise_exception(
+        #                 "All parameters must have the " +
+        #                 "same number of entries")
 
     @property
     def parameters(self):

@@ -49,11 +49,10 @@ class ListSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
-        test_length = None
-
         self._check_variables_existence()
         self._check_variables_for_dups()
-
+        
+        test_length = None
         with suppress(KeyError):
             for key, value in self.data['parameters'].items():
                 if test_length is None:

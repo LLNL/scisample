@@ -62,7 +62,8 @@ class RandomSampler(BaseSampler):
 
         # @TODO: test that file exists and it contains the right parameters
         if 'previous_samples' in self.data.keys():
-            pass
+            log_and_raise_exception(
+                "previous_samples is not yet supported")
 
         # @TODO: add error check to schema
         for key, value in self.data["parameters"].items():

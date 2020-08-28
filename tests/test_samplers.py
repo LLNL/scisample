@@ -1,5 +1,16 @@
 """
-Test module for testing scisampling classes and methods.
+Sampler Tests
+
+Unit tests for the codepy sampler objects:
+#. ListSampler,
+#. ColumnListSampler,
+#. CrossProductSampler,
+#. RandomSampler,
+#. BestCandidateSampler,
+#. CsvSampler,
+#. CustomSampler
+
+More tests on invalid samplers are likely needed.
 """
 
 import os
@@ -19,6 +30,12 @@ from scisample.samplers import (
     )
 from scisample.utils import read_yaml
 
+from scisample.best_candidate import BestCandidateSampler
+from scisample.column_list import ColumnListSampler
+from scisample.cross_product import CrossProductSampler
+from scisample.list import ListSampler
+from scisample.random import RandomSampler
+
 PANDAS_PLUS = False
 with suppress(ModuleNotFoundError):
     import pandas as pd
@@ -35,44 +52,17 @@ def new_sampler_from_yaml(yaml_text):
         yaml.safe_load(yaml_text))
 
 
-class TestScisample(unittest.TestCase):
-    """Unit test for testing several samplers."""
+class TestScisampleExceptions(unittest.TestCase):
+    """
+    Scenario: Requesting samplers with invalid yaml input
+    """
 
-    def test_interfaces(self):
-        """Unit test for testing list sampler."""
-        yaml_text = """
-            type: list
-            constants:
-                X1: 20
-            parameters:
-                X2: [5, 10]
-                X3: [5, 10]
-                X4: [5, 10]
-            """
-        sampler = new_sampler_from_yaml(yaml_text)
-        self.assertEqual(
-            sampler.parameter_block,
-            {'X1': '20,20', 'X2': '5,10', 'X3': '5,10', 'X4': '5,10'}
-        )
-        self.assertEqual(sampler.parameters, ['X1', 'X2', 'X3', 'X4'])
-        # assert(False)
-
-    def test_exceptions(self):
-        """Unit test for testing invalid or unusual inputs."""
-
-        yaml_text = """
-            type: foobar
-            #constants:
-            #    X1: 20
-            #parameters:
-            #   X2: [5, 10]
-            #   X3: [5, 10]
-            """
-        with pytest.raises(SamplingError) as excinfo:
-            sampler = new_sampler_from_yaml(yaml_text)
-        assert ("not a recognized sampler type"
-                in str(excinfo.value))
-
+    def test_missing_type_exception(self):
+        """
+        Given a missing sampler type,
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
         yaml_text = """
             foo: bar
             #constants:
@@ -81,11 +71,38 @@ class TestScisample(unittest.TestCase):
             #   X2: [5, 10]
             #   X3: [5, 10]
             """
-        with pytest.raises(SamplingError) as excinfo:
-            sampler = new_sampler_from_yaml(yaml_text)
-        assert ("No type entry in sampler data"
-                in str(excinfo.value))
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
+            "No type entry in sampler data"
+            in str(context.exception))
 
+    def test_invalid_type_exception(self):
+        """
+        Given an invalid sampler type,
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
+        yaml_text = """
+            type: foobar
+            #constants:
+            #    X1: 20
+            #parameters:
+            #   X2: [5, 10]
+            #   X3: [5, 10]
+            """
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
+            "not a recognized sampler type"
+            in str(context.exception))
+
+    def test_missing_data_exception(self):
+        """
+        Given no constants or parameters
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
         yaml_text = """
             type: list
             #constants:
@@ -94,11 +111,18 @@ class TestScisample(unittest.TestCase):
             #   X2: [5, 10]
             #   X3: [5, 10]
             """
-        with pytest.raises(SamplingError) as excinfo:
-            sampler = new_sampler_from_yaml(yaml_text)
-        assert ("Either constants or parameters must be included"
-                in str(excinfo.value))
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
+            "Either constants or parameters must be included"
+            in str(context.exception))
 
+    def test_duplicate_data_exception(self):
+        """
+        Given a variable in both constants and parameters
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
         # @TODO: We can not detect if parameters are defined twice.
         # @TODO: Fixing this requires a rewrite of read_yaml.
         yaml_text = """
@@ -111,16 +135,29 @@ class TestScisample(unittest.TestCase):
                 X3: [5, 10]
                 X3: [5, 10]
              """
-        with pytest.raises(SamplingError) as excinfo:
-            sampler = new_sampler_from_yaml(yaml_text)
-        assert (
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
             "The following constants or parameters are defined more than once"
-            in str(excinfo.value))
+            in str(context.exception))
 
+
+class TestScisampleUniversal(unittest.TestCase):
+    """
+    Scenario: Testing behavior valid for multiple samplers
+    """
+    def test_constants_only(self):
+        """
+        Given only constants
+        And I request a new sampler
+        Then I should get a sampler with one sample
+        With appropriate values
+        """
         yaml_text = """
             type: list
             constants:
                 X1: 20
+                X2: 30
             #parameters:
             #    X2: [5, 10]
             #    X3: [5, 10]
@@ -131,7 +168,14 @@ class TestScisample(unittest.TestCase):
         self.assertEqual(len(samples), 1)
         for sample in samples:
             self.assertEqual(sample['X1'], 20)
+            self.assertEqual(sample['X2'], 30)
 
+    def test_parameters_only(self):
+        """
+        Given only parameters
+        And I request a new sampler
+        Then I should get appropriate values
+        """
         yaml_text = """
             type: list
             #constants:
@@ -150,8 +194,19 @@ class TestScisample(unittest.TestCase):
         self.assertEqual(samples[1]['X2'], 10)
         self.assertEqual(samples[1]['X3'], 10)
 
-    def test_list_sampler(self):
-        """Unit test for testing list sampler."""
+
+class TestScisampleList(unittest.TestCase):
+    """
+    Scenario: normal and abnormal tests for ListSampler
+    """
+
+    def test_normal(self):
+        """
+        Given a list specification
+        And I request a new sampler
+        Then I should get a ListSampler
+        With appropriate values
+        """
         yaml_text = """
             type: list
             constants:
@@ -162,6 +217,8 @@ class TestScisample(unittest.TestCase):
                 X4: [5, 10]
             """
         sampler = new_sampler_from_yaml(yaml_text)
+        self.assertTrue(isinstance(sampler, ListSampler))
+
         samples = sampler.get_samples()
 
         self.assertEqual(len(samples), 2)
@@ -174,8 +231,39 @@ class TestScisample(unittest.TestCase):
         self.assertEqual(samples[1]['X3'], 10)
         self.assertEqual(samples[1]['X4'], 10)
 
-    def test_cross_product_sampler(self):
-        """Unit test for testing cross product sampler."""
+    def test_error(self):
+        """
+        Given an invalid list specification
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
+        yaml_text = """
+            type: list
+            constants:
+                X1: 20
+            parameters:
+                X2: [5, 10, 20]
+                X3: [5, 10]
+                X4: [5, 10]
+            """
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
+            "All parameters must have the same number of entries"
+            in str(context.exception))
+
+
+class TestScisampleCrossProduct(unittest.TestCase):
+    """
+    Scenario: normal tests for CrossProductSampler
+    """
+    def test_normal(self):
+        """
+        Given a cross_product specification
+        And I request a new sampler
+        Then I should get a CrossProductSampler
+        With appropriate values
+        """
         yaml_text = """
             # sampler:
                 type: cross_product
@@ -186,6 +274,8 @@ class TestScisample(unittest.TestCase):
                     X3: [5, 10]
             """
         sampler = new_sampler_from_yaml(yaml_text)
+        self.assertTrue(isinstance(sampler, CrossProductSampler))
+
         samples = sampler.get_samples()
 
         self.assertEqual(sampler.parameters, ["X1", "X2", "X3"])
@@ -202,8 +292,18 @@ class TestScisample(unittest.TestCase):
         self.assertEqual(samples[3]['X2'], 10)
         self.assertEqual(samples[3]['X3'], 10)
 
-    def test_column_list_sampler(self):
-        """Unit test for testing column list sampler."""
+
+class TestScisampleColumnList(unittest.TestCase):
+    """
+    Scenario: normal and abnormal tests for ColumnListSampler
+    """
+    def test_normal(self):
+        """
+        Given a column_list specification
+        And I request a new sampler
+        Then I should get a ColumnListSampler
+        With appropriate values
+        """
         yaml_text = """
             type: column_list
             constants:
@@ -214,6 +314,8 @@ class TestScisample(unittest.TestCase):
                 10     10     10
             """
         sampler = new_sampler_from_yaml(yaml_text)
+        self.assertTrue(isinstance(sampler, ColumnListSampler))
+
         samples = sampler.get_samples()
 
         self.assertEqual(len(samples), 2)
@@ -226,8 +328,41 @@ class TestScisample(unittest.TestCase):
         self.assertEqual(samples[1]['X3'], '10')
         self.assertEqual(samples[1]['X4'], '10')
 
-    def test_random_sampler(self):
-        """Unit test for testing random sampler."""
+    def test_error(self):
+        """
+        Given an invalid column_list specification
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
+        yaml_text = """
+            type: column_list
+            constants:
+                X1: 20
+            parameters: |
+                X2     X3     X4
+                5      5      5
+                10     10     10
+                20
+            """
+        pytest.xfail("check_validity needs to be fixed")
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
+            "All parameters must have the same number of entries"
+            in str(context.exception))
+
+
+class TestScisampleRandomSampler(unittest.TestCase):
+    """
+    Scenario: normal and abnormal tests for RandomSampler
+    """
+    def test_normal(self):
+        """
+        Given a random specification
+        And I request a new sampler
+        Then I should get a RandomSampler
+        With appropriate values
+        """
         yaml_text = """
             type: random
             num_samples: 5
@@ -243,6 +378,8 @@ class TestScisample(unittest.TestCase):
                     max: 10
             """
         sampler = new_sampler_from_yaml(yaml_text)
+        self.assertTrue(isinstance(sampler, RandomSampler))
+
         samples = sampler.get_samples()
 
         self.assertEqual(len(samples), 5)
@@ -253,8 +390,96 @@ class TestScisample(unittest.TestCase):
             self.assertTrue(sample['X2'] < 10)
             self.assertTrue(sample['X3'] < 10)
 
-    def test_best_candidate_sampler(self):
-        """Unit test for testing best candidate sampler."""
+    def test_error1(self):
+        """
+        Given an invalid random specification
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
+        yaml_text = """
+            type: random
+            num_samples: 5
+            #previous_samples: samples.csv # optional
+            constants:
+                X1: 20
+            parameters:
+                X2:
+                    min: foo
+                    max: 10
+                X3:
+                    min: 5
+                    max: 10
+            """
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
+            "parameter must have a numeric minimum"
+            in str(context.exception))
+
+    def test_error2(self):
+        """
+        Given an invalid random specification
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
+        yaml_text = """
+            type: random
+            num_samples: 5
+            #previous_samples: samples.csv # optional
+            constants:
+                X1: 20
+            parameters:
+                X2:
+                    min: 1
+                    max: bar
+                X3:
+                    min: 5
+                    max: 10
+            """
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
+            "parameter must have a numeric maximum"
+            in str(context.exception))
+
+    def test_error3(self):
+        """
+        Given previous_samples
+        And I request a new sampler
+        Then I should get a SamplerException
+        """
+        yaml_text = """
+            type: random
+            num_samples: 5
+            previous_samples: samples.csv 
+            constants:
+                X1: 20
+            parameters:
+                X2:
+                    min: 1
+                    max: bar
+                X3:
+                    min: 5
+                    max: 10
+            """
+        with self.assertRaises(SamplingError) as context:
+            new_sampler_from_yaml(yaml_text)
+        self.assertTrue(
+            "previous_samples is not yet supported"
+            in str(context.exception))
+
+
+class TestScisampleBestCandidate(unittest.TestCase):
+    """
+    Scenario: normal and abnormal tests for BestCandidate
+    """
+    def test_normal(self):
+        """
+        Given a best_candidate specification
+        And I request a new sampler
+        Then I should get a BestCandidate
+        With appropriate values
+        """
         yaml_text = """
             type: best_candidate
             num_samples: 5
@@ -271,6 +496,7 @@ class TestScisample(unittest.TestCase):
             """
         if PANDAS_PLUS:
             sampler = new_sampler_from_yaml(yaml_text)
+            self.assertTrue(isinstance(sampler, BestCandidateSampler))
             samples = sampler.get_samples()
 
             self.assertEqual(len(samples), 5)
