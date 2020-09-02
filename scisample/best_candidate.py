@@ -56,6 +56,7 @@ class BestCandidateSampler(RandomSampler):
     def check_validity(self):
         # @TODO: add more error checking
         # right now, error checking for RandomSampler is sufficient
+        super().check_validity()
         pass
 
     def get_samples(self, over_sample_rate=10):

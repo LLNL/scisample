@@ -58,6 +58,7 @@ class RandomSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
+        super().check_validity()
         self._check_variables()
 
         # @TODO: test that file exists and it contains the right parameters

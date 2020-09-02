@@ -41,6 +41,7 @@ class CsvSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
+        super().check_validity()
         if not self.path.is_file():
             log_and_raise_exception(
                 f"Could not find file {self.path} for CsvSampler")

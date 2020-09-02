@@ -52,6 +52,7 @@ class CrossProductSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
+        super().check_validity()
         self._check_variables_existence()
         self._check_variables_for_dups()
         

@@ -49,6 +49,7 @@ class ListSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
+        super().check_validity()
         test_length = None
 
         self._check_variables_existence()

@@ -49,6 +49,7 @@ class ColumnListSampler(BaseSampler):
 
     def check_validity(self):
         # @TODO: check to see if every row has the same number of items
+        super().check_validity()
         self._check_variables_existence()
         self._check_variables_for_dups()
 

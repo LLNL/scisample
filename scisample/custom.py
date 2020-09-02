@@ -57,6 +57,7 @@ class CustomSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
+        super().check_validity()
         if not self.path.exists():
             log_and_raise_exception(
                 f"Unable to find module {self.path} for 'custom' sampler")
