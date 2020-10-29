@@ -5,7 +5,6 @@ Module defining the custom sampler object.
 import importlib
 import logging
 import sys
-import time
 
 from pathlib import Path
 
@@ -18,9 +17,6 @@ LOG = logging.getLogger(__name__)
 class CustomSampler(BaseSampler):
     """
     Class which reads samples from a user-defined python function.
-
-    Its sampler data takes three blocks, ``function``, ``module``, and
-    ``args``.
 
     .. code:: yaml
 
@@ -55,13 +51,10 @@ class CustomSampler(BaseSampler):
         super().__init__(data)
         self.path = Path(self.data['module'])
         self._sample_function = None
-        LOG.error(f"path1: {self.path}")
-        LOG.error(f"_sample_function1: {self._sample_function}")
-    #     self.check_validity()
+        self.check_validity()
 
-    # def check_validity(self):
-        LOG.error(f"path2: {self.path}")
-        LOG.error(f"_sample_function2: {self._sample_function}")
+    def check_validity(self):
+        super().check_validity()
         if not self.path.exists():
             log_and_raise_exception(
                 f"Unable to find module {self.path} for 'custom' sampler")
@@ -83,10 +76,10 @@ class CustomSampler(BaseSampler):
             custom_module = importlib.import_module(module_name)
 
             try:
-                self._sample_function = getattr(
-                                            custom_module,
-                                            self.data['function']
-                                            )
+                self._sample_function = (
+                    getattr(
+                        custom_module,
+                        self.data['function']))
             except AttributeError:
                 LOG.error(f"Requested function {self.data['function']}"
                           f" not found in module {self.path} ")

@@ -15,10 +15,6 @@ class ColumnListSampler(BaseSampler):
     """
     Class defining basic column list sampling.
 
-    This is similar to the ``csv`` functionality of ``codepy setup``
-    and ``codepy run``.  Its sampler data takes two blocks:
-    ``constants`` and ``parameters``:
-
     .. code:: yaml
 
         sampler:
@@ -49,18 +45,13 @@ class ColumnListSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
+        super().check_validity()
         self._check_variables_existence()
         self._check_variables_for_dups()
-
-        # test_length = None
-        # with suppress(KeyError):
-        #     for key, value in self.data['parameters'].items():
-        #         if test_length is None:
-        #             test_length = len(value)
-        #         if len(value) != test_length:
-        #             log_and_raise_exception(
-        #                 "All parameters must have the " +
-        #                 "same number of entries")
+        LOG.error(f"parameter_block: {self.parameter_block}")
+        # self.parameter_block must be called to check that
+        # every row must have the same number of items
+        self.parameter_block
 
     @property
     def parameters(self):
@@ -72,7 +63,7 @@ class ColumnListSampler(BaseSampler):
         with suppress(KeyError):
             parameters.extend(list(self.data['constants'].keys()))
         with suppress(KeyError):
-            rows = self.data['parameters'].split('\n')
+            rows = self.data['parameters'].splitlines()
             headers = rows.pop(0).split()
             parameters.extend(headers)
         return parameters
@@ -96,23 +87,20 @@ class ColumnListSampler(BaseSampler):
 
         parameter_samples = []
         with suppress(KeyError):
-            rows = self.data['parameters'].split('\n')
+            rows = self.data['parameters'].splitlines()
             headers = rows.pop(0).split()
-            num_samples = 0
             for row in rows:
                 data = row.split()
                 if data:
                     if len(data) != len(headers):
-                        LOG.error(
-                            "All parameters must have the " +
-                            "same number of entries"
-                        )
+                        log_and_raise_exception(
+                            "All rows must have the " +
+                            "same number of entries")
                         return False
                     sample = {}
                     for header, datum in zip(headers, data):
                         sample[header] = datum
                     parameter_samples.append(sample)
-                    num_samples += 1
 
         for i in range(len(parameter_samples)):
             new_sample = {}

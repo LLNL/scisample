@@ -344,11 +344,10 @@ class TestScisampleColumnList(unittest.TestCase):
                 10     10     10
                 20
             """
-        pytest.xfail("check_validity needs to be fixed")
         with self.assertRaises(SamplingError) as context:
             new_sampler_from_yaml(yaml_text)
         self.assertTrue(
-            "All parameters must have the same number of entries"
+            "All rows must have the same number of entries"
             in str(context.exception))
 
 
@@ -554,14 +553,12 @@ class TestCsvSampler(unittest.TestCase):
     def test_samples(self):
         samples = self.sampler.get_samples()
         self.assertEqual(len(samples), 2)
-
         for sample in samples:
-            self.assertEqual(sample['X1'], "20")
-        self.assertEqual(samples[0]['X2'], "5")
-        self.assertEqual(samples[0]['X3'], "5")
-        self.assertEqual(samples[1]['X2'], "10")
-        self.assertEqual(samples[1]['X3'], "10")
-
+            self.assertEqual(sample['X1'], 20)
+        self.assertEqual(samples[0]['X2'], 5)
+        self.assertEqual(samples[0]['X3'], 5)
+        self.assertEqual(samples[1]['X2'], 10)
+        self.assertEqual(samples[1]['X3'], 10)
 
 class TestCustomSampler(unittest.TestCase):
     """Unit test for testing the custom sampler."""

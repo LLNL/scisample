@@ -2,8 +2,11 @@
 Helper functions for ``scisample``.
 """
 
-import yaml
+from contextlib import suppress
+
+import csv
 import logging
+import yaml
 
 LOG = logging.getLogger(__name__)
 
@@ -14,6 +17,7 @@ class SamplingError(Exception):
 
 
 def log_and_raise_exception(msg):
+    """ Log error and raise exception """
     LOG.error(msg)
     raise(SamplingError(msg))
 
@@ -34,9 +38,24 @@ def read_csv(filename):
     """
     Reads csv files and returns them as a list of lists.
     """
-    with open(filename, 'r') as _file:
-        content = _file.readlines()
-    return [line.strip().split(',') for line in content]
+    results = []
+    with open(filename, newline='') as _file:
+        csvreader = csv.reader(
+            _file,
+            skipinitialspace=True,
+            )
+        for row in csvreader:
+            new_row = []
+            for tok in row:
+                if tok.startswith('#'):
+                    continue
+                tok = tok.strip()
+                with suppress(ValueError):
+                    tok = float(tok)
+                new_row.append(tok)
+            if new_row:
+                results.append(new_row)
+    return results
 
 
 def transpose_tabular(rows):
@@ -72,7 +91,7 @@ def _convert_dict_to_maestro_params(samples):
     return parameters
 
 
-def find_duplicates(lst):
+def find_duplicates(items):
     """
     Takes a list and returns a list of any duplicate items.
 
@@ -81,13 +100,13 @@ def find_duplicates(lst):
     https://stackoverflow.com/questions/9835762/how-do-i-find-the-duplicates-in-a-list-and-create-another-list-with-them
     """
     seen = {}
-    dupes = []
+    duplicates = []
 
-    for x in lst:
-        if x not in seen:
-            seen[x] = 1
+    for item in items:
+        if item not in seen:
+            seen[item] = 1
         else:
-            if seen[x] == 1:
-                dupes.append(x)
-            seen[x] += 1
-    return dupes
+            if seen[item] == 1:
+                duplicates.append(item)
+            seen[item] += 1
+    return duplicates

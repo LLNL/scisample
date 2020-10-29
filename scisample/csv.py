@@ -20,8 +20,6 @@ class CsvSampler(BaseSampler):
     """
     Class which reads samples from a csv file.
 
-    Its sampler data takes two blocks, ``csv_file`` and ``row_headers``:
-
     .. code:: yaml
 
         sampler:
@@ -38,9 +36,10 @@ class CsvSampler(BaseSampler):
         super().__init__(data)
         self.path = Path(self.data['csv_file'])
         self._csv_data = None
-    #     self.check_validity()
+        self.check_validity()
 
-    # def check_validity(self):
+    def check_validity(self):
+        super().check_validity()
         if not self.path.is_file():
             log_and_raise_exception(
                 f"Could not find file {self.path} for CsvSampler")
@@ -48,11 +47,14 @@ class CsvSampler(BaseSampler):
         test_length = None
 
         for key, value in self.csv_data.items():
+            if len(value) == 0:
+                log_and_raise_exception(
+                    f"No values associated with parameter {key}")
             if test_length is None:
                 test_length = len(value)
             if len(value) != test_length:
                 log_and_raise_exception(
-                    "All parameters must have the same nuumber of entries")
+                    "All parameters must have the same number of entries")
 
     @property
     def csv_data(self):
