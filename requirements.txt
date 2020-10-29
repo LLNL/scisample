@@ -1,3 +1,4 @@
+#!/bin/bash
 --trusted-host wciportal.llnl.gov
 -f https://wciportal.llnl.gov/pip/
 -f /usr/gapps/portal/python/wheelhouse
@@ -6,21 +7,24 @@
 --pre
 
 cached-property
-# needed for initial integration and testing with codepy
-# maestrowf==1.1.8
-# encorewf==0.1.1
-sphinx
-sphinx_rtd_theme
-flake8
-pytest
-pyyaml
-wheel
-pandas
+
+# needed for functionality:
 jsonschema
 pandas
 numpy
 scipy
-pytest-cov
 
+# needed for initial integration and testing with codepy:
+# maestrowf==1.1.8
+# encorewf==0.1.1
 
+# optional (could be removed with a small amount of work):
+# pyyaml
 
+# used for development and documentation:
+# sphinx
+# sphinx_rtd_theme
+# flake8
+# pytest
+# wheel
+# pytest-cov
