@@ -64,10 +64,14 @@ class RandomSampler(BaseSampler):
 
         # @TODO: add error check to schema
         for key, value in self.data["parameters"].items():
-            if not str(value["min"]).isnumeric():
+            try:
+                float(value['min'])
+            except ValueError:
                 log_and_raise_exception(
                     "parameter must have a numeric minimum")
-            if not str(value["max"]).isnumeric():
+            try:
+                float(value['max'])
+            except ValueError:
                 log_and_raise_exception(
                     "parameter must have a numeric maximum")
 
