@@ -1,4 +1,4 @@
-# scisample
+# scisample..
 
 A package that implements a number of parameter sampling methods for
 scientific computing.
@@ -14,3 +14,6 @@ scientific computing.
  1. `cd` into the top level scisample directory
  1. `pytest tests`
  1. `pytest --cov=scisample tests/`
+.
+.
+
