@@ -15,16 +15,16 @@ numpy
 scipy
 
 # needed for initial integration and testing with codepy:
-# maestrowf==1.1.8
-# encorewf==0.1.1
+maestrowf==1.1.8
+encorewf==0.1.1
 
 # optional (could be removed with a small amount of work):
-# pyyaml
+pyyaml
 
 # used for development and documentation:
-# sphinx
-# sphinx_rtd_theme
-# flake8
-# pytest
-# wheel
-# pytest-cov
+sphinx
+sphinx_rtd_theme
+flake8
+pytest
+wheel
+pytest-cov
