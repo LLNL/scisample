@@ -14,3 +14,11 @@ scientific computing.
  1. `cd` into the top level scisample directory
  1. `pytest tests`
  1. `pytest --cov=scisample tests/`
+
+publish to github/llnl:
+
+git remote add origin https://github.com/LLNL/scisample.git
+git branch -M main
+git push -u origin main
+
+and, look at files in llnl_github (.github) repo
