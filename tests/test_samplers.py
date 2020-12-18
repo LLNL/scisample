@@ -17,24 +17,18 @@ import os
 import shutil
 import tempfile
 import unittest
-import pytest
-import yaml
-
 from contextlib import suppress
 
-from scisample.utils import SamplingError
-from scisample.samplers import (
-    new_sampler,
-    CsvSampler,
-    CustomSampler
-    )
-from scisample.utils import read_yaml
+import pytest
+import yaml
 
 from scisample.best_candidate import BestCandidateSampler
 from scisample.column_list import ColumnListSampler
 from scisample.cross_product import CrossProductSampler
 from scisample.list import ListSampler
 from scisample.random import RandomSampler
+from scisample.samplers import CsvSampler, CustomSampler, new_sampler
+from scisample.utils import SamplingError, read_yaml
 
 PANDAS_PLUS = False
 with suppress(ModuleNotFoundError):
