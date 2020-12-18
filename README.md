@@ -1,7 +1,7 @@
 # scisample..
 
 A package that implements a number of parameter sampling methods for
-scientific computing..
+scientific computing.
 
 # Installation with a python virtual environment
 1. `cd` into the top level scisample directory
