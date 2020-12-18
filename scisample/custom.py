@@ -5,10 +5,9 @@ Module defining the custom sampler object.
 import importlib
 import logging
 import sys
-
 from pathlib import Path
 
-from scisample.base_sampler import (BaseSampler)
+from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)

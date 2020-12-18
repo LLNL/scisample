@@ -3,9 +3,9 @@ Module defining the column list object.
 """
 
 import logging
-
 from contextlib import suppress
-from scisample.base_sampler import (BaseSampler)
+
+from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)

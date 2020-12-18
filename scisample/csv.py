@@ -3,15 +3,11 @@ Module defining the custom csv sampler object.
 """
 
 import logging
-
 from pathlib import Path
 
-from scisample.base_sampler import (BaseSampler)
-from scisample.utils import log_and_raise_exception
-
-from scisample.utils import (
-    read_csv, transpose_tabular
-    )
+from scisample.base_sampler import BaseSampler
+from scisample.utils import (log_and_raise_exception, read_csv,
+                             transpose_tabular)
 
 LOG = logging.getLogger(__name__)
 

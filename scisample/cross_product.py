@@ -4,10 +4,9 @@ Module defining the cross product sampler object.
 
 import itertools
 import logging
-
 from contextlib import suppress
 
-from scisample.base_sampler import (BaseSampler)
+from scisample.base_sampler import BaseSampler
 
 LOG = logging.getLogger(__name__)
 

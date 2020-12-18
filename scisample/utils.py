@@ -2,10 +2,10 @@
 Helper functions for ``scisample``.
 """
 
-from contextlib import suppress
-
 import csv
 import logging
+from contextlib import suppress
+
 import yaml
 
 LOG = logging.getLogger(__name__)

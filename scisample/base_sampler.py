@@ -2,18 +2,15 @@
 Module defining the BaseSampler class.
 """
 
-from contextlib import suppress
-
 import logging
+from contextlib import suppress
 
 from jsonschema import ValidationError
 
 from scisample.interface import SamplerInterface
 from scisample.schema import validate_sampler
-from scisample.utils import (
-    find_duplicates, _convert_dict_to_maestro_params,
-    log_and_raise_exception
-    )
+from scisample.utils import (_convert_dict_to_maestro_params, find_duplicates,
+                             log_and_raise_exception)
 
 # @TODO: can this duplicate code be removed?
 MAESTROWF = False
@@ -323,4 +320,3 @@ class BaseSampler(SamplerInterface):
             new_samples_df = new_samples_df.append(df.iloc[new_sample_id])
 
         self._samples = new_samples_df.to_dict(orient='records')
-    
