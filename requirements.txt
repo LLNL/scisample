@@ -1,0 +1,26 @@
+--trusted-host wciportal.llnl.gov
+-f https://wciportal.llnl.gov/pip/
+-f /usr/gapps/portal/python/wheelhouse
+
+# Install dev versions of packages if available.
+--pre
+
+cached-property
+# needed for initial integration and testing with codepy
+# maestrowf==1.1.8
+# encorewf==0.1.1
+sphinx
+sphinx_rtd_theme
+flake8
+pytest
+pyyaml
+wheel
+pandas
+jsonschema
+pandas
+numpy
+scipy
+pytest-cov
+
+
+
