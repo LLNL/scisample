@@ -3,10 +3,12 @@ Module defining the custom csv sampler object.
 """
 
 import logging
+from contextlib import suppress
 from pathlib import Path
 
 from scisample.base_sampler import BaseSampler
 from scisample.utils import (log_and_raise_exception, read_csv,
+                             test_for_uniform_lengths,
                              transpose_tabular)
 
 LOG = logging.getLogger(__name__)
@@ -38,19 +40,14 @@ class CsvSampler(BaseSampler):
         super().check_validity()
         if not self.path.is_file():
             log_and_raise_exception(
-                f"Could not find file {self.path} for CsvSampler")
-
-        test_length = None
+                f"Could not find file {self.path} for CsvSampler.")
 
         for key, value in self.csv_data.items():
             if len(value) == 0:
                 log_and_raise_exception(
-                    f"No values associated with parameter {key}")
-            if test_length is None:
-                test_length = len(value)
-            if len(value) != test_length:
-                log_and_raise_exception(
-                    "All parameters must have the same number of entries")
+                    f"No values associated with parameter {key} from file {self.path}.")
+        with suppress(KeyError):
+            test_for_uniform_lengths(self.data['parameters'].items())   
 
     @property
     def csv_data(self):

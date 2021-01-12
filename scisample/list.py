@@ -6,7 +6,7 @@ import logging
 from contextlib import suppress
 
 from scisample.base_sampler import BaseSampler
-from scisample.utils import log_and_raise_exception
+from scisample.utils import test_for_uniform_lengths
 
 LOG = logging.getLogger(__name__)
 
@@ -50,13 +50,7 @@ class ListSampler(BaseSampler):
         self._check_variables_for_dups()
 
         with suppress(KeyError):
-            for key, value in self.data['parameters'].items():
-                if test_length is None:
-                    test_length = len(value)
-                if len(value) != test_length:
-                    log_and_raise_exception(
-                        "All parameters must have the " +
-                        "same number of entries")
+            test_for_uniform_lengths(self.data['parameters'].items())
 
     @property
     def parameters(self):

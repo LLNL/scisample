@@ -22,6 +22,23 @@ def log_and_raise_exception(msg):
     raise(SamplingError(msg))
 
 
+def test_for_uniform_lengths(iterable):
+    test_length = None
+    for key, value in iterable:
+        if test_length is None:
+            test_key = key
+            test_value = value
+            test_length = len(value)
+        if len(value) != test_length:
+            log_and_raise_exception(
+                "All parameters must have the " +
+                "same number of values.\n"
+                f"  Parameter ({test_key}) has {test_length} value(s):\n"
+                f"    {test_value}.\n"
+                f"  Parameter ({key}) has {len(value)} value(s):\n"
+                f"    {value}.\n")
+
+
 def read_yaml(filename):
     """
     Read a yaml file; return its contents as a dictionary.

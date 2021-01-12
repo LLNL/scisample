@@ -37,15 +37,16 @@ def new_sampler(sampler_data):
     ``SamplingError``.
 
     If the ``type`` entry does not match one of the built-in
-    samplers, it will raise a ``SamplingError``.  Currently the
-    built in samplers are:
-    #. ``best_candidate``
-    #. ``column_list``
-    #. ``cross_product``
-    #. ``csv``
-    # ``custom``
-    #. ``list``
-    # ``random``
+    samplers, it will raise a ``SamplingError``. Currently the built-in
+    samplers are:
+
+    | * ``best_candidate``
+    | * ``column_list``
+    | * ``cross_product``
+    | * ``csv``
+    | * ``custom``
+    | * ``list``
+    | * ``random``
 
     :param sampler_data: data to validate.
     :returns: Sampler object matching the data.
