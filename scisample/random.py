@@ -59,7 +59,8 @@ class RandomSampler(BaseSampler):
         # @TODO: test that file exists and it contains the right parameters
         if 'previous_samples' in self.data.keys():
             log_and_raise_exception(
-                "previous_samples is not yet supported")
+                "'previous_samples' is not yet supported.\n"
+                "  Please contact Chris Krenn or Brian Daub for assistance.")
 
         # @TODO: add error check to schema
         for key, value in self.data["parameters"].items():
@@ -67,12 +68,14 @@ class RandomSampler(BaseSampler):
                 float(value['min'])
             except ValueError:
                 log_and_raise_exception(
-                    "parameter must have a numeric minimum")
+                    f"Parameter ({key}) must have a numeric minimum.\n"
+                    f"  Current minimum value is: {value}.")
             try:
                 float(value['max'])
             except ValueError:
                 log_and_raise_exception(
-                    "parameter must have a numeric maximum")
+                    f"Parameter ({key}) must have a numeric maximum.\n"
+                    f"  Current maximum value is: {value}.")
 
     @property
     def parameters(self):

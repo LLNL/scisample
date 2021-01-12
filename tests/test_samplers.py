@@ -243,7 +243,7 @@ class TestScisampleList(unittest.TestCase):
         with self.assertRaises(SamplingError) as context:
             new_sampler_from_yaml(yaml_text)
         self.assertTrue(
-            "All parameters must have the same number of entries"
+            "All parameters must have the same number of values"
             in str(context.exception))
 
 
@@ -341,7 +341,7 @@ class TestScisampleColumnList(unittest.TestCase):
         with self.assertRaises(SamplingError) as context:
             new_sampler_from_yaml(yaml_text)
         self.assertTrue(
-            "All rows must have the same number of entries"
+            "All rows must have the same number of values"
             in str(context.exception))
 
 
@@ -383,6 +383,40 @@ class TestScisampleRandomSampler(unittest.TestCase):
             self.assertTrue(sample['X2'] < 10)
             self.assertTrue(sample['X3'] < 10)
 
+    def test_normal2(self):
+        """
+        Given a random specification
+        And I request a new sampler
+        Then I should get a RandomSampler
+        With appropriate values
+        """
+        yaml_text = """
+            type: random
+            num_samples: 5
+            #previous_samples: samples.csv # optional
+            constants:
+                X1: 0.5
+            parameters:
+                X2:
+                    min: 0.2
+                    max: 0.8
+                X3:
+                    min: 0.2
+                    max: 0.8
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        self.assertTrue(isinstance(sampler, RandomSampler))
+
+        samples = sampler.get_samples()
+
+        self.assertEqual(len(samples), 5)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 0.5)
+            self.assertTrue(sample['X2'] > 0.2)
+            self.assertTrue(sample['X3'] > 0.2)
+            self.assertTrue(sample['X2'] < 0.8)
+            self.assertTrue(sample['X3'] < 0.8)
+
     def test_error1(self):
         """
         Given an invalid random specification
@@ -406,7 +440,7 @@ class TestScisampleRandomSampler(unittest.TestCase):
         with self.assertRaises(SamplingError) as context:
             new_sampler_from_yaml(yaml_text)
         self.assertTrue(
-            "parameter must have a numeric minimum"
+            "must have a numeric minimum"
             in str(context.exception))
 
     def test_error2(self):
@@ -432,7 +466,7 @@ class TestScisampleRandomSampler(unittest.TestCase):
         with self.assertRaises(SamplingError) as context:
             new_sampler_from_yaml(yaml_text)
         self.assertTrue(
-            "parameter must have a numeric maximum"
+            "must have a numeric maximum"
             in str(context.exception))
 
     def test_error3(self):
@@ -458,7 +492,7 @@ class TestScisampleRandomSampler(unittest.TestCase):
         with self.assertRaises(SamplingError) as context:
             new_sampler_from_yaml(yaml_text)
         self.assertTrue(
-            "previous_samples is not yet supported"
+            "'previous_samples' is not yet supported"
             in str(context.exception))
 
 

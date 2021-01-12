@@ -59,7 +59,7 @@ class CustomSampler(BaseSampler):
                 f"Unable to find module {self.path} for 'custom' sampler")
         if self.sample_function is None:
             log_and_raise_exception(
-                "The 'custom' sampler requires a 'sample_function'")
+                "The 'custom' sampler requires 'sample_function' to be defined.")
 
     @property
     def sample_function(self):

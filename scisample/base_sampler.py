@@ -39,7 +39,6 @@ class BaseSampler(SamplerInterface):
     #     return set(cls.__subclasses__()).union(
     #         [s for c in cls.__subclasses__() for s in all_subclasses(c)])
 
-
     _ALLOWED_SAMPLING_DICT = {
         'best_candidate': 'BestCandidateSampler',
         'column_list': 'ColumnListSampler',
@@ -49,7 +48,7 @@ class BaseSampler(SamplerInterface):
         'list': 'ListSampler',
         'random': 'RandomSampler',
     }
-    
+
     ALLOWED_SAMPLING_KEYS = list(_ALLOWED_SAMPLING_DICT.keys())
     """
     Examples of yaml sampling specifications:
@@ -85,7 +84,7 @@ class BaseSampler(SamplerInterface):
                 X1: 20
             parameters:
                 X2: [5, 10]
-                X3: [5, 10]  
+                X3: [5, 10]
 
         sampler:
             type: csv
@@ -105,7 +104,7 @@ class BaseSampler(SamplerInterface):
                 X1: 20
             parameters:
                 X2: [5, 10]
-                X3: [5, 10]  
+                X3: [5, 10]
 
         sampler:
             type: random
@@ -119,9 +118,8 @@ class BaseSampler(SamplerInterface):
                     max: 10
                 X3:
                     min: 5
-                    max: 10                                   
+                    max: 10
         """
-
 
     def __init__(self, data):
         """
@@ -135,7 +133,6 @@ class BaseSampler(SamplerInterface):
         self._pgen = None
 
     def check_validity(self):
-        # validate data
         try:
             validate_sampler(self.data)
         except ValueError:
@@ -164,7 +161,7 @@ class BaseSampler(SamplerInterface):
             parameters.extend(list(self.data['constants'].keys()))
         with suppress(KeyError):
             parameters.extend(list(self.data['parameters'].keys()))
-            
+
         return parameters
 
     def _check_variables(self):
@@ -248,6 +245,7 @@ class BaseSampler(SamplerInterface):
                    min: 10
                    max: 50
         """
+        # @TODO: clean up pylint errors in this method
         if not PANDAS_PLUS:
             log_and_raise_exception(
                 "This function requires pandas, numpy & scipy packages")

@@ -86,6 +86,7 @@ class ColumnListSampler(BaseSampler):
         self._samples = []
 
         parameter_samples = []
+
         with suppress(KeyError):
             rows = self.data['parameters'].splitlines()
             headers = rows.pop(0).split()
@@ -95,7 +96,11 @@ class ColumnListSampler(BaseSampler):
                     if len(data) != len(headers):
                         log_and_raise_exception(
                             "All rows must have the " +
-                            "same number of entries")
+                            "same number of values.\n"
+                            f"  The header row has {len(headers)} values:\n"
+                            f"    {headers}\n"
+                            f"  The following row has {len(data)} values:\n"
+                            f"    {data}.\n")
                         return False
                     sample = {}
                     for header, datum in zip(headers, data):
