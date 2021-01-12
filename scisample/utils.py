@@ -13,16 +13,16 @@ LOG = logging.getLogger(__name__)
 
 class SamplingError(Exception):
     """Base class for exceptions in this module."""
-    pass
 
 
 def log_and_raise_exception(msg):
     """ Log error and raise exception """
     LOG.error(msg)
-    raise(SamplingError(msg))
+    raise SamplingError(msg)
 
 
 def test_for_uniform_lengths(iterable):
+    """ Test that each item in iterable is the same length """
     test_length = None
     for key, value in iterable:
         if test_length is None:

@@ -45,9 +45,10 @@ class CsvSampler(BaseSampler):
         for key, value in self.csv_data.items():
             if len(value) == 0:
                 log_and_raise_exception(
-                    f"No values associated with parameter {key} from file {self.path}.")
+                    f"No values associated with parameter "
+                    f"{key} from file {self.path}.")
         with suppress(KeyError):
-            test_for_uniform_lengths(self.data['parameters'].items())   
+            test_for_uniform_lengths(self.data['parameters'].items())
 
     @property
     def csv_data(self):

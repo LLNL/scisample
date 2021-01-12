@@ -59,7 +59,8 @@ class CustomSampler(BaseSampler):
                 f"Unable to find module {self.path} for 'custom' sampler")
         if self.sample_function is None:
             log_and_raise_exception(
-                "The 'custom' sampler requires 'sample_function' to be defined.")
+                "The 'custom' sampler requires "
+                "'sample_function' to be defined.")
 
     @property
     def sample_function(self):
@@ -80,9 +81,10 @@ class CustomSampler(BaseSampler):
                         custom_module,
                         self.data['function']))
             except AttributeError:
-                LOG.error(f"Requested function {self.data['function']}"
-                          f" not found in module {self.path} ")
-
+                LOG.error(
+                    "Requested function %s not found in module %s",
+                    self.data['function'],
+                    self.path)
         return self._sample_function
 
     @property

@@ -5,6 +5,7 @@ Module defining the custom sampler object.
 import logging
 
 from scisample.random import RandomSampler
+from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ class BestCandidateSampler(RandomSampler):
     A total of ``num_samples`` will be generated. Entries in the ``constants``
     dictionary will be added to all samples. Entries in the ``parameters``
     block will be selected from a range of ``min`` to ``max``.  The final
-    distribution will generated using a best candidate algorithm. The result 
+    distribution will generated using a best candidate algorithm. The result
     of the above block would something like:
 
     .. code:: python
@@ -50,11 +51,15 @@ class BestCandidateSampler(RandomSampler):
         super().__init__(data)
         self.check_validity()
 
-    def check_validity(self):
-        # @TODO: add more error checking
-        # right now, error checking for RandomSampler is sufficient
-        super().check_validity()
+    # @TODO: add more error checking
+    # right now, error checking for RandomSampler is sufficient
+    # def check_validity(self):
+    #     pass
 
+    # @TODO: what is the more correct way to do this?
+    # pylint: warning
+    # W0221 - Parameters differ from overridden 'get_samples' method
+    #         (arguments-differ)
     def get_samples(self, over_sample_rate=10):
         """
         Get samples from the sampler.

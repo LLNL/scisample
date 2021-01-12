@@ -1,7 +1,9 @@
+""" setup.py """
+
 import setuptools
 
 with open("README.md", "r") as fh:
-    long_description = fh.read()
+    LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
     name="scisample",
@@ -9,7 +11,7 @@ setuptools.setup(
     author="Brian Daub, Jessica Semler, Cody Raskin, & Chris Krenn",
     author_email="TBD",
     description="Parameter sampling for scientific computing",
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="TBD",
     license='MIT License',
