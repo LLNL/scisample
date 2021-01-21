@@ -33,8 +33,8 @@ class BestCandidateSampler(RandomSampler):
     A total of ``num_samples`` will be generated. Entries in the ``constants``
     dictionary will be added to all samples. Entries in the ``parameters``
     block will be selected from a range of ``min`` to ``max``.  The final
-    distribution will be generated using a best candidate algorithm. The result
-    of the above block would something like:
+    distribution will be generated using a best candidate algorithm. The 
+    result of the above block would be something like:
 
     .. code:: python
 
