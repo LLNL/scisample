@@ -191,7 +191,26 @@ class BaseSampler(SamplerInterface):
     @property
     def parameter_block(self):
         """
-        Converts samples to parameter dictionary for ``codepy setup`` and ``codepy run``
+        Converts samples to parameter dictionary in a format convenient for ``maestrowf``
+        
+        Given the following sampler:
+        
+        yaml_text = """
+            type: list
+            constants:
+                X1: 20
+            parameters:
+                X2: [5, 10]
+                X3: [5, 10]
+                X4: [5, 10]
+            """
+
+        ``get_samples()`` returns a list of dictionaries:
+
+        [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5}, {'X1': 20, 'X2': 10, 'X3': 10, 'X4': 10}]
+self._parameter_block: {'X1': {'values': [20, 20], 'label': 'X1.%%'}, 'X2': {'values': [5, 10], 'label': 'X2.%%'}, 'X3': {'values': [5, 10], 'label': 'X3.%%'}, 'X4': {'values': [5, 10], 'label': 'X4.%%'}}
+
+
 
         The keys are the labels and the values are a string version of the
         list, so it can be easily passed to Jinja.

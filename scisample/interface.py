@@ -1,8 +1,5 @@
 """
 Interface definition for ``Sampler`` objects.
-
-This will be moved to ``codepyinterfaces`` the next time that package
-is updated.
 """
 
 import abc
@@ -53,5 +50,5 @@ class SamplerInterface(abc.ABC):
     @abc.abstractmethod
     def parameter_block(self):
         """
-        Converts samples to parameter dictionary for ``codepy setup`` and ``codepy run``
+        Converts samples to parameter dictionary in a format convenient for ``maestrowf``
         """ # noqa
