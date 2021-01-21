@@ -224,6 +224,15 @@ class TestScisampleList(unittest.TestCase):
         self.assertEqual(samples[1]['X2'], 10)
         self.assertEqual(samples[1]['X3'], 10)
         self.assertEqual(samples[1]['X4'], 10)
+        sampler
+        self.assertEqual(samples, 
+            [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5}, 
+             {'X1': 20, 'X2': 10, 'X3': 10, 'X4': 10}])
+        self.assertEqual(sampler.parameter_block, 
+            {'X1': {'values': [20, 20], 'label': 'X1.%%'}, 
+             'X2': {'values': [5, 10], 'label': 'X2.%%'}, 
+             'X3': {'values': [5, 10], 'label': 'X3.%%'}, 
+             'X4': {'values': [5, 10], 'label': 'X4.%%'}})
 
     def test_error(self):
         """
