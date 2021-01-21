@@ -5,10 +5,9 @@ Module defining the custom sampler object.
 import importlib
 import logging
 import sys
-
 from pathlib import Path
 
-from scisample.base_sampler import (BaseSampler)
+from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
@@ -17,9 +16,6 @@ LOG = logging.getLogger(__name__)
 class CustomSampler(BaseSampler):
     """
     Class which reads samples from a user-defined python function.
-
-    Its sampler data takes three blocks, ``function``, ``module``, and
-    ``args``.
 
     .. code:: yaml
 
@@ -57,12 +53,14 @@ class CustomSampler(BaseSampler):
         self.check_validity()
 
     def check_validity(self):
+        super().check_validity()
         if not self.path.exists():
             log_and_raise_exception(
                 f"Unable to find module {self.path} for 'custom' sampler")
         if self.sample_function is None:
             log_and_raise_exception(
-                "The 'custom' sampler requires a 'sample_function'")
+                "The 'custom' sampler requires "
+                "'sample_function' to be defined.")
 
     @property
     def sample_function(self):
@@ -78,14 +76,15 @@ class CustomSampler(BaseSampler):
             custom_module = importlib.import_module(module_name)
 
             try:
-                self._sample_function = getattr(
-                                            custom_module,
-                                            self.data['function']
-                                            )
+                self._sample_function = (
+                    getattr(
+                        custom_module,
+                        self.data['function']))
             except AttributeError:
-                LOG.error(f"Requested function {self.data['function']}"
-                          f" not found in module {self.path} ")
-
+                LOG.error(
+                    "Requested function %s not found in module %s",
+                    self.data['function'],
+                    self.path)
         return self._sample_function
 
     @property

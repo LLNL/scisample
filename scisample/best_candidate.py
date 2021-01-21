@@ -5,24 +5,21 @@ Module defining the custom sampler object.
 import logging
 
 from scisample.random import RandomSampler
+from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
 
 
 class BestCandidateSampler(RandomSampler):
     """
-    Class defining basic random sampling.
-
-    This is similar to the ``csv`` functionality of ``codepy setup``
-    and ``codepy run``.  Its sampler data takes two blocks:
-    ``constants`` and ``parameters``:
+    Class defining best candidate sampling.
 
     .. code:: yaml
 
         sampler:
-            type: random
+            type: best_candidate
             num_samples: 30
-            previous_samples: samples.csv # optional
+            previous_samples: samples.csv # not supported yet
             constants:
                 X1: 20
             parameters:
@@ -35,8 +32,9 @@ class BestCandidateSampler(RandomSampler):
 
     A total of ``num_samples`` will be generated. Entries in the ``constants``
     dictionary will be added to all samples. Entries in the ``parameters``
-    block will be selected from a range of ``min`` to ``max``.  The result of
-    the above block would something like:
+    block will be selected from a range of ``min`` to ``max``.  The final
+    distribution will be generated using a best candidate algorithm. The 
+    result of the above block would be something like:
 
     .. code:: python
 
@@ -53,29 +51,25 @@ class BestCandidateSampler(RandomSampler):
         super().__init__(data)
         self.check_validity()
 
-    def check_validity(self):
-        # @TODO: add more error checking
-        pass
+    # @TODO: add more error checking
+    # right now, error checking for RandomSampler is sufficient
+    # def check_validity(self):
+    #     pass
 
+    # @TODO: what is the more correct way to do this?
+    # pylint: warning
+    # W0221 - Parameters differ from overridden 'get_samples' method
+    #         (arguments-differ)
     def get_samples(self, over_sample_rate=10):
         """
-        Return set of best candidate samples based
-        on specification in sampling_dict.
+        Get samples from the sampler.
 
-        Prototype dictionary:
+        This returns samples as a list of dictionaries, with the
+        sample variables as the keys:
 
-        sample_type: best_candidate
-        num_samples: 30
-        # previous_samples: samples.csv
-        constants:
-            X3: 20
-        parameters:
-            X1:
-                min: 10
-                max: 50
-            X2:
-                min: 10
-                max: 50
+        .. code:: python
+
+            [{'b': 0.89856, 'a': 1}, {'b': 0.923223, 'a': 1}, ... ]
         """
         if self._samples is not None:
             return self._samples
@@ -87,8 +81,12 @@ class BestCandidateSampler(RandomSampler):
         new_sampling_dict["type"] = "random"
         new_random_sample = RandomSampler(new_sampling_dict)
         new_random_sample.get_samples()
-        new_random_sample.downselect(self.data["num_samples"])
-
+        try:
+            new_random_sample.downselect(self.data["num_samples"])
+        except Exception as exception:
+            log_and_raise_exception(
+                f"Error during 'downselect' in 'best_candidate' "
+                f"sampling: {exception}")
         self._samples = new_random_sample._samples
 
         return self._samples

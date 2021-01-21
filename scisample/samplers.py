@@ -5,9 +5,6 @@ Module defining different sampler interfaces.
 import logging
 
 from scisample.base_sampler import BaseSampler
-
-from scisample.utils import log_and_raise_exception, SamplingError
-
 from scisample.best_candidate import BestCandidateSampler
 from scisample.column_list import ColumnListSampler
 from scisample.cross_product import CrossProductSampler
@@ -15,6 +12,7 @@ from scisample.csv import CsvSampler
 from scisample.custom import CustomSampler
 from scisample.list import ListSampler
 from scisample.random import RandomSampler
+from scisample.utils import SamplingError, log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
 
@@ -36,12 +34,19 @@ def new_sampler(sampler_data):
     Dispatch the sampler for the requested sampler data.
 
     If there is no ``type`` entry in the data, it will raise a
-    ``ValueError``.
+    ``SamplingError``.
 
     If the ``type`` entry does not match one of the built-in
-    samplers, it will raise a ``KeyError``.  Currently the
-    three built in samplers are ``custom``, ``cross_product``,
-    ``list``, and ``csv``.
+    samplers, it will raise a ``SamplingError``. Currently the built-in
+    samplers are:
+
+    | * ``best_candidate``
+    | * ``column_list``
+    | * ``cross_product``
+    | * ``csv``
+    | * ``custom``
+    | * ``list``
+    | * ``random``
 
     :param sampler_data: data to validate.
     :returns: Sampler object matching the data.
@@ -56,9 +61,9 @@ def new_sampler(sampler_data):
     except KeyError:
         log_and_raise_exception(
             f"{sampler_data['type']} " +
-            "  s not a recognized sampler type")
+            "is not a recognized sampler type")
 
     try:
         return sampler(sampler_data)
-    except SamplingError as e:
-        log_and_raise_exception(e)
+    except SamplingError as exception:
+        log_and_raise_exception(exception)

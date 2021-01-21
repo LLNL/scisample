@@ -3,15 +3,13 @@ Module defining the custom csv sampler object.
 """
 
 import logging
-
+from contextlib import suppress
 from pathlib import Path
 
-from scisample.base_sampler import (BaseSampler)
-from scisample.utils import log_and_raise_exception
-
-from scisample.utils import (
-    read_csv, transpose_tabular
-    )
+from scisample.base_sampler import BaseSampler
+from scisample.utils import (log_and_raise_exception, read_csv,
+                             test_for_uniform_lengths,
+                             transpose_tabular)
 
 LOG = logging.getLogger(__name__)
 
@@ -19,8 +17,6 @@ LOG = logging.getLogger(__name__)
 class CsvSampler(BaseSampler):
     """
     Class which reads samples from a csv file.
-
-    Its sampler data takes two blocks, ``csv_file`` and ``row_headers``:
 
     .. code:: yaml
 
@@ -38,21 +34,21 @@ class CsvSampler(BaseSampler):
         super().__init__(data)
         self.path = Path(self.data['csv_file'])
         self._csv_data = None
-    #     self.check_validity()
+        self.check_validity()
 
-    # def check_validity(self):
+    def check_validity(self):
+        super().check_validity()
         if not self.path.is_file():
             log_and_raise_exception(
-                f"Could not find file {self.path} for CsvSampler")
-
-        test_length = None
+                f"Could not find file {self.path} for CsvSampler.")
 
         for key, value in self.csv_data.items():
-            if test_length is None:
-                test_length = len(value)
-            if len(value) != test_length:
+            if len(value) == 0:
                 log_and_raise_exception(
-                    "All parameters must have the same nuumber of entries")
+                    f"No values associated with parameter "
+                    f"{key} from file {self.path}.")
+        with suppress(KeyError):
+            test_for_uniform_lengths(self.data['parameters'].items())
 
     @property
     def csv_data(self):
