@@ -206,7 +206,7 @@ class BaseSampler(SamplerInterface):
         |    X3: [5, 10]
         |    X4: [5, 10]
 
-        ``get_samples()`` returns a list of dictionaries:
+        ``get_samples`` returns a list of dictionaries:
 
         |[{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5}, 
         | {'X1': 20, 'X2': 10, 'X3': 10, 'X4': 10}]
