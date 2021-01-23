@@ -22,7 +22,6 @@ if os.path.exists(UQPIPELINE_SAMPLE_PATH):
     sys.path.append('/collab/usr/gapps/uq/UQPipeline/smplg_cmpnt')
     with suppress(ModuleNotFoundError):
         import sampling.sampler as sampler
-        # import sampling.sampler a
         UQPIPELINE_SAMPLE = True
 
 LOG = logging.getLogger(__name__)
