@@ -2,8 +2,15 @@
 Module defining UQPipelineSampler object.
 """
 
+# ask uqp team about validation; could not find 
+# dictionary that mapped keyword ('montecarlo') to
+# class or to verify the presence of necessary options
+
+# @TODO: create dictionary, parse yaml, produce samples
+
 # https://lc.llnl.gov/uqp/docs/sampling.html
 # https://lc.llnl.gov/uqp/docs/sampling_tutorial.html
+
 
 import importlib
 import logging
@@ -38,11 +45,11 @@ class UQPipelineSampler(BaseSampler):
 
         sampler:
             type: uqpipeline
-            uq_type: 
-            function: <name of function>
-            module: <path to module containing function>
-            args: {} # Dictionary of keyword arguments to pass
-                     # To the function.
+            uq_type: <UQPipeline Sampler keyword> 
+                     cartesian_cross centered corners default_value geolhs 
+                     list montecarlo moat multi_normal pdf quasi_rn rawsamplepoints 
+                     samplepoints stdlhs uniform
+
 
     The ``function`` entry names the function to call to get the samples.
     It must return a list of dictionaries:
