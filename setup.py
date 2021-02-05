@@ -13,7 +13,7 @@ setuptools.setup(
     description="Parameter sampling for scientific computing",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    url="https://github.com/LLNL/scisample"
+    url="https://github.com/LLNL/scisample",
     license='MIT License',
     packages=setuptools.find_packages(),
     classifiers=[
