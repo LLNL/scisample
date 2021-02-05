@@ -4,10 +4,21 @@ Module defining the random sampler object.
 
 import logging
 import random
+import os
+import sys
 from contextlib import suppress
 
 from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception
+
+# @TODO: can this duplicate code be removed?
+UQPIPELINE_SAMPLE = False
+UQPIPELINE_SAMPLE_PATH = '/collab/usr/gapps/uq/UQPipeline/smplg_cmpnt'
+if os.path.exists(UQPIPELINE_SAMPLE_PATH):
+    sys.path.append('/collab/usr/gapps/uq/UQPipeline/smplg_cmpnt')
+    with suppress(ModuleNotFoundError):
+        import sampling.sampler as sampler
+        UQPIPELINE_SAMPLE = True
 
 LOG = logging.getLogger(__name__)
 
@@ -96,6 +107,23 @@ class RandomSampler(BaseSampler):
 
             [{'b': 0.89856, 'a': 1}, {'b': 0.923223, 'a': 1}, ... ]
         """
+        # yaml_text = """
+        #     type: random
+        #     num_samples: 5
+        #     #previous_samples: samples.csv # optional
+        #     constants:
+        #         X1: 20
+        #     parameters:
+        #         X2:
+        #             min: 5
+        #             max: 10
+        #         X3:
+        #             min: 5
+        #             max: 10
+        #     """
+        # LatinHyperCubeSampler = sampler.LatinHyperCubeSampler
+        # points = LatinHyperCubeSampler.sample_points(num_points=10, box=[[0, 1], [0, 1]])
+        # print(f"points: {points}")
 
         if self._samples is not None:
             return self._samples
@@ -105,10 +133,12 @@ class RandomSampler(BaseSampler):
         random_list = []
         min_dict = {}
         range_dict = {}
+        box = []
 
         for key, value in self.data["parameters"].items():
             min_dict[key] = value["min"]
             range_dict[key] = value["max"] - value["min"]
+            box.append([value["min"], value["max"]])
 
         for i in range(self.data["num_samples"]):
             random_dictionary = {}
@@ -116,6 +146,24 @@ class RandomSampler(BaseSampler):
                 random_dictionary[key] = (
                     min_dict[key] + random.random() * range_dict[key])
             random_list.append(random_dictionary)
+        print(f"CRK: random_list {random_list}")
+
+        
+        LatinHyperCubeSampler = sampler.LatinHyperCubeSampler
+        points = LatinHyperCubeSampler.sample_points(
+            num_points=self.data["num_samples"], 
+            box=box)
+        print(f"CRK: points {points}")
+
+        random_list = []
+        for i in range(self.data["num_samples"]):
+            random_dictionary = {}
+            j = 0
+            for key, value in self.data["parameters"].items():
+                random_dictionary[key] = points[i][j]
+                j += 1
+            random_list.append(random_dictionary)
+        print(f"CRK: random_list_2 {random_list}")
 
         for i in range(len(random_list)):
             new_sample = {}

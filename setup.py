@@ -9,11 +9,11 @@ setuptools.setup(
     name="scisample",
     version="0.0.1",
     author="Brian Daub, Jessica Semler, Cody Raskin, & Chris Krenn",
-    author_email="TBD",
+    author_email="crkrenn@gmail.com",
     description="Parameter sampling for scientific computing",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    url="TBD",
+    url="git@github.com:LLNL/scisample.git",
     license='MIT License',
     packages=setuptools.find_packages(),
     classifiers=[
