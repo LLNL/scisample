@@ -28,7 +28,7 @@ from scisample.cross_product import CrossProductSampler
 from scisample.list import ListSampler
 from scisample.random import RandomSampler
 from scisample.samplers import CsvSampler, CustomSampler, new_sampler
-from scisample.utils import SamplingError, read_yaml
+from scisample.utils import SamplingError, read_yaml #, new_sampler_from_yaml
 
 PANDAS_PLUS = False
 with suppress(ModuleNotFoundError):
@@ -39,12 +39,10 @@ with suppress(ModuleNotFoundError):
 
 # @TODO: improve coverage
 
-
 def new_sampler_from_yaml(yaml_text):
     """Returns sampler from yaml text"""
     return new_sampler(
         yaml.safe_load(yaml_text))
-
 
 class TestScisampleExceptions(unittest.TestCase):
     """

@@ -47,6 +47,7 @@ class BaseSampler(SamplerInterface):
         'custom': 'CustomSampler',
         'list': 'ListSampler',
         'random': 'RandomSampler',
+        'uqpipeline': 'UQPipelineSampler',
     }
 
     ALLOWED_SAMPLING_KEYS = list(_ALLOWED_SAMPLING_DICT.keys())

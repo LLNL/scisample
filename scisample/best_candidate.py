@@ -9,7 +9,6 @@ from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
 
-
 class BestCandidateSampler(RandomSampler):
     """
     Class defining best candidate sampling.

@@ -46,6 +46,7 @@ LIST_SCHEMA = {
     'required': ['type'],
 }
 
+
 # Built-in schema
 COLUMN_LIST_SCHEMA = {
     'type': 'object',
@@ -108,6 +109,16 @@ RANDOM_SCHEMA = {
 
 BEST_CANDIDATE_SCHEMA = RANDOM_SCHEMA
 
+
+UQPIPELINE_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'type': {'type': 'string'},
+        'uq_samples': {'type': 'string'},
+        'uq_code': {'type': 'string'},
+    },
+    'required': ['type', 'uq_samples', 'uq_code'],
+}
 SAMPLER_SCHEMA = {
     'list': LIST_SCHEMA,
     'column_list': COLUMN_LIST_SCHEMA,
@@ -115,5 +126,6 @@ SAMPLER_SCHEMA = {
     'csv': CSV_SCHEMA,
     'custom': CUSTOM_SCHEMA,
     'random': RANDOM_SCHEMA,
-    'best_candidate': BEST_CANDIDATE_SCHEMA
+    'best_candidate': BEST_CANDIDATE_SCHEMA,
+    'uqpipeline': UQPIPELINE_SCHEMA
 }

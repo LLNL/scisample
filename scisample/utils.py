@@ -10,16 +10,18 @@ import yaml
 
 LOG = logging.getLogger(__name__)
 
-
 class SamplingError(Exception):
     """Base class for exceptions in this module."""
 
+# def new_sampler_from_yaml(yaml_text):
+#     """Returns sampler from yaml text"""
+#     return new_sampler(
+#         yaml.safe_load(yaml_text))
 
 def log_and_raise_exception(msg):
     """ Log error and raise exception """
     LOG.error(msg)
     raise SamplingError(msg)
-
 
 def test_for_uniform_lengths(iterable):
     """ Test that each item in iterable is the same length """
@@ -37,6 +39,22 @@ def test_for_uniform_lengths(iterable):
                 f"    {test_value}.\n"
                 f"  Parameter ({key}) has {len(value)} value(s):\n"
                 f"    {value}.\n")
+
+def test_for_min_max(parameters):
+
+        for key, value in parameters.items():
+            try:
+                float(value['min'])
+            except ValueError:
+                log_and_raise_exception(
+                    f"Parameter ({key}) must have a numeric minimum.\n"
+                    f"  Current minimum value is: {value}.")
+            try:
+                float(value['max'])
+            except ValueError:
+                log_and_raise_exception(
+                    f"Parameter ({key}) must have a numeric maximum.\n"
+                    f"  Current maximum value is: {value}.")
 
 
 def read_yaml(filename):

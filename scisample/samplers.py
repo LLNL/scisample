@@ -12,6 +12,7 @@ from scisample.csv import CsvSampler
 from scisample.custom import CustomSampler
 from scisample.list import ListSampler
 from scisample.random import RandomSampler
+from scisample.uqpipeline_sample import UQPipelineSampler
 from scisample.utils import SamplingError, log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
@@ -23,7 +24,9 @@ BaseSampler.SAMPLE_FUNCTIONS_DICT = {
     'cross_product': CrossProductSampler,
     'csv': CsvSampler,
     'random': RandomSampler,
-    'custom': CustomSampler
+    'custom': CustomSampler,
+    'uqpipeline': UQPipelineSampler,
+
 }
 
 BaseSampler.SAMPLE_FUNCTIONS_KEYS = BaseSampler.SAMPLE_FUNCTIONS_DICT.keys()
