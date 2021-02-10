@@ -115,9 +115,11 @@ UQPIPELINE_SCHEMA = {
     'properties': {
         'type': {'type': 'string'},
         'uq_samples': {'type': 'string'},
+        'uq_points': {'type': 'string'},
+        'uq_variables': {'type': 'string'},
         'uq_code': {'type': 'string'},
     },
-    'required': ['type', 'uq_samples', 'uq_code'],
+    'required': ['type', 'uq_code'],
 }
 SAMPLER_SCHEMA = {
     'list': LIST_SCHEMA,

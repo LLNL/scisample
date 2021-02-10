@@ -17,7 +17,6 @@ if os.path.exists(UQPIPELINE_SAMPLE_PATH):
         import sampling.composite_samples as composite_samples
         UQPIPELINE_SAMPLE = True
 
-
 from scisample.samplers import new_sampler 
 import yaml 
 def new_sampler_from_yaml(yaml_text):
@@ -25,12 +24,6 @@ def new_sampler_from_yaml(yaml_text):
     return new_sampler(
         yaml.safe_load(yaml_text))
 
-"""
-Given a list specification
-And I request a new sampler
-Then I should get a ListSampler
-With appropriate values
-"""
 yaml_text = """
     type: uqpipeline
     uq_samples: my_samples
@@ -43,24 +36,42 @@ yaml_text = """
         my_samples.generate_samples(['density', 'material'],
                             sampler.LatinHyperCubeSampler(),
                             num_points=10)
-    # uq_code: LatinHyperCubeSampler
-    # # num_points: 6
-    # num_samples: 6
-    # constants:
-    #     X1: 20
-    # parameters:
-    #     X2: 
-    #         min: 5
-    #         max: 10
-    #         # default: 7
-    #     X3: 
-    #         min: 5
-    #         max: 10
     """
+
+sci_sampler = new_sampler_from_yaml(yaml_text)
+
+
+samples = sci_sampler.get_samples()
+print("\nscisample.list:", samples)
+
+yaml_text = """
+    type: uqpipeline
+    uq_points: points
+    uq_variables: ['X1', 'X2']
+    uq_code: |
+        points = sampler.LatinHyperCubeSampler.sample_points(
+            num_points=10, box=[[0, 1], [0, 1]])
+    """
+
 sci_sampler = new_sampler_from_yaml(yaml_text)
 
 samples = sci_sampler.get_samples()
-print("scisample.list:", samples)
+print("\nscisample.list:", samples)
+
+
+yaml_text = """
+    type: list
+    constants:
+        X1: 20
+    parameters:
+        X2: [5, 10]
+        X3: [5, 10]
+    """
+
+sci_sampler = new_sampler_from_yaml(yaml_text)
+
+samples = sci_sampler.get_samples()
+print("\nscisample.list:", samples)
 
 
 my_samples = composite_samples.Samples()
