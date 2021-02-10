@@ -24,18 +24,31 @@ def new_sampler_from_yaml(yaml_text):
     return new_sampler(
         yaml.safe_load(yaml_text))
 
+# yaml_text = """
+#     type: uqpipeline
+#     uq_samples: my_samples
+#     uq_code: |
+#         my_samples = composite_samples.Samples()
+#         my_samples.set_continuous_variable('density', 1.2, 2.8, 3.9)
+#         my_samples.set_discrete_variable('material',
+#                                  ['steel', 'aluminum'],
+#                                  'steel')
+#         my_samples.generate_samples(['density', 'material'],
+#                             sampler.LatinHyperCubeSampler(),
+#                             num_points=10)
+#     """
+
 yaml_text = """
     type: uqpipeline
     uq_samples: my_samples
     uq_code: |
         my_samples = composite_samples.Samples()
-        my_samples.set_continuous_variable('density', 1.2, 2.8, 3.9)
-        my_samples.set_discrete_variable('material',
-                                 ['steel', 'aluminum'],
-                                 'steel')
-        my_samples.generate_samples(['density', 'material'],
-                            sampler.LatinHyperCubeSampler(),
-                            num_points=10)
+        my_samples.set_continuous_variable('X1', -1, 0, 1)
+        my_samples.set_discrete_variable('type', ['foo', 'bar'], 'foo')
+        my_samples.generate_samples(
+            ['X1', 'type'],
+            sampler.CartesianCrossSampler(),
+            num_divisions=[3,2])
     """
 
 sci_sampler = new_sampler_from_yaml(yaml_text)
@@ -47,11 +60,22 @@ print("\nscisample.list:", samples)
 yaml_text = """
     type: uqpipeline
     uq_points: points
-    uq_variables: ['X1', 'X2']
+    uq_variables: ['X1', 'type']
     uq_code: |
-        points = sampler.LatinHyperCubeSampler.sample_points(
-            num_points=10, box=[[0, 1], [0, 1]])
+        points = sampler.CartesianCrossSampler.sample_points(
+            num_divisions=[3,2], 
+            box=[[-1,1],[]], 
+            values=[[],['foo', 'bar']])
     """
+
+# yaml_text = """
+#     type: uqpipeline
+#     uq_points: points
+#     uq_variables: ['X1', 'X2']
+#     uq_code: |
+#         points = sampler.LatinHyperCubeSampler.sample_points(
+#             num_points=10, box=[[0, 1], [0, 1]])
+#     """
 
 sci_sampler = new_sampler_from_yaml(yaml_text)
 
