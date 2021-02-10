@@ -1,5 +1,5 @@
 """
-Module defining the random sampler object.
+Module defining the UQ Pipeline sampler object.
 """
 
 import logging
@@ -28,9 +28,23 @@ class UQPipelineSampler(BaseSampler):
     """
     Class which wraps UQPipeline sampling methods.
 
+    This  
+
     .. code:: yaml
 
         sampler:
+            type: uqpipeline
+            uq_points: points
+            uq_variables: ['X1', 'type']
+            uq_code: |
+            points = sampler.CartesianCrossSampler.sample_points(
+                num_divisions=[3,3], 
+                box=[[-1,1],[]], 
+                values=[[],['foo', 'bar', 'zzyzx']])
+
+                points = sampler.LatinHyperCubeSampler.sample_points(
+                    num_points=10, box=[[0, 1], [0, 1]])
+
             type: uqpipeline
             uq_type: <UQPipeline Sampler keyword>
                      cartesian_cross, centered, corners, default_value, geolhs,
