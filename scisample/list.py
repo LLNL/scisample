@@ -6,12 +6,12 @@ import logging
 from contextlib import suppress
 
 from scisample.base_sampler import BaseSampler
-from scisample.utils import test_for_uniform_lengths
+from scisample.utils import test_for_uniform_lengths, ParameterMixIn
 
 LOG = logging.getLogger(__name__)
 
 
-class ListSampler(BaseSampler):
+class ListSampler(BaseSampler, ParameterMixIn):
     """
     Class defining basic list sampling.
 
@@ -49,7 +49,7 @@ class ListSampler(BaseSampler):
         self._check_variables_for_dups()
 
         with suppress(KeyError):
-            test_for_uniform_lengths(self.data['parameters'].items())
+            test_for_uniform_lengths(self._parsed_parameters.items())
 
     @property
     def parameters(self):
@@ -78,7 +78,7 @@ class ListSampler(BaseSampler):
         num_samples = 1
 
         with suppress(KeyError):
-            for key, value in self.data['parameters'].items():
+            for key, value in self._parsed_parameters.items():
                 num_samples = len(value)
                 break
 
@@ -89,7 +89,7 @@ class ListSampler(BaseSampler):
                 new_sample.update(self.data['constants'])
 
             with suppress(KeyError):
-                for key, value in self.data['parameters'].items():
+                for key, value in self._parsed_parameters.items():
                     new_sample[key] = value[i]
 
             self._samples.append(new_sample)

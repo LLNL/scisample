@@ -7,11 +7,12 @@
 --pre
 
 cached-property
+numpy
+parse
 
 # needed for functionality:
 jsonschema
 pandas
-numpy
 scipy
 
 # optional (could be removed with a small amount of work):

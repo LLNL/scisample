@@ -7,11 +7,12 @@ import logging
 from contextlib import suppress
 
 from scisample.base_sampler import BaseSampler
+from scisample.utils import ParameterMixIn
 
 LOG = logging.getLogger(__name__)
 
 
-class CrossProductSampler(BaseSampler):
+class CrossProductSampler(BaseSampler, ParameterMixIn):
     """
     Class defining cross-product sampling.
 
@@ -85,7 +86,7 @@ class CrossProductSampler(BaseSampler):
 
         with suppress(KeyError):
             product_list.extend(
-                [value for key, value in self.data['parameters'].items()]
+                [value for key, value in self._parsed_parameters.items()]
             )
 
         sample_list = itertools.product(*product_list)

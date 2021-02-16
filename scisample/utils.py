@@ -6,7 +6,10 @@ import csv
 import logging
 from contextlib import suppress
 
+from cached_property import cached_property
 import yaml
+import numpy
+import parse
 
 LOG = logging.getLogger(__name__)
 
@@ -127,3 +130,82 @@ def find_duplicates(items):
                 duplicates.append(item)
             seen[item] += 1
     return duplicates
+
+
+class ParameterMixIn:
+    """
+    Mixin for reading the different ways to define parameters.
+    """
+    @cached_property
+    def _parsed_parameters(self):
+        """
+        Property containing the parsed parameters.
+        """
+        return {
+            key: parse_parameters(value)
+            for key, value in self.data['parameters'].items()
+        }
+
+def parse_parameters(data):
+    """
+    Takes a specification for a list of parameters and converts it to the list.
+
+    If a list is passed, the list will be returned.
+    
+    If a dict is passed with the keys  "start" or "min", "stop" or "max", "step" or
+        "num_points", a list will be constructed based on these parameters.
+
+    If a string is passed, either of the form ``[start:stop:step]`` or
+        ``start to stop by step``, a list will be constructed.
+
+    :param data: Data to parse.
+    :returns: List of parameters.
+    """
+    if isinstance(data, list):
+        return data
+
+    if isinstance(data, dict):
+        start = data.get('start', data.get('min'))
+        stop = data.get('stop', data.get('max'))
+        step = data.get('step')
+        num_points = data.get('num_points')
+        if start is None or stop is None:
+            raise SamplingError("Parameter dictionaries must define start and stop")
+        return parameter_list(start, stop, step, num_points)
+
+    if isinstance(data, str):
+        parse_formats = [
+            '{start} to {stop} by {step}',
+            '[{start}:{stop}:{step}]'
+        ]
+        for fmt in parse_formats:
+            result = parse.parse(fmt, data)
+            if result:
+                kwargs = {
+                    key: float(value)
+                    for key, value in result.named.items()
+                }
+                return parameter_list(**kwargs)
+    raise SamplingError(f"Unable to parse parameters from {data}")
+
+
+def parameter_list(start, stop, step=None, num_points=None):
+    """
+    Create a list of points.
+
+    :param start: First point in the list
+    :param stop: Last point in the list
+    :param step: Step size.  Will be ignored if step_size is
+        specified.
+    :param num_points: Number of points.
+    """
+    if not step and not num_points:
+        raise SamplingError("Must specify either number of points or step")
+    
+    if step and not num_points:
+        return_list = list(numpy.arange(start, stop, step))
+        return_list.append(stop)
+    else:
+        return_list = list(numpy.linspace(start, stop, num_points))
+    
+    return return_list
