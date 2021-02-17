@@ -174,7 +174,7 @@ def parse_parameters(data):
         return parameter_list(start, stop, step, num_points)
 
     if isinstance(data, str):
-        parse_formats = [
+        parse_formats = [git 
             '{start} to {stop} by {step}',
             '[{start}:{stop}:{step}]'
         ]
@@ -195,7 +195,7 @@ def parameter_list(start, stop, step=None, num_points=None):
 
     :param start: First point in the list
     :param stop: Last point in the list
-    :param step: Step size.  Will be ignored if step_size is
+    :param step: Step size.  Will be ignored if ``num_points`` is
         specified.
     :param num_points: Number of points.
     """
