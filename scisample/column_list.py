@@ -47,6 +47,22 @@ class ColumnListSampler(BaseSampler):
     .. code:: python
 
         [{X1: 20, X2: 5, X3: 5}, {X1: 20, X2: 10, X3: 10}]
+    
+    Any text following a ``#`` in the parameters entry will be treated as
+    a comment and ignored.  The following input would produce the same results
+    as above.
+
+    .. code:: yaml
+
+        sampler:
+            type: column_list
+            constants:
+                X1: 20
+            parameters: |
+                X2       X3
+                5        5
+                10       10
+                #15      15  # Don't use this line
     """
 
     def __init__(self, data):
