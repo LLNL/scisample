@@ -94,7 +94,7 @@ class ColumnListSampler(BaseSampler):
             parameters.extend(list(self.data['constants'].keys()))
         with suppress(KeyError):
             rows = self.data['parameters'].splitlines()
-            headers = rows.pop(0).split()
+            headers = process_row(rows.pop(0))
             parameters.extend(headers)
         return parameters
 
