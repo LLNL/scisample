@@ -1,7 +1,4 @@
 #!/bin/bash
---trusted-host wciportal.llnl.gov
--f https://wciportal.llnl.gov/pip/
--f /usr/gapps/portal/python/wheelhouse
 
 # Install dev versions of packages if available.
 --pre
