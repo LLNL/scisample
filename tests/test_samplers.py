@@ -331,6 +331,39 @@ class TestScisampleColumnList(unittest.TestCase):
         self.assertEqual(samples[1]['X3'], '10')
         self.assertEqual(samples[1]['X4'], '10')
 
+    def test_comments(self):
+        """
+        Given a column_list specification
+        And I request a new sampler
+        Then I should get a ColumnListSampler
+        With appropriate values
+        And any commented lines should be ignored.
+        """
+        yaml_text = """
+            type: column_list
+            constants:
+                X1: 20
+            parameters: |
+                X2     X3     X4
+                5      5      5 # This is a comment
+                10     10     10
+                #15    15     15 # Don't process this line
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        self.assertTrue(isinstance(sampler, ColumnListSampler))
+
+        samples = sampler.get_samples()
+
+        self.assertEqual(len(samples), 2)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 20)
+        self.assertEqual(samples[0]['X2'], '5')
+        self.assertEqual(samples[0]['X3'], '5')
+        self.assertEqual(samples[0]['X4'], '5')
+        self.assertEqual(samples[1]['X2'], '10')
+        self.assertEqual(samples[1]['X3'], '10')
+        self.assertEqual(samples[1]['X4'], '10')
+
     def test_error(self):
         """
         Given an invalid column_list specification
