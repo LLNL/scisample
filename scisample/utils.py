@@ -174,7 +174,7 @@ def parse_parameters(data):
         return parameter_list(start, stop, step, num_points)
 
     if isinstance(data, str):
-        parse_formats = [git 
+        parse_formats = [
             '{start} to {stop} by {step}',
             '[{start}:{stop}:{step}]'
         ]
