@@ -30,6 +30,46 @@ def validate_sampler(sampler_data):
         SAMPLER_SCHEMA[sampler_data['type']]
         )
 
+PARAMETER_SCHEMA = {
+    'oneOf': [
+        {
+            'type': 'array'
+        },
+        {
+            'type': 'object',
+            'properties': {
+                'min': {'type': 'number'},
+                'max': {'type': 'number'},
+                'start': {'type': 'number'},
+                'stop': {'type': 'number'},
+                'step': {'type': 'number'},
+                'num_points': {'type': 'number'},
+            },
+            # Require defining each field once.
+            'allOf': [
+                {'oneOf':[
+                    {'required': ['min']},
+                    {'required': ['start']},
+                ]},
+                {'oneOf':[
+                    {'required': ['max']},
+                    {'required': ['stop']},
+                ]},
+                {'oneOf':[
+                    {'required': ['step']},
+                    {'required': ['num_points']},
+                ]},
+            ]
+        },
+        {
+            'type': 'string',
+            'anyOf': [
+                {'pattern': r'\[[0-9]*\.?[0-9]+:[0-9]*\.?[0-9]+:[0-9]*\.?[0-9]+\]'},
+                {'pattern': r'[0-9]*\.?[0-9]+ to [0-9]*\.?[0-9]+ by [0-9]*\.?[0-9]+'},
+            ]
+        }
+    ]
+}
 
 # @TODO: consider moving these schema into sampling files
 # Built-in schema
@@ -40,7 +80,7 @@ LIST_SCHEMA = {
         'constants': {'type': 'object'},
         'parameters': {
             'type': 'object',
-            'additionalProperties': {'type': 'array'}
+            'additionalProperties': PARAMETER_SCHEMA
         },
     },
     'required': ['type'],
@@ -64,7 +104,7 @@ CROSS_PRODUCT_SCHEMA = {
         'constants': {'type': 'object'},
         'parameters': {
             'type': 'object',
-            'additionalProperties': {'type': 'array'}
+            'additionalProperties': PARAMETER_SCHEMA
         },
     },
     'required': ['type'],

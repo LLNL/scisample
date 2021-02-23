@@ -21,10 +21,14 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires=[],
+    install_requires=[
+        'parse',
+        'numpy',
+        'cached_property',
+    ],
     extras_require={
         'maestrowf': ['maestrowf'],
-        'best_candidate': ['pandas', 'numpy', 'scipy']
+        'best_candidate': ['pandas', 'scipy']
     },
     scripts=['bin/pgen_scisample.py']
 )
