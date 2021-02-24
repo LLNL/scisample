@@ -11,6 +11,20 @@ from scisample.utils import log_and_raise_exception
 LOG = logging.getLogger(__name__)
 
 
+def process_row(row):
+    """
+    Take a row line and remove any comments,
+    then split it.
+
+    :param row: String to process.
+    :returns: List of entries from the row.
+    """
+    row = row.strip()
+    # Strip out comments
+    with suppress(ValueError):
+        row = row[:row.index('#')]
+    return row.split()
+
 class ColumnListSampler(BaseSampler):
     """
     Class defining basic column list sampling.
@@ -33,6 +47,22 @@ class ColumnListSampler(BaseSampler):
     .. code:: python
 
         [{X1: 20, X2: 5, X3: 5}, {X1: 20, X2: 10, X3: 10}]
+    
+    Any text following a ``#`` in the parameters entry will be treated as
+    a comment and ignored.  The following input would produce the same results
+    as above.
+
+    .. code:: yaml
+
+        sampler:
+            type: column_list
+            constants:
+                X1: 20
+            parameters: |
+                X2       X3
+                5        5
+                10       10
+                #15      15  # Don't use this line
     """
 
     def __init__(self, data):
@@ -64,7 +94,7 @@ class ColumnListSampler(BaseSampler):
             parameters.extend(list(self.data['constants'].keys()))
         with suppress(KeyError):
             rows = self.data['parameters'].splitlines()
-            headers = rows.pop(0).split()
+            headers = process_row(rows.pop(0))
             parameters.extend(headers)
         return parameters
 
@@ -87,25 +117,29 @@ class ColumnListSampler(BaseSampler):
 
         parameter_samples = []
 
+
         with suppress(KeyError):
             rows = self.data['parameters'].splitlines()
-            headers = rows.pop(0).split()
+            headers = process_row(rows.pop(0))
+
             for row in rows:
-                data = row.split()
-                if data:
-                    if len(data) != len(headers):
-                        log_and_raise_exception(
-                            "All rows must have the " +
-                            "same number of values.\n"
-                            f"  The header row has {len(headers)} values:\n"
-                            f"    {headers}\n"
-                            f"  The following row has {len(data)} values:\n"
-                            f"    {data}.\n")
-                        return False
-                    sample = {}
-                    for header, datum in zip(headers, data):
-                        sample[header] = datum
-                    parameter_samples.append(sample)
+                data = process_row(row)
+                if not data:
+                    continue
+
+                if len(data) != len(headers):
+                    log_and_raise_exception(
+                        "All rows must have the " +
+                        "same number of values.\n"
+                        f"  The header row has {len(headers)} values:\n"
+                        f"    {headers}\n"
+                        f"  The following row has {len(data)} values:\n"
+                        f"    {data}.\n")
+                    return False
+                sample = {}
+                for header, datum in zip(headers, data):
+                    sample[header] = datum
+                parameter_samples.append(sample)
 
         for i in range(len(parameter_samples)):
             new_sample = {}

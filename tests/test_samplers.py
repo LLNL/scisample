@@ -205,8 +205,16 @@ class TestScisampleList(unittest.TestCase):
                 X1: 20
             parameters:
                 X2: [5, 10]
-                X3: [5, 10]
-                X4: [5, 10]
+                X3:
+                    min: 5
+                    max: 10
+                    step: 5
+                X4: 5.0 to 10 by 5.0
+                X5: "[5.0:10.0:5]"
+                X6:
+                    start: 5
+                    stop: 10
+                    num_points: 2
             """
         sampler = new_sampler_from_yaml(yaml_text)
         self.assertTrue(isinstance(sampler, ListSampler))
@@ -216,21 +224,20 @@ class TestScisampleList(unittest.TestCase):
         self.assertEqual(len(samples), 2)
         for sample in samples:
             self.assertEqual(sample['X1'], 20)
-        self.assertEqual(samples[0]['X2'], 5)
-        self.assertEqual(samples[0]['X3'], 5)
-        self.assertEqual(samples[0]['X4'], 5)
-        self.assertEqual(samples[1]['X2'], 10)
-        self.assertEqual(samples[1]['X3'], 10)
-        self.assertEqual(samples[1]['X4'], 10)
+        for i in range(2, 7):
+            self.assertEqual(samples[0][f'X{i}'], 5)
+            self.assertEqual(samples[1][f'X{i}'], 10)
         sampler
         self.assertEqual(samples, 
-            [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5}, 
-             {'X1': 20, 'X2': 10, 'X3': 10, 'X4': 10}])
+            [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5, 'X5': 5, 'X6': 5}, 
+             {'X1': 20, 'X2': 10, 'X3': 10, 'X4': 10, 'X5': 10, 'X6': 10}])
         self.assertEqual(sampler.parameter_block, 
             {'X1': {'values': [20, 20], 'label': 'X1.%%'}, 
              'X2': {'values': [5, 10], 'label': 'X2.%%'}, 
              'X3': {'values': [5, 10], 'label': 'X3.%%'}, 
-             'X4': {'values': [5, 10], 'label': 'X4.%%'}})
+             'X4': {'values': [5, 10], 'label': 'X4.%%'}, 
+             'X5': {'values': [5, 10], 'label': 'X5.%%'}, 
+             'X6': {'values': [5, 10], 'label': 'X6.%%'}})
 
     def test_error(self):
         """
@@ -313,6 +320,39 @@ class TestScisampleColumnList(unittest.TestCase):
                 X2     X3     X4
                 5      5      5
                 10     10     10
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        self.assertTrue(isinstance(sampler, ColumnListSampler))
+
+        samples = sampler.get_samples()
+
+        self.assertEqual(len(samples), 2)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 20)
+        self.assertEqual(samples[0]['X2'], '5')
+        self.assertEqual(samples[0]['X3'], '5')
+        self.assertEqual(samples[0]['X4'], '5')
+        self.assertEqual(samples[1]['X2'], '10')
+        self.assertEqual(samples[1]['X3'], '10')
+        self.assertEqual(samples[1]['X4'], '10')
+
+    def test_comments(self):
+        """
+        Given a column_list specification
+        And I request a new sampler
+        Then I should get a ColumnListSampler
+        With appropriate values
+        And any commented lines should be ignored.
+        """
+        yaml_text = """
+            type: column_list
+            constants:
+                X1: 20
+            parameters: |
+                X2     X3     X4
+                5      5      5 # This is a comment
+                10     10     10
+                #15    15     15 # Don't process this line
             """
         sampler = new_sampler_from_yaml(yaml_text)
         self.assertTrue(isinstance(sampler, ColumnListSampler))

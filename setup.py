@@ -9,7 +9,6 @@ setuptools.setup(
     name="scisample",
     version="0.0.1",
     author="Brian Daub, Jessica Semler, Cody Raskin, & Chris Krenn",
-    author_email="crkrenn@gmail.com",
     description="Parameter sampling for scientific computing",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
@@ -22,10 +21,14 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires=[],
+    install_requires=[
+        'parse',
+        'numpy',
+        'cached_property',
+    ],
     extras_require={
         'maestrowf': ['maestrowf'],
-        'best_candidate': ['pandas', 'numpy', 'scipy']
+        'best_candidate': ['pandas', 'scipy']
     },
     scripts=['bin/pgen_scisample.py']
 )
