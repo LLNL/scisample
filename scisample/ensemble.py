@@ -24,9 +24,29 @@ class Ensemble(BaseSampler):
         :param sampler_data: Sampler data to use to initialize the samplers.
         """
         super(Ensemble, self).__init__(sampler_data)
-        self._samplers = [new_sampler(data) for data in sampler_data]
+
+        self._samplers = []
+        for data in sampler_data:
+            if not isinstance(data, list):
+                data = [data]
+            self.add_samplers(*data)
 
         self.check_validity()
+
+    def add_samplers(self, *sampler_data):
+        """
+        Add additional samplers to the Ensemble.
+        A validity check will be performed after adding samples.
+        Additionally, the samples will be un-cached from the Ensemble.
+        (sampler caches will not be impacted).
+
+        :param sampler_data: Sampler data to use to add samplers.
+        """
+        for data in sampler_data:
+            self._samplers.append(new_sampler(data))
+        self.check_validity()
+        self._samples = None
+        self._parameter_block = None
 
     def check_validity(self):
         """
