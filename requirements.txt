@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Install dev versions of packages if available.
---pre
+# --pre
 
-cached-property
+cached_property
 numpy
 parse
 

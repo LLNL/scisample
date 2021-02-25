@@ -5,14 +5,14 @@ Module defining different sampler interfaces.
 import logging
 
 from scisample.base_sampler import BaseSampler
-from scisample.best_candidate import BestCandidateSampler
-from scisample.column_list import ColumnListSampler
-from scisample.cross_product import CrossProductSampler
-from scisample.csv import CsvSampler
-from scisample.custom import CustomSampler
-from scisample.list import ListSampler
-from scisample.random import RandomSampler
-from scisample.uqpipeline_sample import UQPipelineSampler
+from scisample.best_candidate_sampler import BestCandidateSampler
+from scisample.column_list_sampler import ColumnListSampler
+from scisample.cross_product_sampler import CrossProductSampler
+from scisample.csv_sampler import CsvSampler
+from scisample.custom_sampler import CustomSampler
+from scisample.list_sampler import ListSampler
+from scisample.random_sampler import RandomSampler
+from scisample.uqpipeline_sampler import UQPipelineSampler
 from scisample.utils import SamplingError, log_and_raise_exception
 
 LOG = logging.getLogger(__name__)

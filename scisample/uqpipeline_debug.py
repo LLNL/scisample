@@ -4,9 +4,6 @@ import os
 import sys
 from contextlib import suppress
 
-from scisample.base_sampler import BaseSampler
-from scisample.utils import log_and_raise_exception
-
 # @TODO: can this duplicate code be removed?
 UQPIPELINE_SAMPLE = False
 UQPIPELINE_SAMPLE_PATH = '/collab/usr/gapps/uq/UQPipeline/smplg_cmpnt'
@@ -16,6 +13,9 @@ if os.path.exists(UQPIPELINE_SAMPLE_PATH):
         import sampling.sampler as sampler
         import sampling.composite_samples as composite_samples
         UQPIPELINE_SAMPLE = True
+
+from scisample.base_sampler import BaseSampler
+from scisample.utils import log_and_raise_exception
 
 from scisample.samplers import new_sampler 
 import yaml 
@@ -50,7 +50,7 @@ yaml_text = """
             sampler.CartesianCrossSampler(),
             num_divisions=[3,2])
     """
-
+print("yaml\n", yaml_text)
 sci_sampler = new_sampler_from_yaml(yaml_text)
 
 
@@ -68,15 +68,15 @@ yaml_text = """
             values=[[],['foo', 'bar']])
     """
 
-# yaml_text = """
-#     type: uqpipeline
-#     uq_points: points
-#     uq_variables: ['X1', 'X2']
-#     uq_code: |
-#         points = sampler.LatinHyperCubeSampler.sample_points(
-#             num_points=10, box=[[0, 1], [0, 1]])
-#     """
-
+yaml_text = """
+    type: uqpipeline
+    uq_points: points
+    uq_variables: ['X1', 'X2']
+    uq_code: |
+        points = sampler.LatinHyperCubeSampler.sample_points(
+            num_points=4, box=[[0, 1], [0, 1]])
+    """
+print(yaml_text)
 sci_sampler = new_sampler_from_yaml(yaml_text)
 
 samples = sci_sampler.get_samples()
