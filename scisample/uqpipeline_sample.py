@@ -29,6 +29,12 @@ class UQPipelineSampler(BaseSampler):
     """
     Class which wraps UQPipeline sampling methods.
 
+    The UQPipeline is a proprietary LLNL uncertainty quantification tool. 
+        * "Ensemble Calculation via the LLNL UQ Pipeline: A User's Guide", 
+          Brandon, S; Christianson, G; Domyancic, D; Lucas, D; McEnerney, J; 
+          Klein, R I; Tannahill, J; Lawrence Livermore National Laboratory, 2011
+        * https://llnl.primo.exlibrisgroup.com/permalink/01LLNL_INST/1g1o79t/alma991000602089706316
+
     This class currently supports two ways of creating samples with 
     UQPipeline methods:
 
