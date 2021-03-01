@@ -229,7 +229,23 @@ class TestScisampleUQPipeline(unittest.TestCase):
              {'X1': -0.5, 'X2': 1.5}, 
              {'X1': -0.25, 'X2': 0.75}])
 
-
+#     def test_method_other_uqpipeline_samplers(self):
+#         """
+#         Given other uqpipeline specifications
+#         And I request a new sampler with the uqpipeline method interface
+#         Then I should get a uqpipeline sampler
+#         With appropriate values
+#         """
+#         yaml_list = []
+#         result_list = []
+#         yaml_text = """
+#             type: uqpipeline
+#             uq_points: points
+#             uq_variables: ['X1', 'X2']
+#             uq_code: |
+#                 points = sampler.QuasiRandomNumberSampler.sample_points(
+#                     num_points=4, box=[[-1,1],[0,2]], technique='sobol')
+#             """
 # name = "centered"
 # my_sampler = sampler.CenteredSampler()
 # points = my_sampler.sample_points(
