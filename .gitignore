@@ -5,3 +5,5 @@ build/
 dist/
 venv/
  *#
+docs/source/modules.rst
+docs/source/scisample.rst
