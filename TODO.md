@@ -10,12 +10,7 @@
     'X3': {'values': [5, 10], 'label': 'X3.%%'}, 
     'X4': {'values': [5, 10], 'label': 'X4.%%'}}       
 
-* add Read the Docs (RtD) 
-
 * potential improvements:
-1. To support list comprehension using `asteval`.
-1. To support Morris one at a time sampling.
+1. To support list comprehension using `eval`.
+1. Merge in composite sampler from daub1
 
-* integration of uqpipeline samplers
-1. test by modifying random
-1. add as a new sampler
