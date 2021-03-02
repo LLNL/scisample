@@ -4,8 +4,6 @@ Module defining the random sampler object.
 
 import logging
 import random
-import os
-import sys
 from contextlib import suppress
 
 from scisample.base_sampler import BaseSampler
@@ -107,24 +105,6 @@ class RandomSampler(BaseSampler):
                 random_dictionary[key] = (
                     min_dict[key] + random.random() * range_dict[key])
             random_list.append(random_dictionary)
-        print(f"CRK: random_list {random_list}")
-
-        
-        LatinHyperCubeSampler = sampler.LatinHyperCubeSampler
-        points = LatinHyperCubeSampler.sample_points(
-            num_points=self.data["num_samples"], 
-            box=box)
-        print(f"CRK: points {points}")
-
-        random_list = []
-        for i in range(self.data["num_samples"]):
-            random_dictionary = {}
-            j = 0
-            for key, value in self.data["parameters"].items():
-                random_dictionary[key] = points[i][j]
-                j += 1
-            random_list.append(random_dictionary)
-        print(f"CRK: random_list_2 {random_list}")
 
         for i in range(len(random_list)):
             new_sample = {}
