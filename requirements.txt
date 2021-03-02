@@ -3,7 +3,7 @@
 # Install dev versions of packages if available.
 # --pre
 
-cached_property
+cached-property
 numpy
 parse
 
