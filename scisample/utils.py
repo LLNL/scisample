@@ -16,11 +16,6 @@ LOG = logging.getLogger(__name__)
 class SamplingError(Exception):
     """Base class for exceptions in this module."""
 
-# def new_sampler_from_yaml(yaml_text):
-#     """Returns sampler from yaml text"""
-#     return new_sampler(
-#         yaml.safe_load(yaml_text))
-
 def log_and_raise_exception(msg):
     """ Log error and raise exception """
     LOG.error(msg)
