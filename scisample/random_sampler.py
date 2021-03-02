@@ -11,15 +11,6 @@ from contextlib import suppress
 from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception, test_for_min_max
 
-# @TODO: can this duplicate code be removed?
-UQPIPELINE_SAMPLE = False
-UQPIPELINE_SAMPLE_PATH = '/collab/usr/gapps/uq/UQPipeline/smplg_cmpnt'
-if os.path.exists(UQPIPELINE_SAMPLE_PATH):
-    sys.path.append('/collab/usr/gapps/uq/UQPipeline/smplg_cmpnt')
-    with suppress(ModuleNotFoundError):
-        import sampling.sampler as sampler
-        UQPIPELINE_SAMPLE = True
-
 LOG = logging.getLogger(__name__)
 
 
@@ -95,24 +86,6 @@ class RandomSampler(BaseSampler):
 
             [{'b': 0.89856, 'a': 1}, {'b': 0.923223, 'a': 1}, ... ]
         """
-        # yaml_text = """
-        #     type: random
-        #     num_samples: 5
-        #     #previous_samples: samples.csv # optional
-        #     constants:
-        #         X1: 20
-        #     parameters:
-        #         X2:
-        #             min: 5
-        #             max: 10
-        #         X3:
-        #             min: 5
-        #             max: 10
-        #     """
-        # LatinHyperCubeSampler = sampler.LatinHyperCubeSampler
-        # points = LatinHyperCubeSampler.sample_points(num_points=10, box=[[0, 1], [0, 1]])
-        # print(f"points: {points}")
-
         if self._samples is not None:
             return self._samples
 
