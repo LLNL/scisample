@@ -170,30 +170,3 @@ class UQPipelineSampler(BaseSampler):
 
             self._samples.append(new_sample)
         return self._samples
-
-# # extra
-#   points = sampler.LatinHyperCubeSampler.sample_points(
-#                     num_points=10, box=[[0, 1], [0, 1]])
-
-#             type: uqpipeline
-#             uq_type: <UQPipeline Sampler keyword>
-#                      cartesian_cross, centered, corners, default_value, geolhs,
-#                      list, montecarlo, moat, multi_normal, pdf, quasi_rn,
-#                      rawsamplepoints, samplepoints, stdlhs, uniform
-#                      <Also accepts class names>
-#                      LatinHyperCubeSampler, CartesianCrossSampler
-#             num_samples: 5      # uq_type accepts either
-#             num_points: 5       # uq_type accepts either
-#             <uqpipeline parameters>
-#             constants:
-#                 X1: 20
-#             parameters:         # uq_type box and range are entered here
-#                 X2:             # some uq_types accept range or list
-#                     min: 5
-#                     max: 10
-#                 X3: [5, 10]     # some uq_types accept range or list
-
-#     A total of ``num_samples`` will be generated. Entries in the ``constants``
-#     dictionary will be added to all samples. Entries in the ``parameters``
-#     block will be selected from a range of ``min`` to ``max``.  The result of
-#     the above block would something like:
