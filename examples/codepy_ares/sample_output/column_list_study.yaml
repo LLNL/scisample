@@ -1,0 +1,57 @@
+description:
+    name: column-list
+    description: |
+        Running sampling.
+        Example model showing how to apply different sampling techniques.
+
+env:
+    variables:
+        OUTPUT_PATH: <current working directory>/studies
+    dependencies:
+        paths:
+            - name: ares
+              path: /usr/apps/ARES/exec/ares.prod
+
+            - name: SAMPLING_PHASE1_DRIVER
+              path: <current working directory>/model/phase1_driver
+
+            - name: SAMPLING
+              path: <current working directory>/model
+
+study:
+    - name: phase1-sampling-baseline
+      description: |
+          Run the first phase of the model.      
+      run:
+          cmd: |
+              touch codepy_log.yaml
+              echo "study: $(OUTPUT_PATH)" >> codepy_log.yaml
+              echo "model: sampling" >> codepy_log.yaml
+              echo "phase: phase1" >> codepy_log.yaml
+              echo "flavor: baseline" >> codepy_log.yaml
+              echo "parameters:" >> codepy_log.yaml
+              echo "  X1: $(X1)" >> codepy_log.yaml
+              echo "  X2: $(X2)" >> codepy_log.yaml
+              echo "  X3: $(X3)" >> codepy_log.yaml
+
+              cp -L -r $(SAMPLING)/* ./
+
+               $(ares) phase1_driver -r  -def X1=$(X1) -def X2=$(X2) -def X3=$(X3) 
+          nodes: 1
+          procs: 1
+          walltime: "00:00:10"
+          depends: []
+
+global.parameters:
+
+    X1:
+        values: [20, 20]
+        label: X1.%%
+
+    X2:
+        values: ['5', '10']
+        label: X2.%%
+
+    X3:
+        values: ['5', '10']
+        label: X3.%%

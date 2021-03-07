@@ -1,0 +1,11 @@
+
+def model "sampling"
+
+* Default values that will be overwritten via sampling
+ifundef X1 1.0
+ifundef X2 2.0
+ifundef X3 3.0
+
+doneset
+gen
+quit

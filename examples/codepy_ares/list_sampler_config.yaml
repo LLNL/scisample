@@ -1,0 +1,10 @@
+# Configuration file for using the list sampler.
+setup:
+    study_name: list-sampler
+    sampler:
+        type: list
+        constants:
+            X1: 20
+        parameters:
+            X2: [5, 10]
+            X3: [5, 10]

@@ -1,0 +1,11 @@
+# Configuration file for using the column list sampler.
+setup:
+    study_name: column-list
+    sampler:
+        type: column_list
+        constants:
+            X1: 20
+        parameters: |
+            X2      X3
+            5       5
+            10      10
