@@ -1,0 +1,11 @@
+# Configuration file for using the list sampler.
+setup:
+    study_name: csv-sampler
+    sampler:
+        type: csv
+        # For column headers
+        csv_file: column_headers.csv
+        row_headers: false
+        # For row headers
+        #csv_file: row_headers.csv
+        #row_headers: true

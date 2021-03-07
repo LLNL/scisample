@@ -1,0 +1,33 @@
+summary:
+    name: sampling
+    description: |
+        Example model showing how to apply different sampling techniques.
+    date: 2020-12-03
+    authors:
+        - Daub, Brian H.
+    status: production
+    purpose: example
+    source: example
+
+phases:
+    - name: phase1
+      driver: phase1_driver
+      code: ares
+      description: |
+        Run the first phase of the model.
+      cmd: |
+          {{launcher}} {{code}} {{driver}} -r {{defs}} {{flags}}
+
+flavors:
+    baseline:
+        description: Baseline flavor
+        procs: 1
+        walltime: "00:00:10"
+        def: {}
+        flags: {}
+
+tags: []
+
+experiment: []
+
+references: []
