@@ -1,0 +1,32 @@
+summary:
+    name: test
+    description: |
+        A test model for use with codepy.
+    date: 2021-03-02
+    authors:
+        - Krenn, Christopher R.
+    status: TBD
+    purpose: TBD
+    source: TBD
+
+# model.yaml
+phases:
+    - name: run
+      driver: driver
+      code: test
+      batch: false
+      description: |
+        Run the model.
+      cmd: |
+        echo "{$(X1), $(X2), $(X3)}" > out.txt
+
+
+
+flavors:
+    baseline:
+        description: TBD
+        procs: 1
+        walltime: "00:10:00"
+        def: {}
+        flags: {} 
+        dependencies: []
