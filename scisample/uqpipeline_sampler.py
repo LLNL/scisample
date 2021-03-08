@@ -58,6 +58,32 @@ class UQPipelineSampler(BaseSampler):
          {'X1': 0.0, 'type': 'bar'}, 
          {'X1': 1.0, 'type': 'foo'}, 
          {'X1': 1.0, 'type': 'bar'}]
+
+    .. code:: yaml
+
+         # `composite_samples` class example.
+         sampler:
+            type: uqpipeline
+            uq_samples: my_samples
+            uq_code: |
+                my_samples = composite_samples.Samples()
+                my_samples.set_continuous_variable('X1', -1, 0, 1)
+                my_samples.set_discrete_variable('type', ['foo', 'bar'], 'foo')
+                my_samples.generate_samples(
+                    ['X1', 'type'],
+                    sampler.CartesianCrossSampler(),
+                    num_divisions=[3,2])
+
+    results in the same sample set:
+    
+    .. code:: python
+
+        [{'X1': -1.0, 'type': 'foo'}, 
+         {'X1': -1.0, 'type': 'bar'}, 
+         {'X1': 0.0, 'type': 'foo'}, 
+         {'X1': 0.0, 'type': 'bar'}, 
+         {'X1': 1.0, 'type': 'foo'}, 
+         {'X1': 1.0, 'type': 'bar'}]
     """
     def __init__(self, data):
         """
