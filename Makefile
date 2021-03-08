@@ -17,7 +17,7 @@ twine-check:
 	twine check dist/*
 
 twine-upload:
-	twine upload dist/*
+	twine upload dist/scisample-0.0.3*
 
 test:
 	$(PYTEST)
