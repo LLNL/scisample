@@ -1,5 +1,5 @@
-# pip: run with 'maestro run -y --pgen `which pgen_scisample.py` sample_list.yaml'
-# pyenv: run with 'maestro run -y --pgen pgen_scisample.py sample_list.yaml'
+# pip: run with 'maestro run -y --pgen `which pgen_scisample.py` sample_uqpipeline.yaml'
+# pyenv: run with 'maestro run -y --pgen pgen_scisample.py sample_uqpipeline.yaml'
 
 description:
     name: sample_list
