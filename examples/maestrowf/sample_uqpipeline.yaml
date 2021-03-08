@@ -1,0 +1,27 @@
+# pip: run with 'maestro run -y --pgen `which pgen_scisample.py` sample_list.yaml'
+# pyenv: run with 'maestro run -y --pgen pgen_scisample.py sample_list.yaml'
+
+description:
+    name: sample_list
+    description: simple sampling of multi variables (X1, X2, X3)
+
+env:
+    variables:
+        OUTPUT_PATH: ./output
+        SAMPLE_DICTIONARY:
+           type: uqpipeline
+           uq_points: points
+           uq_variables: ['X1', 'X2']
+           uq_code: |
+               points = sampler.CartesianCrossSampler.sample_points(
+                   num_divisions=[3,3], 
+                   box=[[-1,1],[]], 
+                   values=[[],['foo', 'bar']])
+
+study:
+    - name: sample
+      description: produce a sample
+      run:
+          cmd: |
+            echo "{$(X1), $(X2)}" > out.txt
+
