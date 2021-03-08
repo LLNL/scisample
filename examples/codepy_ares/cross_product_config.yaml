@@ -1,0 +1,10 @@
+# Configuration file for using the cross product sampler.
+setup:
+    study_name: cross-product
+    sampler:
+        type: cross_product
+        constants:
+            X1: 20
+        parameters:
+            X2: [5, 10]
+            X3: [5, 10]

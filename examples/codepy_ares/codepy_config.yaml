@@ -1,0 +1,10 @@
+# These settings are for running the simple problem interactively
+# They will disable batch submission and parallel processing
+# Do not use them for a real physics simulation
+setup:
+    interactive: true
+    launcher: ""
+    sleep: 1
+table:
+    transpose: true
+    items: [X1, X2, X3]

@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="scisample",
-    version="0.0.1",
+    version="0.0.3",
     author="Brian Daub, Chris Krenn, Cody Raskin, and Jessica Semler",
     description="Parameter sampling for scientific computing",
     long_description=LONG_DESCRIPTION,

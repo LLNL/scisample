@@ -18,9 +18,9 @@ from scisample.utils import SamplingError, log_and_raise_exception
 LOG = logging.getLogger(__name__)
 
 BaseSampler.SAMPLE_FUNCTIONS_DICT = {
+    'list': ListSampler,
     'best_candidate': BestCandidateSampler,
     'column_list': ColumnListSampler,
-    'list': ListSampler,
     'cross_product': CrossProductSampler,
     'csv': CsvSampler,
     'random': RandomSampler,

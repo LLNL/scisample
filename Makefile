@@ -11,7 +11,13 @@ sphinx:
 
 wheel:
 	rm -rf build
-	python setup.py bdist_wheel
+	python setup.py sdist bdist_wheel
+
+twine-check:
+	twine check dist/*
+
+twine-upload:
+	twine upload dist/scisample-0.0.3*
 
 test:
 	$(PYTEST)

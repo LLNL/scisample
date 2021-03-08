@@ -11,6 +11,7 @@
     'X4': {'values': [5, 10], 'label': 'X4.%%'}}       
 
 * potential improvements:
+1. Support previous_samples for `best_candidate`
 1. To support list comprehension using `eval`.
 1. Merge in composite sampler from daub1
 1. Add webhook for read the docs

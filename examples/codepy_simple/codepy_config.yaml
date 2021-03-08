@@ -1,0 +1,17 @@
+# run this with 
+#   codepy multirun . -study-directory ${HOME}/studies -c simple_queue_codepy_config.yaml
+# from within this directory
+# Note: this is not working reliably when `-study-directory` is not specified to be somewhere
+# besides lustre, which is the default.
+
+setup:
+    interactive: true
+    sleep: 1
+    autoyes: true
+    sampler:
+        type: list
+        parameters:
+            X1: [1, 5, 10]
+        constants:
+            X2: 5
+            X3: 5
