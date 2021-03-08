@@ -24,4 +24,3 @@ wheel
 pytest-cov
 twine
 tbump
-doitlive
