@@ -56,6 +56,32 @@ class BaseSampler(SamplerInterface):
     .. code:: yaml
 
         sampler:
+            type: list
+            constants:
+                X1: 20
+            parameters:
+                X2: [5, 10]
+                X3: [5, 10]
+
+        # additional ways of defining ranges are shown below
+        sampler:
+            type: list
+            constants:
+                X1: 20
+            parameters:
+                X2: [5, 10]
+                X3:
+                    min: 5
+                    max: 10
+                    step: 5
+                X4: 5.0 to 10 by 5.0
+                X5: "[5.0:10.0:5]"
+                X6:
+                    start: 5
+                    stop: 10
+                    num_points: 2
+
+        sampler:
             type: best_candidate
             num_samples: 30
             previous_samples: samples.csv # not supported yet
@@ -97,14 +123,6 @@ class BaseSampler(SamplerInterface):
             module: <path to module containing function>
             args: {} # Dictionary of keyword arguments to pass
                      # To the function.
-
-        sampler:
-            type: list
-            constants:
-                X1: 20
-            parameters:
-                X2: [5, 10]
-                X3: [5, 10]
 
         sampler:
             type: random
