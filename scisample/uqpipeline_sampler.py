@@ -43,10 +43,10 @@ class UQPipelineSampler(BaseSampler):
             uq_points: points
             uq_variables: ['X1', 'type']
             uq_code: |
-            points = sampler.CartesianCrossSampler.sample_points(
-                num_divisions=[3,3], 
-                box=[[-1,1],[]], 
-                values=[[],['foo', 'bar']])
+                points = sampler.CartesianCrossSampler.sample_points(
+                    num_divisions=[3,3], 
+                    box=[[-1,1],[]], 
+                    values=[[],['foo', 'bar']])
 
     results in the following sample set:
 
