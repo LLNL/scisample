@@ -26,7 +26,6 @@ BaseSampler.SAMPLE_FUNCTIONS_DICT = {
     'random': RandomSampler,
     'custom': CustomSampler,
     'uqpipeline': UQPipelineSampler,
-
 }
 
 BaseSampler.SAMPLE_FUNCTIONS_KEYS = BaseSampler.SAMPLE_FUNCTIONS_DICT.keys()
