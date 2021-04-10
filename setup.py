@@ -15,6 +15,7 @@ setuptools.setup(
     url="git@github.com:LLNL/scisample.git",
     license='MIT License',
     packages=setuptools.find_packages(),
+    package_data = {'scisample': ['config.yaml']},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

@@ -3,7 +3,7 @@
 __pycache__
 build/
 dist/
-venv/
- *#
+venv*/
+*#
 docs/source/modules.rst
 docs/source/scisample.rst
