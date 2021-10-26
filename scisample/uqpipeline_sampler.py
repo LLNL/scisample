@@ -7,27 +7,48 @@ import random
 import os
 import sys
 from contextlib import suppress
-
-UQPIPELINE_SAMPLE = False
-UQPIPELINE_SAMPLE_PATH = '/collab/usr/gapps/uq/UQPipeline/smplg_cmpnt'
-if os.path.exists(UQPIPELINE_SAMPLE_PATH):
-    sys.path.append(UQPIPELINE_SAMPLE_PATH)
-    with suppress(ModuleNotFoundError):
-        import sampling.sampler as sampler
-        import sampling.composite_samples as composite_samples
-        UQPIPELINE_SAMPLE = True
+import pkg_resources
+import yaml
+from pathlib import Path
 
 from scisample.base_sampler import BaseSampler
-from scisample.utils import log_and_raise_exception
+from scisample.utils import log_and_raise_exception, read_yaml
 from scisample.utils import test_for_uniform_lengths, test_for_min_max
 
-# @TODO: can this duplicate code be removed?
-
 LOG = logging.getLogger(__name__)
+
+UQPIPELINE_SAMPLE = False
+
+config_file_list = [os.path.join(str(Path.home()),".scisample_config.yaml")]
+config_file_list.append(pkg_resources.resource_filename('scisample', 'config.yaml'))
+for config_file in config_file_list:
+    if os.path.exists(config_file):
+        config_dict = read_yaml(config_file)
+    else:
+        continue
+    if UQPIPELINE_SAMPLE:
+        continue
+    for uqpipeline_sample_path in config_dict["uqpipeline_sampling_component_import_paths"]:
+        if os.path.exists(uqpipeline_sample_path):
+            sys.path.append(uqpipeline_sample_path)
+            with suppress(ModuleNotFoundError):
+                import sampling.sampler as sampler
+                import sampling.composite_samples as composite_samples
+                UQPIPELINE_SAMPLE = True
+                continue
 
 class UQPipelineSampler(BaseSampler):
     """
     Class which wraps UQPipeline sampling methods.
+
+    The path to the UQPipeline library can be set by adding the following
+    to a ".scisample_config.yaml" file in the user's home directory. The
+    first directory with a valid UQPipeline package will be used.
+
+    .. code:: yaml
+        uqpipeline_sampling_component_import_paths:
+          - /custom_installation_path/smplg_cmpnt
+          - /collab/usr/gapps/uq/UQPipeline/smplg_cmpnt
 
     This class currently supports two ways of creating samples with 
     UQPipeline methods:
