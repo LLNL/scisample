@@ -7,9 +7,6 @@ import random
 import os
 import sys
 from contextlib import suppress
-import pkg_resources
-import yaml
-from pathlib import Path
 
 from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception, read_yaml
@@ -17,7 +14,14 @@ from scisample.utils import test_for_uniform_lengths, test_for_min_max
 
 LOG = logging.getLogger(__name__)
 
-UQPIPELINE_SAMPLE = False
+#"""Import the uqpipeline composite_samples package if it exists."""
+from pathlib import Path
+import os
+import sys
+import pkg_resources
+from scisample.utils import read_yaml
+
+UQPIPELINE_SAMPLE_IMPORT = False
 
 config_file_list = [os.path.join(str(Path.home()),".scisample_config.yaml")]
 config_file_list.append(pkg_resources.resource_filename('scisample', 'config.yaml'))
@@ -26,7 +30,7 @@ for config_file in config_file_list:
         config_dict = read_yaml(config_file)
     else:
         continue
-    if UQPIPELINE_SAMPLE:
+    if UQPIPELINE_SAMPLE_IMPORT:
         continue
     for uqpipeline_sample_path in config_dict["uqpipeline_sampling_component_import_paths"]:
         if os.path.exists(uqpipeline_sample_path):
@@ -34,7 +38,7 @@ for config_file in config_file_list:
             with suppress(ModuleNotFoundError):
                 import sampling.sampler as sampler
                 import sampling.composite_samples as composite_samples
-                UQPIPELINE_SAMPLE = True
+                UQPIPELINE_SAMPLE_IMPORT = True
                 continue
 
 class UQPipelineSampler(BaseSampler):
@@ -106,6 +110,8 @@ class UQPipelineSampler(BaseSampler):
          {'X1': 1.0, 'type': 'foo'}, 
          {'X1': 1.0, 'type': 'bar'}]
     """
+    UQPIPELINE_SAMPLE = UQPIPELINE_SAMPLE_IMPORT
+
     def __init__(self, data):
         """
         Initialize the sampler.
@@ -160,8 +166,11 @@ class UQPipelineSampler(BaseSampler):
 
             [{'b': 0.89856, 'a': 1}, {'b': 0.923223, 'a': 1}, ... ]
         """
+        #
         # Note: I am being careful with internal variables
         #       to avoid conflicts with exec(uq_code)
+        # @TODO: @daub1 and @FrankD412 suggested to remove eval statements.
+        # @TODO: https://github.com/LLNL/scisample/pull/6/files/0f233105fe402b107888ed7d47f33a3b1ebd3366#r585669045
         if self._samples is not None:
             return self._samples
         LOG.info("generating uqpipeline samples")

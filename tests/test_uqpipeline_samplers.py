@@ -16,16 +16,6 @@ from contextlib import suppress
 import pytest
 import yaml
 
-# @TODO: can this duplicate code be removed?
-UQPIPELINE_SAMPLE = False
-UQPIPELINE_SAMPLE_PATH = '/collab/usr/gapps/uq/UQPipeline/smplg_cmpnt'
-if os.path.exists(UQPIPELINE_SAMPLE_PATH):
-    sys.path.append(UQPIPELINE_SAMPLE_PATH)
-    with suppress(ModuleNotFoundError):
-        import sampling.sampler as sampler
-        import sampling.composite_samples as composite_samples
-        UQPIPELINE_SAMPLE = True
-
 from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception
 from scisample.uqpipeline_sampler import UQPipelineSampler
@@ -37,6 +27,7 @@ def new_sampler_from_yaml(yaml_text):
     return new_sampler(
         yaml.safe_load(yaml_text))
 
+@pytest.mark.skipif(not UQPipelineSampler.UQPIPELINE_SAMPLE, reason="uqpipeline was not imported")
 class TestScisampleUQPipeline(unittest.TestCase):
     """
     Scenario: normal and abnormal tests for ListSampler

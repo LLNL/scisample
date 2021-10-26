@@ -39,20 +39,20 @@ def test_for_uniform_lengths(iterable):
                 f"    {value}.\n")
 
 def test_for_min_max(parameters):
-
-        for key, value in parameters.items():
-            try:
-                float(value['min'])
-            except ValueError:
-                log_and_raise_exception(
-                    f"Parameter ({key}) must have a numeric minimum.\n"
-                    f"  Current minimum value is: {value}.")
-            try:
-                float(value['max'])
-            except ValueError:
-                log_and_raise_exception(
-                    f"Parameter ({key}) must have a numeric maximum.\n"
-                    f"  Current maximum value is: {value}.")
+    """Test for required `min` and `max` dictionary entries."""
+    for key, value in parameters.items():
+        try:
+            float(value['min'])
+        except ValueError:
+            log_and_raise_exception(
+                f"Parameter ({key}) must have a numeric minimum.\n"
+                f"  Current minimum value is: {value}.")
+        try:
+            float(value['max'])
+        except ValueError:
+            log_and_raise_exception(
+                f"Parameter ({key}) must have a numeric maximum.\n"
+                f"  Current maximum value is: {value}.")
 
 
 def read_yaml(filename):
@@ -222,3 +222,4 @@ def parameter_list(start, stop, step=None, num_points=None):
         return_list = list(numpy.linspace(start, stop, num_points))
     
     return return_list
+
