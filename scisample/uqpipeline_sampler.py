@@ -38,9 +38,9 @@ for config_file in config_file_list:
                 import sampling.composite_samples as composite_samples
                 # to prevent flake8: warning F401 - 
                 # 'sampling.sampler' imported but unused
-                temp = sampler()
+                temp = sampler
                 del temp
-                temp = composite_samples()
+                temp = composite_samples
                 del temp 
                 UQPIPELINE_SAMPLE_IMPORT = True
                 continue
