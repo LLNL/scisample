@@ -30,6 +30,7 @@ def validate_sampler(sampler_data):
         SAMPLER_SCHEMA[sampler_data['type']]
         )
 
+
 PARAMETER_SCHEMA = {
     'oneOf': [
         {
@@ -47,15 +48,15 @@ PARAMETER_SCHEMA = {
             },
             # Require defining each field once.
             'allOf': [
-                {'oneOf':[
+                {'oneOf': [
                     {'required': ['min']},
                     {'required': ['start']},
                 ]},
-                {'oneOf':[
+                {'oneOf': [
                     {'required': ['max']},
                     {'required': ['stop']},
                 ]},
-                {'oneOf':[
+                {'oneOf': [
                     {'required': ['step']},
                     {'required': ['num_points']},
                 ]},
@@ -64,8 +65,10 @@ PARAMETER_SCHEMA = {
         {
             'type': 'string',
             'anyOf': [
-                {'pattern': r'\[[0-9]*\.?[0-9]+:[0-9]*\.?[0-9]+:[0-9]*\.?[0-9]+\]'},
-                {'pattern': r'[0-9]*\.?[0-9]+ to [0-9]*\.?[0-9]+ by [0-9]*\.?[0-9]+'},
+                {'pattern':
+                    r'\[[0-9]*\.?[0-9]+:[0-9]*\.?[0-9]+:[0-9]*\.?[0-9]+\]'},
+                {'pattern':
+                    r'[0-9]*\.?[0-9]+ to [0-9]*\.?[0-9]+ by [0-9]*\.?[0-9]+'},
             ]
         }
     ]

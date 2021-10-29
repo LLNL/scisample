@@ -269,7 +269,6 @@ class BaseSampler(SamplerInterface):
         self._pgen = pgen
         return pgen
 
-
     # @TODO: resolve pylint warnings for `downselect`
     # R0914 - Too many local variables (27/15) (too-many-locals)
     # R0912 - Too many branches (14/12) (too-many-branches)

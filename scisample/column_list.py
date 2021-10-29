@@ -25,6 +25,7 @@ def process_row(row):
         row = row[:row.index('#')]
     return row.split()
 
+
 class ColumnListSampler(BaseSampler):
     """
     Class defining basic column list sampling.
@@ -47,7 +48,7 @@ class ColumnListSampler(BaseSampler):
     .. code:: python
 
         [{X1: 20, X2: 5, X3: 5}, {X1: 20, X2: 10, X3: 10}]
-    
+
     Any text following a ``#`` in the parameters entry will be treated as
     a comment and ignored.  The following input would produce the same results
     as above.
@@ -116,7 +117,6 @@ class ColumnListSampler(BaseSampler):
         self._samples = []
 
         parameter_samples = []
-
 
         with suppress(KeyError):
             rows = self.data['parameters'].splitlines()
