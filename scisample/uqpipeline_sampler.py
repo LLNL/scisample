@@ -3,28 +3,25 @@ Module defining the UQ Pipeline sampler object.
 """
 
 import logging
-import random
 import os
 import sys
 from contextlib import suppress
 
 from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception, read_yaml
-from scisample.utils import test_for_uniform_lengths, test_for_min_max
 
-LOG = logging.getLogger(__name__)
-
-#"""Import the uqpipeline composite_samples package if it exists."""
+# """Import the uqpipeline composite_samples package if it exists."""
+# import os
+# import sys
+# from scisample.utils import read_yaml
 from pathlib import Path
-import os
-import sys
 import pkg_resources
-from scisample.utils import read_yaml
 
 UQPIPELINE_SAMPLE_IMPORT = False
 
-config_file_list = [os.path.join(str(Path.home()),".scisample_config.yaml")]
-config_file_list.append(pkg_resources.resource_filename('scisample', 'config.yaml'))
+config_file_list = [os.path.join(str(Path.home()), ".scisample_config.yaml")]
+config_file_list.append(
+    pkg_resources.resource_filename('scisample', 'config.yaml'))
 for config_file in config_file_list:
     if os.path.exists(config_file):
         config_dict = read_yaml(config_file)
@@ -32,14 +29,24 @@ for config_file in config_file_list:
         continue
     if UQPIPELINE_SAMPLE_IMPORT:
         continue
-    for uqpipeline_sample_path in config_dict["uqpipeline_sampling_component_import_paths"]:
+    for uqpipeline_sample_path in config_dict[
+            "uqpipeline_sampling_component_import_paths"]:
         if os.path.exists(uqpipeline_sample_path):
             sys.path.append(uqpipeline_sample_path)
             with suppress(ModuleNotFoundError):
                 import sampling.sampler as sampler
                 import sampling.composite_samples as composite_samples
+                # to prevent flake8: warning F401 - 
+                # 'sampling.sampler' imported but unused
+                temp = sampler()
+                del temp
+                temp = composite_samples()
+                del temp 
                 UQPIPELINE_SAMPLE_IMPORT = True
                 continue
+
+LOG = logging.getLogger(__name__)
+
 
 class UQPipelineSampler(BaseSampler):
     """
