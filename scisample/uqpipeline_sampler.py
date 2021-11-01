@@ -36,12 +36,12 @@ for config_file in config_file_list:
             with suppress(ModuleNotFoundError):
                 import sampling.sampler as sampler
                 import sampling.composite_samples as composite_samples
-                # to prevent flake8: warning F401 - 
+                # to prevent flake8: warning F401 -
                 # 'sampling.sampler' imported but unused
                 temp = sampler
                 del temp
                 temp = composite_samples
-                del temp 
+                del temp
                 UQPIPELINE_SAMPLE_IMPORT = True
                 continue
 
@@ -61,7 +61,7 @@ class UQPipelineSampler(BaseSampler):
           - /custom_installation_path/smplg_cmpnt
           - /collab/usr/gapps/uq/UQPipeline/smplg_cmpnt
 
-    This class currently supports two ways of creating samples with 
+    This class currently supports two ways of creating samples with
     UQPipeline methods:
 
     1. With "sampler.<SAMPLER_NAME>.sample_points" methods, and
@@ -76,19 +76,19 @@ class UQPipelineSampler(BaseSampler):
             uq_variables: ['X1', 'type']
             uq_code: |
                 points = sampler.CartesianCrossSampler.sample_points(
-                    num_divisions=[3,3], 
-                    box=[[-1,1],[]], 
+                    num_divisions=[3,3],
+                    box=[[-1,1],[]],
                     values=[[],['foo', 'bar']])
 
     results in the following sample set:
 
     .. code:: python
 
-        [{'X1': -1.0, 'type': 'foo'}, 
-         {'X1': -1.0, 'type': 'bar'}, 
-         {'X1': 0.0, 'type': 'foo'}, 
-         {'X1': 0.0, 'type': 'bar'}, 
-         {'X1': 1.0, 'type': 'foo'}, 
+        [{'X1': -1.0, 'type': 'foo'},
+         {'X1': -1.0, 'type': 'bar'},
+         {'X1': 0.0, 'type': 'foo'},
+         {'X1': 0.0, 'type': 'bar'},
+         {'X1': 1.0, 'type': 'foo'},
          {'X1': 1.0, 'type': 'bar'}]
 
     .. code:: yaml
@@ -107,14 +107,14 @@ class UQPipelineSampler(BaseSampler):
                     num_divisions=[3,2])
 
     results in the same sample set:
-    
+
     .. code:: python
 
-        [{'X1': -1.0, 'type': 'foo'}, 
-         {'X1': -1.0, 'type': 'bar'}, 
-         {'X1': 0.0, 'type': 'foo'}, 
-         {'X1': 0.0, 'type': 'bar'}, 
-         {'X1': 1.0, 'type': 'foo'}, 
+        [{'X1': -1.0, 'type': 'foo'},
+         {'X1': -1.0, 'type': 'bar'},
+         {'X1': 0.0, 'type': 'foo'},
+         {'X1': 0.0, 'type': 'bar'},
+         {'X1': 1.0, 'type': 'foo'},
          {'X1': 1.0, 'type': 'bar'}]
     """
     UQPIPELINE_SAMPLE = UQPIPELINE_SAMPLE_IMPORT
@@ -142,16 +142,20 @@ class UQPipelineSampler(BaseSampler):
             self._uq_type = "points"
         if not (samples or points):
             log_and_raise_exception(
-                "Either 'uq_samples' or 'uq_points' are required for a uqpipeline sampler.")
+                "Either 'uq_samples' or 'uq_points' are required "
+                "for a uqpipeline sampler.")
         if (samples and points):
             log_and_raise_exception(
-                "Only 'uq_samples' or 'uq_points' can be specified for a uqpipeline sampler.")
+                "Only 'uq_samples' or 'uq_points' can be specified "
+                "for a uqpipeline sampler.")
         if (samples and variables):
             log_and_raise_exception(
-                "Only 'uq_samples' or 'uq_variables' can be specified for a uqpipeline sampler.")
+                "Only 'uq_samples' or 'uq_variables' can be specified "
+                "for a uqpipeline sampler.")
         if (points and not variables):
             log_and_raise_exception(
-                "Both 'uq_points' and 'uq_variables' are required for a uqpipeline sampler.")
+                "Both 'uq_points' and 'uq_variables' are required "
+                "for a uqpipeline sampler.")
 
     @property
     def parameters(self):
@@ -177,13 +181,14 @@ class UQPipelineSampler(BaseSampler):
         # Note: I am being careful with internal variables
         #       to avoid conflicts with exec(uq_code)
         # @TODO: @daub1 and @FrankD412 suggested to remove eval statements.
-        # @TODO: https://github.com/LLNL/scisample/pull/6/files/0f233105fe402b107888ed7d47f33a3b1ebd3366#r585669045
+        # @TODO: https://github.com/LLNL/scisample/pull/6/files/
+        #                0f233105fe402b107888ed7d47f33a3b1ebd3366#r585669045
         if self._samples is not None:
             return self._samples
         LOG.info("generating uqpipeline samples")
         try:
             exec(self.data['uq_code'])
-        except:
+        except Exception:
             log_and_raise_exception(
                 "unknown error when executing 'uq_code':"
                 f"{self.data['uq_code']}")
@@ -202,7 +207,7 @@ class UQPipelineSampler(BaseSampler):
                     "Unknown error when attempting to use"
                     "uq_pipeline code with scisample."
                     "Please contact a developer.")
-        except:
+        except Exception:
             log_and_raise_exception(
                 "unknown error when evaluating 'uq_samples':"
                 f"{self.data['uq_samples']}")
@@ -215,7 +220,7 @@ class UQPipelineSampler(BaseSampler):
             for j in range(len(_uq_points)):
                 _parameter_list.append(_uq_points[j][i])
             _uq_parameters[_uq_variables[i]] = _parameter_list
-        
+
         with suppress(KeyError):
             for key, value in _uq_parameters.items():
                 num_samples = len(value)

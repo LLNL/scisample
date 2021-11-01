@@ -25,6 +25,7 @@ def process_row(row):
         row = row[:row.index('#')]
     return row.split()
 
+
 class ColumnListSampler(BaseSampler):
     """
     Class defining basic column list sampling.
@@ -116,7 +117,6 @@ class ColumnListSampler(BaseSampler):
         self._samples = []
 
         parameter_samples = []
-
 
         with suppress(KeyError):
             rows = self.data['parameters'].splitlines()

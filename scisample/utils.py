@@ -13,13 +13,16 @@ import parse
 
 LOG = logging.getLogger(__name__)
 
+
 class SamplingError(Exception):
     """Base class for exceptions in this module."""
+
 
 def log_and_raise_exception(msg):
     """ Log error and raise exception """
     LOG.error(msg)
     raise SamplingError(msg)
+
 
 def test_for_uniform_lengths(iterable):
     """ Test that each item in iterable is the same length """
@@ -37,6 +40,7 @@ def test_for_uniform_lengths(iterable):
                 f"    {test_value}.\n"
                 f"  Parameter ({key}) has {len(value)} value(s):\n"
                 f"    {value}.\n")
+
 
 def test_for_min_max(parameters):
     """Test for required `min` and `max` dictionary entries."""
@@ -76,7 +80,7 @@ def read_csv(filename):
         csvreader = csv.reader(
             _file,
             skipinitialspace=True,
-            )
+        )
         for row in csvreader:
             new_row = []
             for tok in row:
@@ -159,14 +163,16 @@ class ParameterMixIn:
             for key, value in self.data['parameters'].items()
         }
 
+
 def parse_parameters(data):
     """
     Takes a specification for a list of parameters and converts it to the list.
 
     If a list is passed, the list will be returned.
-    
-    If a dict is passed with the keys  "start" or "min", "stop" or "max", "step" or
-        "num_points", a list will be constructed based on these parameters.
+
+    If a dict is passed with the keys  "start" or "min", "stop" or "max",
+        "step" or "num_points", a list will be constructed based on these
+        parameters.
 
     If a string is passed, either of the form ``[start:stop:step]`` or
         ``start to stop by step``, a list will be constructed.
@@ -183,7 +189,8 @@ def parse_parameters(data):
         step = data.get('step')
         num_points = data.get('num_points')
         if start is None or stop is None:
-            raise SamplingError("Parameter dictionaries must define start and stop")
+            raise SamplingError(
+                "Parameter dictionaries must define start and stop")
         return parameter_list(start, stop, step, num_points)
 
     if isinstance(data, str):
@@ -214,12 +221,11 @@ def parameter_list(start, stop, step=None, num_points=None):
     """
     if not step and not num_points:
         raise SamplingError("Must specify either number of points or step")
-    
+
     if step and not num_points:
         return_list = list(numpy.arange(start, stop, step))
         return_list.append(stop)
     else:
         return_list = list(numpy.linspace(start, stop, num_points))
-    
-    return return_list
 
+    return return_list

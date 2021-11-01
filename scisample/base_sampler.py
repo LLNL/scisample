@@ -204,7 +204,9 @@ class BaseSampler(SamplerInterface):
                 "sampler data")
 
     def _check_variables_for_dups(self):
-        """Check that constants or parameters are not defined more than once."""
+        """
+        Check that constants or parameters are not defined more than once.
+        """
         if len(self.parameters) != len(set(self.parameters)):
             dupes = set(find_duplicates(self.parameters))
             log_and_raise_exception(
@@ -273,7 +275,6 @@ class BaseSampler(SamplerInterface):
 
         self._pgen = pgen
         return pgen
-
 
     # @TODO: resolve pylint warnings for `downselect`
     # R0914 - Too many local variables (27/15) (too-many-locals)
