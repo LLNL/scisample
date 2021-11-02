@@ -12,7 +12,6 @@ from scisample.schema import validate_sampler
 from scisample.utils import (_convert_dict_to_maestro_params, find_duplicates,
                              log_and_raise_exception)
 
-# @TODO: can this duplicate code be removed?
 MAESTROWF = False
 with suppress(ModuleNotFoundError):
     from maestrowf.datastructures.core import ParameterGenerator
@@ -47,6 +46,7 @@ class BaseSampler(SamplerInterface):
         'custom': 'CustomSampler',
         'list': 'ListSampler',
         'random': 'RandomSampler',
+        'uqpipeline': 'UQPipelineSampler',
     }
 
     ALLOWED_SAMPLING_KEYS = list(_ALLOWED_SAMPLING_DICT.keys())
@@ -151,6 +151,7 @@ class BaseSampler(SamplerInterface):
         self._pgen = None
 
     def check_validity(self):
+        """Check validity"""
         try:
             validate_sampler(self.data)
         except ValueError:
@@ -183,23 +184,29 @@ class BaseSampler(SamplerInterface):
         return parameters
 
     def _check_variables(self):
+        """Run all three variable checks: _strings, _existance, _for_dups."""
         self._check_variables_strings()
         self._check_variables_existence()
         self._check_variables_for_dups()
 
     def _check_variables_strings(self):
+        """Check that all constants and parameters are strings."""
         for parameter in self.parameters:
             if not isinstance(parameter, str):
                 log_and_raise_exception(
                     "constants and parameters must be strings")
 
     def _check_variables_existence(self):
+        """Check at least one constant or parameter is defined."""
         if len(self.parameters) == 0:
             log_and_raise_exception(
                 "Either constants or parameters must be included in the " +
                 "sampler data")
 
     def _check_variables_for_dups(self):
+        """
+        Check that constants or parameters are not defined more than once.
+        """
         if len(self.parameters) != len(set(self.parameters)):
             dupes = set(find_duplicates(self.parameters))
             log_and_raise_exception(

@@ -48,8 +48,8 @@ participating in the `scisample` community, you agree to abide by its rules.
 
 # Authors
 
-Current authors of `scisample` include Brian Daub, Jessica Semler, Cody
-Raskin, & Chris Krenn. 
+Current authors of `scisample` include Brian Daub, Chris Krenn, Cody Raskin, &
+Jessica Semler.
 
 # License
 

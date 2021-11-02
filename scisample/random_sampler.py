@@ -7,7 +7,7 @@ import random
 from contextlib import suppress
 
 from scisample.base_sampler import BaseSampler
-from scisample.utils import log_and_raise_exception
+from scisample.utils import log_and_raise_exception, test_for_min_max
 
 LOG = logging.getLogger(__name__)
 
@@ -63,19 +63,7 @@ class RandomSampler(BaseSampler):
                 "  Please contact Chris Krenn or Brian Daub for assistance.")
 
         # @TODO: add error check to schema
-        for key, value in self.data["parameters"].items():
-            try:
-                float(value['min'])
-            except ValueError:
-                log_and_raise_exception(
-                    f"Parameter ({key}) must have a numeric minimum.\n"
-                    f"  Current minimum value is: {value}.")
-            try:
-                float(value['max'])
-            except ValueError:
-                log_and_raise_exception(
-                    f"Parameter ({key}) must have a numeric maximum.\n"
-                    f"  Current maximum value is: {value}.")
+        test_for_min_max(self.data["parameters"])
 
     @property
     def parameters(self):
@@ -96,7 +84,6 @@ class RandomSampler(BaseSampler):
 
             [{'b': 0.89856, 'a': 1}, {'b': 0.923223, 'a': 1}, ... ]
         """
-
         if self._samples is not None:
             return self._samples
 
@@ -105,10 +92,12 @@ class RandomSampler(BaseSampler):
         random_list = []
         min_dict = {}
         range_dict = {}
+        box = []
 
         for key, value in self.data["parameters"].items():
             min_dict[key] = value["min"]
             range_dict[key] = value["max"] - value["min"]
+            box.append([value["min"], value["max"]])
 
         for i in range(self.data["num_samples"]):
             random_dictionary = {}

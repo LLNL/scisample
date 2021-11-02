@@ -65,10 +65,10 @@ PARAMETER_SCHEMA = {
         {
             'type': 'string',
             'anyOf': [
-                {'pattern':
-                    r'\[[0-9]*\.?[0-9]+:[0-9]*\.?[0-9]+:[0-9]*\.?[0-9]+\]'},
-                {'pattern':
-                    r'[0-9]*\.?[0-9]+ to [0-9]*\.?[0-9]+ by [0-9]*\.?[0-9]+'},
+                {'pattern': (r'\[[0-9]*\.?[0-9]+:[0-9]*\.?'
+                             r'[0-9]+:[0-9]*\.?[0-9]+\]')},
+                {'pattern': (r'[0-9]*\.?[0-9]+ to [0-9]*\.?'
+                             r'[0-9]+ by [0-9]*\.?[0-9]+')},
             ]
         }
     ]
@@ -88,6 +88,7 @@ LIST_SCHEMA = {
     },
     'required': ['type'],
 }
+
 
 # Built-in schema
 COLUMN_LIST_SCHEMA = {
@@ -151,6 +152,18 @@ RANDOM_SCHEMA = {
 
 BEST_CANDIDATE_SCHEMA = RANDOM_SCHEMA
 
+
+UQPIPELINE_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'type': {'type': 'string'},
+        'uq_samples': {'type': 'string'},
+        'uq_points': {'type': 'string'},
+        'uq_variables': {'type': 'string'},
+        'uq_code': {'type': 'string'},
+    },
+    'required': ['type', 'uq_code'],
+}
 SAMPLER_SCHEMA = {
     'list': LIST_SCHEMA,
     'column_list': COLUMN_LIST_SCHEMA,
@@ -158,5 +171,6 @@ SAMPLER_SCHEMA = {
     'csv': CSV_SCHEMA,
     'custom': CUSTOM_SCHEMA,
     'random': RANDOM_SCHEMA,
-    'best_candidate': BEST_CANDIDATE_SCHEMA
+    'best_candidate': BEST_CANDIDATE_SCHEMA,
+    'uqpipeline': UQPIPELINE_SCHEMA
 }

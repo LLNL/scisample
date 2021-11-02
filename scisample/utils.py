@@ -42,6 +42,23 @@ def test_for_uniform_lengths(iterable):
                 f"    {value}.\n")
 
 
+def test_for_min_max(parameters):
+    """Test for required `min` and `max` dictionary entries."""
+    for key, value in parameters.items():
+        try:
+            float(value['min'])
+        except ValueError:
+            log_and_raise_exception(
+                f"Parameter ({key}) must have a numeric minimum.\n"
+                f"  Current minimum value is: {value}.")
+        try:
+            float(value['max'])
+        except ValueError:
+            log_and_raise_exception(
+                f"Parameter ({key}) must have a numeric maximum.\n"
+                f"  Current maximum value is: {value}.")
+
+
 def read_yaml(filename):
     """
     Read a yaml file; return its contents as a dictionary.
@@ -63,7 +80,7 @@ def read_csv(filename):
         csvreader = csv.reader(
             _file,
             skipinitialspace=True,
-            )
+        )
         for row in csvreader:
             new_row = []
             for tok in row:
@@ -154,8 +171,8 @@ def parse_parameters(data):
     If a list is passed, the list will be returned.
 
     If a dict is passed with the keys  "start" or "min", "stop" or "max",
-         "step" or "num_points", a list will be constructed based on
-         these parameters.
+        "step" or "num_points", a list will be constructed based on these
+        parameters.
 
     If a string is passed, either of the form ``[start:stop:step]`` or
         ``start to stop by step``, a list will be constructed.

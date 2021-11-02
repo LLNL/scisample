@@ -4,7 +4,7 @@ Module defining the custom sampler object.
 
 import logging
 
-from scisample.random import RandomSampler
+from scisample.random_sampler import RandomSampler
 from scisample.utils import log_and_raise_exception
 
 LOG = logging.getLogger(__name__)
