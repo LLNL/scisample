@@ -9,6 +9,9 @@ sphinx:
 	sphinx-apidoc -f -M -o docs/source/ scisample
 	cd docs && make html
 
+tbump:
+	echo tbump 1.0.1
+
 wheel:
 	rm -rf build
 	python setup.py sdist bdist_wheel
@@ -17,7 +20,8 @@ twine-check:
 	twine check dist/*
 
 twine-upload:
-	twine upload dist/scisample-0.0.3*
+	echo https://realpython.com/pypi-publish-python-package/
+	echo twine upload dist/scisample-0.0.3*
 
 test:
 	$(PYTEST)
