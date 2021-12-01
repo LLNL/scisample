@@ -10,6 +10,24 @@ and run a simple workflow.
 You can also
 [manually set up the model](running-ares-model.md#setting-up-the-model-manually).
 
+## Sampling methods
+
+The following sampling methods are currently supported: 
+
+* [best_candidate](#best_candidate): Random sampling with approximately constant sampling density. 
+* column_list: Inline list of sample points, with one simulation defined on each line.
+* cross_product: 
+* csv
+* custom
+* list
+* random
+* uqpipeline
+
+## best_candidate {#best_candidate}
+
+
+
+
 ## Running the Model
 
 To run the model in its default configuration, the command is `codepy run <model name>`
