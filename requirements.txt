@@ -24,3 +24,4 @@ wheel
 pytest-cov
 twine
 tbump
+MarkdownPP
