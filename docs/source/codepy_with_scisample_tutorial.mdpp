@@ -4,7 +4,7 @@ In this tutorial, you will run `codepy` with a variety of `scisample` sampling m
 
 ## Codepy model
 
-The following `codepy` `model.yaml` file will generate run directories, and insert variable values into `out.txt`
+The following `codepy` `model.yaml` file is meant to demonstrate the `scisaple` package and nothing else. It will generate run directories, and insert variable values into `out.txt`. You can replace this `model.yaml` file with a different model file to run simulations. The `driver` file is empty and not read, but `codepy` requires some driver file to be present. 
 
 !INCLUDECODE "../../examples/codepy_simple/model.yaml" (yaml)
 

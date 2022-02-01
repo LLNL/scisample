@@ -1,0 +1,15 @@
+# run this with codepy run . -c codepy_config_best_candidate.yaml
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  sampler:
+    type: best_candidate
+    num_samples: 5
+    constants:
+      X1: 20
+      s_type: best_candidate
+    parameters:
+      X2: '{''min'': 5, ''max'': 10}'
+      X3: '{''min'': 5, ''max'': 10}'
