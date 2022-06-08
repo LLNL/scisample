@@ -329,6 +329,11 @@ class BaseSampler(SamplerInterface):
         mins = np.zeros(ndims)
         maxs = np.zeros(ndims)
 
+        print(f"candidates: {candidates}")
+#         print(int(hex_val, 16))
+#         hashlib.sha224(b"Nobody inspects the spammish repetition").hexdigest()
+# 'a4337bc45a8fc544c03f52dc550cd6e1e87021bc896588bd79e901e2'
+
         first = True
         for i, candidate in enumerate(candidates):
             for j in range(ndims):

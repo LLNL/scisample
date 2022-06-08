@@ -1,3 +1,6 @@
+* update downsample to use int(hexdigest) to work with strings
+* update merge random tests into best candidate tests
+
 * update docstring for parameter_block:     
 
   self.get_samples: [
