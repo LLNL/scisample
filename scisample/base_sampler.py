@@ -3,6 +3,7 @@ Module defining the BaseSampler class.
 """
 
 import logging
+import hashlib
 from contextlib import suppress
 
 from jsonschema import ValidationError
@@ -329,10 +330,13 @@ class BaseSampler(SamplerInterface):
         mins = np.zeros(ndims)
         maxs = np.zeros(ndims)
 
-        print(f"candidates: {candidates}")
-#         print(int(hex_val, 16))
-#         hashlib.sha224(b"Nobody inspects the spammish repetition").hexdigest()
-# 'a4337bc45a8fc544c03f52dc550cd6e1e87021bc896588bd79e901e2'
+        hashmap = {}
+        for j in range(len(candidates)):
+            for i in range(len(candidates[0])):
+                if type(candidates[j][i]) not in [int, float]:
+                    hashvalue = int(hashlib.sha224(candidates[j][i].encode()).hexdigest(),16)
+                    hashmap[hashvalue] = candidates[j][i]
+                    candidates[j][i] = hashvalue
 
         first = True
         for i, candidate in enumerate(candidates):

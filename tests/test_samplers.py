@@ -588,7 +588,6 @@ class TestScisampleBestCandidate(unittest.TestCase):
             # test only works if pandas is installed
             self.assertTrue(True)
 
-
 class TestCsvSampler(unittest.TestCase):
     """Unit test for testing the csv sampler."""
     CSV_SAMPLER = """

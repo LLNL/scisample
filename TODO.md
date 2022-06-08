@@ -1,5 +1,3 @@
-* update downsample to use int(hexdigest) to work with strings
-* update merge random tests into best candidate tests
 
 * update docstring for parameter_block:     
 
@@ -18,4 +16,5 @@
 1. To support list comprehension using `eval`.
 1. Merge in composite sampler from daub1
 1. Add webhook for read the docs
+1. Consider merging random tests into best candidate tests
 
