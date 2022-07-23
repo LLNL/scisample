@@ -1,5 +1,7 @@
 # use: 
-# python3 ./make_mdpp_codepy_docs.py best_candidate column_list cross_product list random uqpipeline
+# python3 tools/make_mdpp_codepy_docs.py best_candidate column_list cross_product list random uqpipeline > codepy_docs.mdpp
+# markdown-pp codepy_docs.mdpp -o codepy_docs.md
+
 
 import sys
 
