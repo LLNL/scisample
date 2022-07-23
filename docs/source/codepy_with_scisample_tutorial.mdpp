@@ -37,7 +37,7 @@ Using
 
 ```bash
 codepy run . -c codepy_config_list.yaml
-```
+```)
 
 to run the following `codepy_config` file
 
