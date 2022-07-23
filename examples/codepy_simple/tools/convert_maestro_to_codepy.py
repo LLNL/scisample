@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""Converts maestro examples to codepy examples.
+   Usage: ./tools/convert_maestro_to_codepy.py ../maestrowf/sample*yaml 
+"""
 
 import sys
 import yaml
