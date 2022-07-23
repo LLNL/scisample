@@ -17,6 +17,13 @@ phases:
         Run the first phase of the model.
       cmd: |
           {{launcher}} {{code}} {{driver}} -r {{defs}} {{flags}}
+    - name: phase2
+      driver: phase2_driver
+      code: ares
+      description: |
+        Run the second phase of the model.
+      cmd: |
+          {{launcher}} {{code}} {{driver}} -r {{defs}} {{flags}}
 
 flavors:
     baseline:
