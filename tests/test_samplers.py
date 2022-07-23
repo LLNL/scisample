@@ -393,7 +393,6 @@ class TestScisampleColumnList(unittest.TestCase):
             "All rows must have the same number of values"
             in str(context.exception))
 
-
 class TestScisampleRandomSampler(unittest.TestCase):
     """
     Scenario: normal and abnormal tests for RandomSampler
@@ -411,11 +410,12 @@ class TestScisampleRandomSampler(unittest.TestCase):
             #previous_samples: samples.csv # optional
             constants:
                 X1: 20
+                X2: foo
             parameters:
-                X2:
+                X3:
                     min: 5
                     max: 10
-                X3:
+                X4:
                     min: 5
                     max: 10
             """
@@ -427,11 +427,11 @@ class TestScisampleRandomSampler(unittest.TestCase):
         self.assertEqual(len(samples), 5)
         for sample in samples:
             self.assertEqual(sample['X1'], 20)
-            self.assertTrue(sample['X2'] > 5)
+            self.assertEqual(sample['X2'], "foo")
             self.assertTrue(sample['X3'] > 5)
-            self.assertTrue(sample['X2'] < 10)
+            self.assertTrue(sample['X4'] > 5)
             self.assertTrue(sample['X3'] < 10)
-
+            self.assertTrue(sample['X4'] < 10)
     def test_normal2(self):
         """
         Given a random specification
@@ -562,11 +562,12 @@ class TestScisampleBestCandidate(unittest.TestCase):
             #previous_samples: samples.csv # optional
             constants:
                 X1: 20
+                X2: foo
             parameters:
-                X2:
+                X3:
                     min: 5
                     max: 10
-                X3:
+                X4:
                     min: 5
                     max: 10
             """
@@ -578,14 +579,14 @@ class TestScisampleBestCandidate(unittest.TestCase):
             self.assertEqual(len(samples), 5)
             for sample in samples:
                 self.assertEqual(sample['X1'], 20)
-                self.assertTrue(sample['X2'] > 5)
+                self.assertEqual(sample['X2'], "foo")
                 self.assertTrue(sample['X3'] > 5)
-                self.assertTrue(sample['X2'] < 10)
+                self.assertTrue(sample['X4'] > 5)
                 self.assertTrue(sample['X3'] < 10)
+                self.assertTrue(sample['X4'] < 10)
         else:
             # test only works if pandas is installed
             self.assertTrue(True)
-
 
 class TestCsvSampler(unittest.TestCase):
     """Unit test for testing the csv sampler."""
