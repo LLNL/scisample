@@ -79,7 +79,6 @@ class ColumnListSampler(BaseSampler):
         super().check_validity()
         self._check_variables_existence()
         self._check_variables_for_dups()
-        LOG.error(f"parameter_block: {self.parameter_block}")
         # self.parameter_block must be called to check that
         # every row must have the same number of items
         self.parameter_block
