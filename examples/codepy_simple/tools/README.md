@@ -1,3 +1,6 @@
+# TTD: figure out errors with random and best candidate samplers
+# update tests if needed. 
+
 # convert maestro examples to codepy format
 tools/convert_maestro_to_codepy.py ../maestrowf/sample*yaml
 #
