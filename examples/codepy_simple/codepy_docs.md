@@ -29,11 +29,9 @@ setup:
       X3:
         min: 5
         max: 10
-
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::
@@ -74,10 +72,9 @@ setup:
       X2  X3
       5   5
       10  10
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::
@@ -117,10 +114,9 @@ setup:
     parameters:
       X2: [5, 10]
       X3: [5, 10]
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::
@@ -168,10 +164,9 @@ setup:
     parameters:
       X2: [5, 10]
       X3: [5, 10]
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::
@@ -216,11 +211,9 @@ setup:
       X3:
         min: 5
         max: 10
-
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::
@@ -263,10 +256,9 @@ setup:
         num_divisions=[3,3], 
         box=[[-1,1],[]], 
         values=[[],['foo', 'bar']])    
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::
@@ -323,10 +315,9 @@ setup:
     type: csv
     csv_file: column_test.csv
     row_headers: false
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::
@@ -367,10 +358,9 @@ setup:
     type: csv
     csv_file: row_test.csv
     row_headers: True
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::
@@ -413,10 +403,9 @@ setup:
     module: custom_function.py
     args:
       num_samples: 2
-
 ```
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 ```
 ::::::::::::::

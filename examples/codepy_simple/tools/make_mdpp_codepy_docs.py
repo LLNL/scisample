@@ -20,7 +20,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_SAMPLER.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/SAMPLER_out.txt" 
 ''')

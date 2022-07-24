@@ -11,7 +11,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_best_candidate.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/best_candidate_out.txt" 
 
@@ -28,7 +28,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_column_list.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/column_list_out.txt" 
 
@@ -45,7 +45,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_cross_product.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/cross_product_out.txt" 
 
@@ -62,7 +62,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_list.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/list_out.txt" 
 
@@ -79,7 +79,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_random.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/random_out.txt" 
 
@@ -96,7 +96,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_uqpipeline.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/uqpipeline_out.txt" 
 
@@ -113,7 +113,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_csv_column.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/csv_column_out.txt" 
 
@@ -130,7 +130,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_csv_row.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/csv_row_out.txt" 
 
@@ -147,7 +147,7 @@ to run the following `codepy_config` file
 
 !INCLUDECODE "../../examples/codepy_simple/codepy_config_custom.yaml" (yaml), 2:999
 
-will result in the following `out.txt` files.
+will result in output identical (or similar) to the following: 
 
 !INCLUDECODE "../../examples/codepy_simple/custom_out.txt" 
 
