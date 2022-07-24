@@ -1,0 +1,16 @@
+# run this with codepy run . -c codepy_config_csv_column.yaml
+
+## cat column_test.csv
+# X1,X2,X3
+# 20,5,5
+# 20,10,10
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: csv_column
+  sampler:
+    type: csv
+    csv_file: column_test.csv
+    row_headers: false

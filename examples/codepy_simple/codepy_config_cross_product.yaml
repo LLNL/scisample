@@ -1,0 +1,15 @@
+# run this with codepy run . -c codepy_config_cross_product.yaml
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: cross_product
+  sampler:
+    type: cross_product
+    constants:
+      X1: 20
+      s_type: cross_product
+    parameters:
+      X2: [5, 10]
+      X3: [5, 10]

@@ -1,0 +1,16 @@
+# run this with codepy run . -c codepy_config_column_list.yaml
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: column_list
+  sampler:
+    type: column_list
+    constants:
+      X1: 20
+      s_type: column_list
+    parameters: |
+      X2  X3
+      5   5
+      10  10

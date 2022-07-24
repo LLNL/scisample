@@ -1,0 +1,18 @@
+# run this with codepy run . -c codepy_config_custom.yaml
+
+## cat custom_function.py
+# def test_function(num_samples):
+#     return [{"X1": 20, "X2": 5, "X3": 5},
+#             {"X1": 20, "X2": 10, "X3": 10}][:num_samples]
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: custom
+  sampler:
+    type: custom
+    function: test_function
+    module: custom_function.py
+    args:
+      num_samples: 2

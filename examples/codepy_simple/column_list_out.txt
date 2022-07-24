@@ -1,0 +1,8 @@
+::::::::::::::
+column_list/X1.20.X2.10.X3.10.s_type.column_list/out.txt
+::::::::::::::
+{20, 10, 10}
+::::::::::::::
+column_list/X1.20.X2.5.X3.5.s_type.column_list/out.txt
+::::::::::::::
+{20, 5, 5}

@@ -1,0 +1,16 @@
+::::::::::::::
+cross_product/X1.20.X2.10.X3.10.s_type.cross_product/out.txt
+::::::::::::::
+{20, 10, 10}
+::::::::::::::
+cross_product/X1.20.X2.10.X3.5.s_type.cross_product/out.txt
+::::::::::::::
+{20, 10, 5}
+::::::::::::::
+cross_product/X1.20.X2.5.X3.10.s_type.cross_product/out.txt
+::::::::::::::
+{20, 5, 10}
+::::::::::::::
+cross_product/X1.20.X2.5.X3.5.s_type.cross_product/out.txt
+::::::::::::::
+{20, 5, 5}

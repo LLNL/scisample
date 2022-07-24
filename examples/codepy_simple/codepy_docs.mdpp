@@ -1,0 +1,153 @@
+
+## best_candidate {#best_candidate}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_best_candidate.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_best_candidate.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/best_candidate_out.txt" 
+
+
+## column_list {#column_list}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_column_list.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_column_list.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/column_list_out.txt" 
+
+
+## cross_product {#cross_product}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_cross_product.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_cross_product.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/cross_product_out.txt" 
+
+
+## list {#list}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_list.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_list.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/list_out.txt" 
+
+
+## random {#random}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_random.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_random.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/random_out.txt" 
+
+
+## uqpipeline {#uqpipeline}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_uqpipeline.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_uqpipeline.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/uqpipeline_out.txt" 
+
+
+## csv_column {#csv_column}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_csv_column.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_csv_column.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/csv_column_out.txt" 
+
+
+## csv_row {#csv_row}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_csv_row.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_csv_row.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/csv_row_out.txt" 
+
+
+## custom {#custom}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_custom.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_custom.yaml" (yaml), 2:999
+
+will result in output identical (or similar) to the following: 
+
+!INCLUDECODE "../../examples/codepy_simple/custom_out.txt" 
+

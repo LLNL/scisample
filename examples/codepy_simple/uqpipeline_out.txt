@@ -1,0 +1,24 @@
+::::::::::::::
+uqpipeline/X1.-1.0.X2.bar/out.txt
+::::::::::::::
+{-1.0, bar, }
+::::::::::::::
+uqpipeline/X1.-1.0.X2.foo/out.txt
+::::::::::::::
+{-1.0, foo, }
+::::::::::::::
+uqpipeline/X1.0.0.X2.bar/out.txt
+::::::::::::::
+{0.0, bar, }
+::::::::::::::
+uqpipeline/X1.0.0.X2.foo/out.txt
+::::::::::::::
+{0.0, foo, }
+::::::::::::::
+uqpipeline/X1.1.0.X2.bar/out.txt
+::::::::::::::
+{1.0, bar, }
+::::::::::::::
+uqpipeline/X1.1.0.X2.foo/out.txt
+::::::::::::::
+{1.0, foo, }

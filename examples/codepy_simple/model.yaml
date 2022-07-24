@@ -9,7 +9,6 @@ summary:
     purpose: TBD
     source: TBD
 
-# model.yaml
 phases:
     - name: run
       driver: driver
@@ -19,8 +18,6 @@ phases:
         Run the model.
       cmd: |
         echo "{$(X1), $(X2), $(X3)}" > out.txt
-
-
 
 flavors:
     baseline:

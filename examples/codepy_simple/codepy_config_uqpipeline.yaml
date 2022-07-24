@@ -1,0 +1,18 @@
+# run this with codepy run . -c codepy_config_uqpipeline.yaml
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: uqpipeline
+  sampler:
+    type: uqpipeline
+    uq_points: points
+    uq_variables:
+      - X1
+      - X2
+    uq_code: |
+      points = sampler.CartesianCrossSampler.sample_points(
+        num_divisions=[3,3], 
+        box=[[-1,1],[]], 
+        values=[[],['foo', 'bar']])    

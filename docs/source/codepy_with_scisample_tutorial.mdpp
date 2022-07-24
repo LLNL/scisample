@@ -1,0 +1,53 @@
+# Using scisample with codepy
+
+In this tutorial, you will run `codepy` with a variety of `scisample` sampling methods.
+
+## Codepy model
+
+The following `codepy` `model.yaml` file is meant to demonstrate the `scisaple` package and nothing else. It will generate run directories, and insert variable values into `out.txt`. You can replace this `model.yaml` file with a different model file to run simulations. The `driver` file is empty and not read, but `codepy` requires some driver file to be present. 
+
+!INCLUDECODE "../../examples/codepy_simple/model.yaml" (yaml)
+
+## Sampling methods
+
+The following sampling methods are currently supported: 
+
+* [best_candidate](#best_candidate): Random sampling with approximately constant sampling density. 
+* [column_list](#column_list): Inline list of sample points, with one simulation defined on each line.
+* [cross_product](#cross_product): The Cartesian product of sample points for multiple variables.
+* [csv](#csv): Reads sample points from a `csv` file.
+* [custom](#custom): Uses an external python method to generate sample points.
+* [list](#list): Inline list of sample points, with one variable defined on each line.
+* [random](#random): Random sampling from a uniform distribution.
+* [uqpipeline](#uqpipeline): If possible, enables access to all of [LLNL's UQPipeline](https://www.cesm.ucar.edu/events/wg-meetings/2011/presentations/amwg/tannahill.pdf) sampling methods. (Note: the UQPipeline is not currently available as open source.)
+
+## best_candidate {#best_candidate}
+
+## column_list {#column_list}
+
+## cross_product {#cross_product}
+
+## csv {#csv}
+
+## custom {#custom}
+
+## list {#list}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_list.yaml
+```)
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_list.yaml" (yaml), 2:999
+
+will result in the following `out.txt` files.
+
+!INCLUDECODE "../../examples/codepy_simple/list_out.txt" 
+
+## random {#random}
+
+## uqpipeline {#uqpipeline}
+

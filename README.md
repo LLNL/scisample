@@ -7,8 +7,9 @@ are written in  the YAML markup language.
 # Installation with a python virtual environment
 
 1. `cd` into the top level scisample directory
-1. `python3 -m venv venv`
-1. `source venv/bin/activate`
+1. `python3 -m venv venv_scisample`
+1. `source venv_sci_sample/bin/activate`
+1. `pip install --upgrade pip`
 1. `pip install -r requirements.txt`
 1. `pip install -e .`
 
