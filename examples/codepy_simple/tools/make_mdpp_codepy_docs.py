@@ -5,6 +5,12 @@
 
 import sys
 
+print(f"There are {len(sys.argv[1:])} examples:")
+
+for sampler in sys.argv[1:]:
+	print(f"1. [{sampler}](#{sampler})")
+print()
+
 for sampler in sys.argv[1:]:
 	output = (
 		'''
