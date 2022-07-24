@@ -15,9 +15,10 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: best_candidate
   sampler:
     type: best_candidate
-    num_samples: 5
+    num_samples: 2
     constants:
       X1: 20
       s_type: best_candidate
@@ -36,13 +37,13 @@ will result in the following `out.txt` files.
 
 ```
 ::::::::::::::
-X1.20.X2.5.161752200752359.X3.9.921390919925802.s_type.best_candidate/out.txt
+best_candidate/X1.20.X2.7.602642791775893.X3.8.05887326792994.s_type.best_candidate/out.txt
 ::::::::::::::
-{20, 5.161752200752359, 9.921390919925802}
+{20, 7.602642791775893, 8.05887326792994}
 ::::::::::::::
-X1.20.X2.5.265568649708979.X3.6.052470560491571.s_type.best_candidate/out.txt
+best_candidate/X1.20.X2.9.621633469241472.X3.5.619325094643691.s_type.best_candidate/out.txt
 ::::::::::::::
-{20, 5.265568649708979, 6.052470560491571}
+{20, 9.621633469241472, 5.619325094643691}
 
 ```
 
@@ -63,12 +64,16 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: column_list
   sampler:
     type: column_list
     constants:
       X1: 20
       s_type: column_list
-    parameters: "X2  X3\n5   5\n10  10 \n"
+    parameters: |
+      X2  X3
+      5   5
+      10  10
 
 ```
 
@@ -76,11 +81,11 @@ will result in the following `out.txt` files.
 
 ```
 ::::::::::::::
-X1.20.X2.10.X3.10.s_type.column_list/out.txt
+column_list/X1.20.X2.10.X3.10.s_type.column_list/out.txt
 ::::::::::::::
 {20, 10, 10}
 ::::::::::::::
-X1.20.X2.5.X3.5.s_type.column_list/out.txt
+column_list/X1.20.X2.5.X3.5.s_type.column_list/out.txt
 ::::::::::::::
 {20, 5, 5}
 
@@ -103,6 +108,7 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: cross_product
   sampler:
     type: cross_product
     constants:
@@ -118,19 +124,19 @@ will result in the following `out.txt` files.
 
 ```
 ::::::::::::::
-X1.20.X2.10.X3.10.s_type.cross_product/out.txt
+cross_product/X1.20.X2.10.X3.10.s_type.cross_product/out.txt
 ::::::::::::::
 {20, 10, 10}
 ::::::::::::::
-X1.20.X2.10.X3.5.s_type.cross_product/out.txt
+cross_product/X1.20.X2.10.X3.5.s_type.cross_product/out.txt
 ::::::::::::::
 {20, 10, 5}
 ::::::::::::::
-X1.20.X2.5.X3.10.s_type.cross_product/out.txt
+cross_product/X1.20.X2.5.X3.10.s_type.cross_product/out.txt
 ::::::::::::::
 {20, 5, 10}
 ::::::::::::::
-X1.20.X2.5.X3.5.s_type.cross_product/out.txt
+cross_product/X1.20.X2.5.X3.5.s_type.cross_product/out.txt
 ::::::::::::::
 {20, 5, 5}
 
@@ -153,6 +159,7 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: list
   sampler:
     type: list
     constants:
@@ -168,11 +175,11 @@ will result in the following `out.txt` files.
 
 ```
 ::::::::::::::
-X1.20.X2.10.X3.10.s_type.list/out.txt
+list/X1.20.X2.10.X3.10.s_type.list/out.txt
 ::::::::::::::
 {20, 10, 10}
 ::::::::::::::
-X1.20.X2.5.X3.5.s_type.list/out.txt
+list/X1.20.X2.5.X3.5.s_type.list/out.txt
 ::::::::::::::
 {20, 5, 5}
 
@@ -195,9 +202,10 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: random
   sampler:
     type: random
-    num_samples: 5
+    num_samples: 2
     constants:
       X1: 20
       s_type: random
@@ -216,13 +224,13 @@ will result in the following `out.txt` files.
 
 ```
 ::::::::::::::
-X1.20.X2.5.216116379276561.X3.9.596853343739944.s_type.random/out.txt
+random/X1.20.X2.6.0683107773232186.X3.7.965846349547918.s_type.random/out.txt
 ::::::::::::::
-{20, 5.216116379276561, 9.596853343739944}
+{20, 6.0683107773232186, 7.965846349547918}
 ::::::::::::::
-X1.20.X2.9.290368859808531.X3.8.759626617749904.s_type.random/out.txt
+random/X1.20.X2.9.440349297581555.X3.5.801121329066036.s_type.random/out.txt
 ::::::::::::::
-{20, 9.290368859808531, 8.759626617749904}
+{20, 9.440349297581555, 5.801121329066036}
 
 ```
 
@@ -243,14 +251,18 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: uqpipeline
   sampler:
     type: uqpipeline
     uq_points: points
     uq_variables:
-    - X1
-    - X2
-    uq_code: "points = sampler.CartesianCrossSampler.sample_points(\n    num_divisions=[3,3],\
-      \ \n    box=[[-1,1],[]], \n    values=[[],['foo', 'bar']])\n"
+      - X1
+      - X2
+    uq_code: |
+      points = sampler.CartesianCrossSampler.sample_points(
+        num_divisions=[3,3], 
+        box=[[-1,1],[]], 
+        values=[[],['foo', 'bar']])    
 
 ```
 
@@ -258,25 +270,163 @@ will result in the following `out.txt` files.
 
 ```
 ::::::::::::::
-X1.-1.0.X2.bar/out.txt
+uqpipeline/X1.-1.0.X2.bar/out.txt
 ::::::::::::::
 {-1.0, bar, }
 ::::::::::::::
-X1.-1.0.X2.foo/out.txt
+uqpipeline/X1.-1.0.X2.foo/out.txt
 ::::::::::::::
 {-1.0, foo, }
 ::::::::::::::
-X1.0.0.X2.bar/out.txt
+uqpipeline/X1.0.0.X2.bar/out.txt
 ::::::::::::::
 {0.0, bar, }
 ::::::::::::::
-X1.0.0.X2.foo/out.txt
+uqpipeline/X1.0.0.X2.foo/out.txt
 ::::::::::::::
 {0.0, foo, }
 ::::::::::::::
-X1.1.0.X2.foo/out.txt
+uqpipeline/X1.1.0.X2.bar/out.txt
+::::::::::::::
+{1.0, bar, }
+::::::::::::::
+uqpipeline/X1.1.0.X2.foo/out.txt
 ::::::::::::::
 {1.0, foo, }
+
+```
+
+
+## csv_column {#csv_column}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_csv_column.yaml
+```
+
+to run the following `codepy_config` file
+
+```yaml
+
+## cat column_test.csv
+# X1,X2,X3
+# 20,5,5
+# 20,10,10
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: csv_column
+  sampler:
+    type: csv
+    csv_file: column_test.csv
+    row_headers: false
+
+```
+
+will result in the following `out.txt` files.
+
+```
+::::::::::::::
+csv_column/X1.20.0.X2.10.0.X3.10.0/out.txt
+::::::::::::::
+{20.0, 10.0, 10.0}
+::::::::::::::
+csv_column/X1.20.0.X2.5.0.X3.5.0/out.txt
+::::::::::::::
+{20.0, 5.0, 5.0}
+
+```
+
+
+## csv_row {#csv_row}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_csv_row.yaml
+```
+
+to run the following `codepy_config` file
+
+```yaml
+
+## cat row_test.csv
+# X1,20,20
+# X2,5,10
+# X3,5,10
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: csv_row
+  sampler:
+    type: csv
+    csv_file: row_test.csv
+    row_headers: True
+
+```
+
+will result in the following `out.txt` files.
+
+```
+::::::::::::::
+csv_row/X1.20.0.X2.10.0.X3.10.0/out.txt
+::::::::::::::
+{20.0, 10.0, 10.0}
+::::::::::::::
+csv_row/X1.20.0.X2.5.0.X3.5.0/out.txt
+::::::::::::::
+{20.0, 5.0, 5.0}
+
+```
+
+
+## custom {#custom}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_custom.yaml
+```
+
+to run the following `codepy_config` file
+
+```yaml
+
+## cat custom_function.py
+# def test_function(num_samples):
+#     return [{"X1": 20, "X2": 5, "X3": 5},
+#             {"X1": 20, "X2": 10, "X3": 10}][:num_samples]
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: custom
+  sampler:
+    type: custom
+    function: test_function
+    module: custom_function.py
+    args:
+      num_samples: 2
+
+```
+
+will result in the following `out.txt` files.
+
+```
+::::::::::::::
+custom/X1.20.X2.10.X3.10/out.txt
+::::::::::::::
+{20, 10, 10}
+::::::::::::::
+custom/X1.20.X2.5.X3.5/out.txt
+::::::::::::::
+{20, 5, 5}
 
 ```
 

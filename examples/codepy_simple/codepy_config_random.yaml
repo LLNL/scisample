@@ -4,9 +4,10 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: random
   sampler:
     type: random
-    num_samples: 5
+    num_samples: 2
     constants:
       X1: 20
       s_type: random

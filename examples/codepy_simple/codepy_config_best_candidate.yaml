@@ -4,9 +4,10 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: best_candidate
   sampler:
     type: best_candidate
-    num_samples: 5
+    num_samples: 2
     constants:
       X1: 20
       s_type: best_candidate

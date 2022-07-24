@@ -100,3 +100,54 @@ will result in the following `out.txt` files.
 
 !INCLUDECODE "../../examples/codepy_simple/uqpipeline_out.txt" 
 
+
+## csv_column {#csv_column}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_csv_column.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_csv_column.yaml" (yaml), 2:999
+
+will result in the following `out.txt` files.
+
+!INCLUDECODE "../../examples/codepy_simple/csv_column_out.txt" 
+
+
+## csv_row {#csv_row}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_csv_row.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_csv_row.yaml" (yaml), 2:999
+
+will result in the following `out.txt` files.
+
+!INCLUDECODE "../../examples/codepy_simple/csv_row_out.txt" 
+
+
+## custom {#custom}
+
+Using 
+
+```bash
+codepy run . -c codepy_config_custom.yaml
+```
+
+to run the following `codepy_config` file
+
+!INCLUDECODE "../../examples/codepy_simple/codepy_config_custom.yaml" (yaml), 2:999
+
+will result in the following `out.txt` files.
+
+!INCLUDECODE "../../examples/codepy_simple/custom_out.txt" 
+

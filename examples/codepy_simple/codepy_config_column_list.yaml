@@ -4,9 +4,13 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: column_list
   sampler:
     type: column_list
     constants:
       X1: 20
       s_type: column_list
-    parameters: "X2  X3\n5   5\n10  10 \n"
+    parameters: |
+      X2  X3
+      5   5
+      10  10

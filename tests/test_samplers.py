@@ -588,7 +588,7 @@ class TestScisampleBestCandidate(unittest.TestCase):
             # test only works if pandas is installed
             self.assertTrue(True)
 
-class TestCsvSampler(unittest.TestCase):
+class TestCsvRowSampler(unittest.TestCase):
     """Unit test for testing the csv sampler."""
     CSV_SAMPLER = """
     sampler:
@@ -638,6 +638,56 @@ class TestCsvSampler(unittest.TestCase):
         self.assertEqual(samples[1]['X2'], 10)
         self.assertEqual(samples[1]['X3'], 10)
 
+class TestCsvColumnSampler(unittest.TestCase):
+    """Unit test for testing the csv sampler."""
+    CSV_SAMPLER = """
+    sampler:
+        type: csv
+        csv_file: {path}/test.csv
+        row_headers: False
+    """
+
+    # Note: the csv reader does not ignore blank lines
+    CSV1 = """X1,X2,X3
+    20,5,5
+    20,10,10"""
+    
+    def setUp(self):
+        self.tmp_dir = tempfile.mkdtemp()
+        self.definitions = self.CSV_SAMPLER.format(path=self.tmp_dir)
+        self.csv_data = self.CSV1
+        self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
+        self.csv_file = os.path.join(self.tmp_dir, "test.csv")
+        with open(self.sampler_file, 'w') as _file:
+            _file.write(self.definitions)
+        with open(self.csv_file, 'w') as _file:
+            _file.write(self.csv_data)
+
+        self.sample_data = read_yaml(self.sampler_file)
+
+        self.sampler = new_sampler(self.sample_data['sampler'])
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_dir, ignore_errors=True)
+
+    def test_setup(self):
+        self.assertTrue(os.path.isdir(self.tmp_dir))
+        self.assertTrue(os.path.isfile(self.sampler_file))
+        self.assertTrue(os.path.isfile(self.csv_file))
+
+    def test_dispatch(self):
+        self.assertTrue(isinstance(self.sampler, CsvSampler))
+
+    def test_samples(self):
+        samples = self.sampler.get_samples()
+        self.assertEqual(len(samples), 2)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 20)
+        self.assertEqual(samples[0]['X2'], 5)
+        self.assertEqual(samples[0]['X3'], 5)
+        self.assertEqual(samples[1]['X2'], 10)
+        self.assertEqual(samples[1]['X3'], 10)
+        
 class TestCustomSampler(unittest.TestCase):
     """Unit test for testing the custom sampler."""
 

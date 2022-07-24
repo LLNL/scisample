@@ -4,6 +4,7 @@ setup:
   interactive: true
   sleep: 1
   autoyes: true
+  study_name: cross_product
   sampler:
     type: cross_product
     constants:
