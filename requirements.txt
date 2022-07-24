@@ -25,3 +25,4 @@ pytest-cov
 twine
 tbump
 MarkdownPP
+build
