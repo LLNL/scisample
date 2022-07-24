@@ -2,12 +2,12 @@ There are 9 examples:
 1. [best_candidate](#best_candidate)
 1. [column_list](#column_list)
 1. [cross_product](#cross_product)
-1. [list](#list)
-1. [random](#random)
-1. [uqpipeline](#uqpipeline)
 1. [csv_column](#csv_column)
 1. [csv_row](#csv_row)
 1. [custom](#custom)
+1. [list](#list)
+1. [random](#random)
+1. [uqpipeline](#uqpipeline)
 
 ## best_candidate
 Using 
@@ -140,6 +140,134 @@ cross_product/X1.20.X2.5.X3.10.s_type.cross_product/out.txt
 {20, 5, 10}
 ::::::::::::::
 cross_product/X1.20.X2.5.X3.5.s_type.cross_product/out.txt
+::::::::::::::
+{20, 5, 5}
+```
+
+
+## csv_column
+
+Using 
+
+```bash
+codepy run . -c codepy_config_csv_column.yaml
+```
+
+to run the following `codepy_config` file
+
+```yaml
+
+## cat column_test.csv
+# X1,X2,X3
+# 20,5,5
+# 20,10,10
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: csv_column
+  sampler:
+    type: csv
+    csv_file: column_test.csv
+    row_headers: false
+```
+
+will result in output identical (or similar) to the following: 
+
+```
+::::::::::::::
+csv_column/X1.20.0.X2.10.0.X3.10.0/out.txt
+::::::::::::::
+{20.0, 10.0, 10.0}
+::::::::::::::
+csv_column/X1.20.0.X2.5.0.X3.5.0/out.txt
+::::::::::::::
+{20.0, 5.0, 5.0}
+```
+
+
+## csv_row
+
+Using 
+
+```bash
+codepy run . -c codepy_config_csv_row.yaml
+```
+
+to run the following `codepy_config` file
+
+```yaml
+
+## cat row_test.csv
+# X1,20,20
+# X2,5,10
+# X3,5,10
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: csv_row
+  sampler:
+    type: csv
+    csv_file: row_test.csv
+    row_headers: True
+```
+
+will result in output identical (or similar) to the following: 
+
+```
+::::::::::::::
+csv_row/X1.20.0.X2.10.0.X3.10.0/out.txt
+::::::::::::::
+{20.0, 10.0, 10.0}
+::::::::::::::
+csv_row/X1.20.0.X2.5.0.X3.5.0/out.txt
+::::::::::::::
+{20.0, 5.0, 5.0}
+```
+
+
+## custom
+
+Using 
+
+```bash
+codepy run . -c codepy_config_custom.yaml
+```
+
+to run the following `codepy_config` file
+
+```yaml
+
+## cat custom_function.py
+# def test_function(num_samples):
+#     return [{"X1": 20, "X2": 5, "X3": 5},
+#             {"X1": 20, "X2": 10, "X3": 10}][:num_samples]
+
+setup:
+  interactive: true
+  sleep: 1
+  autoyes: true
+  study_name: custom
+  sampler:
+    type: custom
+    function: test_function
+    module: custom_function.py
+    args:
+      num_samples: 2
+```
+
+will result in output identical (or similar) to the following: 
+
+```
+::::::::::::::
+custom/X1.20.X2.10.X3.10/out.txt
+::::::::::::::
+{20, 10, 10}
+::::::::::::::
+custom/X1.20.X2.5.X3.5/out.txt
 ::::::::::::::
 {20, 5, 5}
 ```
@@ -289,133 +417,5 @@ uqpipeline/X1.1.0.X2.bar/out.txt
 uqpipeline/X1.1.0.X2.foo/out.txt
 ::::::::::::::
 {1.0, foo, }
-```
-
-
-## csv_column
-
-Using 
-
-```bash
-codepy run . -c codepy_config_csv_column.yaml
-```
-
-to run the following `codepy_config` file
-
-```yaml
-
-## cat column_test.csv
-# X1,X2,X3
-# 20,5,5
-# 20,10,10
-
-setup:
-  interactive: true
-  sleep: 1
-  autoyes: true
-  study_name: csv_column
-  sampler:
-    type: csv
-    csv_file: column_test.csv
-    row_headers: false
-```
-
-will result in output identical (or similar) to the following: 
-
-```
-::::::::::::::
-csv_column/X1.20.0.X2.10.0.X3.10.0/out.txt
-::::::::::::::
-{20.0, 10.0, 10.0}
-::::::::::::::
-csv_column/X1.20.0.X2.5.0.X3.5.0/out.txt
-::::::::::::::
-{20.0, 5.0, 5.0}
-```
-
-
-## csv_row
-
-Using 
-
-```bash
-codepy run . -c codepy_config_csv_row.yaml
-```
-
-to run the following `codepy_config` file
-
-```yaml
-
-## cat row_test.csv
-# X1,20,20
-# X2,5,10
-# X3,5,10
-
-setup:
-  interactive: true
-  sleep: 1
-  autoyes: true
-  study_name: csv_row
-  sampler:
-    type: csv
-    csv_file: row_test.csv
-    row_headers: True
-```
-
-will result in output identical (or similar) to the following: 
-
-```
-::::::::::::::
-csv_row/X1.20.0.X2.10.0.X3.10.0/out.txt
-::::::::::::::
-{20.0, 10.0, 10.0}
-::::::::::::::
-csv_row/X1.20.0.X2.5.0.X3.5.0/out.txt
-::::::::::::::
-{20.0, 5.0, 5.0}
-```
-
-
-## custom
-
-Using 
-
-```bash
-codepy run . -c codepy_config_custom.yaml
-```
-
-to run the following `codepy_config` file
-
-```yaml
-
-## cat custom_function.py
-# def test_function(num_samples):
-#     return [{"X1": 20, "X2": 5, "X3": 5},
-#             {"X1": 20, "X2": 10, "X3": 10}][:num_samples]
-
-setup:
-  interactive: true
-  sleep: 1
-  autoyes: true
-  study_name: custom
-  sampler:
-    type: custom
-    function: test_function
-    module: custom_function.py
-    args:
-      num_samples: 2
-```
-
-will result in output identical (or similar) to the following: 
-
-```
-::::::::::::::
-custom/X1.20.X2.10.X3.10/out.txt
-::::::::::::::
-{20, 10, 10}
-::::::::::::::
-custom/X1.20.X2.5.X3.5/out.txt
-::::::::::::::
-{20, 5, 5}
 ```
 

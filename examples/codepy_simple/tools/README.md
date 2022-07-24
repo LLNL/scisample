@@ -7,7 +7,7 @@ parallel "echo {}; cd {}; more *2022*/run*/*/out.txt > ../{}_out.txt" ::: *20220
 # edit names and files as needed
 
 # make markdown document
-python3 tools/make_mdpp_codepy_docs.py best_candidate column_list cross_product list random uqpipeline csv_column csv_row custom > codepy_docs.mdpp
+python3 tools/make_mdpp_codepy_docs.py best_candidate column_list cross_product csv_column csv_row custom list random uqpipeline  > codepy_docs.mdpp
 markdown-pp codepy_docs.mdpp -o codepy_docs.md
 
 # edit markdown file to remove extra newlines
