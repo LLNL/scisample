@@ -9,8 +9,7 @@ There are 9 examples:
 1. [csv_row](#csv_row)
 1. [custom](#custom)
 
-## best_candidate {#best_candidate}
-
+## best_candidate
 Using 
 
 ```bash
@@ -55,7 +54,7 @@ best_candidate/X1.20.X2.9.621633469241472.X3.5.619325094643691.s_type.best_candi
 ```
 
 
-## column_list {#column_list}
+## column_list
 
 Using 
 
@@ -233,7 +232,7 @@ random/X1.20.X2.9.440349297581555.X3.5.801121329066036.s_type.random/out.txt
 ```
 
 
-## uqpipeline {#uqpipeline}
+## uqpipeline
 
 Using 
 
