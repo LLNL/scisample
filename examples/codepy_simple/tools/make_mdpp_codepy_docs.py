@@ -14,7 +14,7 @@ print()
 for sampler in sys.argv[1:]:
 	output = (
 		'''
-## SAMPLER {#SAMPLER}
+## SAMPLER
 
 Using 
 
