@@ -11,5 +11,10 @@ setup:
       X1: 20
       s_type: best_candidate
     parameters:
-      X2: '{''min'': 5, ''max'': 10}'
-      X3: '{''min'': 5, ''max'': 10}'
+      X2:
+        min: 5
+        max: 10
+      X3:
+        min: 5
+        max: 10
+

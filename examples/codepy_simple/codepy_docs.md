@@ -22,13 +22,29 @@ setup:
       X1: 20
       s_type: best_candidate
     parameters:
-      X2: '{''min'': 5, ''max'': 10}'
-      X3: '{''min'': 5, ''max'': 10}'
+      X2:
+        min: 5
+        max: 10
+      X3:
+        min: 5
+        max: 10
+
 
 ```
 
 will result in the following `out.txt` files.
 
+```
+::::::::::::::
+X1.20.X2.5.161752200752359.X3.9.921390919925802.s_type.best_candidate/out.txt
+::::::::::::::
+{20, 5.161752200752359, 9.921390919925802}
+::::::::::::::
+X1.20.X2.5.265568649708979.X3.6.052470560491571.s_type.best_candidate/out.txt
+::::::::::::::
+{20, 5.265568649708979, 6.052470560491571}
+
+```
 
 
 ## column_list {#column_list}
@@ -186,13 +202,29 @@ setup:
       X1: 20
       s_type: random
     parameters:
-      X2: '{''min'': 5, ''max'': 10}'
-      X3: '{''min'': 5, ''max'': 10}'
+      X2:
+        min: 5
+        max: 10
+      X3:
+        min: 5
+        max: 10
+
 
 ```
 
 will result in the following `out.txt` files.
 
+```
+::::::::::::::
+X1.20.X2.5.216116379276561.X3.9.596853343739944.s_type.random/out.txt
+::::::::::::::
+{20, 5.216116379276561, 9.596853343739944}
+::::::::::::::
+X1.20.X2.9.290368859808531.X3.8.759626617749904.s_type.random/out.txt
+::::::::::::::
+{20, 9.290368859808531, 8.759626617749904}
+
+```
 
 
 ## uqpipeline {#uqpipeline}
