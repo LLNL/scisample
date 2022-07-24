@@ -42,7 +42,6 @@ best_candidate/X1.20.X2.7.602642791775893.X3.8.05887326792994.s_type.best_candid
 best_candidate/X1.20.X2.9.621633469241472.X3.5.619325094643691.s_type.best_candidate/out.txt
 ::::::::::::::
 {20, 9.621633469241472, 5.619325094643691}
-
 ```
 
 
@@ -85,7 +84,6 @@ column_list/X1.20.X2.10.X3.10.s_type.column_list/out.txt
 column_list/X1.20.X2.5.X3.5.s_type.column_list/out.txt
 ::::::::::::::
 {20, 5, 5}
-
 ```
 
 
@@ -135,7 +133,6 @@ cross_product/X1.20.X2.5.X3.10.s_type.cross_product/out.txt
 cross_product/X1.20.X2.5.X3.5.s_type.cross_product/out.txt
 ::::::::::::::
 {20, 5, 5}
-
 ```
 
 
@@ -177,7 +174,6 @@ list/X1.20.X2.10.X3.10.s_type.list/out.txt
 list/X1.20.X2.5.X3.5.s_type.list/out.txt
 ::::::::::::::
 {20, 5, 5}
-
 ```
 
 
@@ -224,7 +220,6 @@ random/X1.20.X2.6.0683107773232186.X3.7.965846349547918.s_type.random/out.txt
 random/X1.20.X2.9.440349297581555.X3.5.801121329066036.s_type.random/out.txt
 ::::::::::::::
 {20, 9.440349297581555, 5.801121329066036}
-
 ```
 
 
@@ -285,7 +280,6 @@ uqpipeline/X1.1.0.X2.bar/out.txt
 uqpipeline/X1.1.0.X2.foo/out.txt
 ::::::::::::::
 {1.0, foo, }
-
 ```
 
 
@@ -328,7 +322,6 @@ csv_column/X1.20.0.X2.10.0.X3.10.0/out.txt
 csv_column/X1.20.0.X2.5.0.X3.5.0/out.txt
 ::::::::::::::
 {20.0, 5.0, 5.0}
-
 ```
 
 
@@ -371,7 +364,6 @@ csv_row/X1.20.0.X2.10.0.X3.10.0/out.txt
 csv_row/X1.20.0.X2.5.0.X3.5.0/out.txt
 ::::::::::::::
 {20.0, 5.0, 5.0}
-
 ```
 
 
@@ -416,6 +408,5 @@ custom/X1.20.X2.10.X3.10/out.txt
 custom/X1.20.X2.5.X3.5/out.txt
 ::::::::::::::
 {20, 5, 5}
-
 ```
 

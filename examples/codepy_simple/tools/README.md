@@ -10,6 +10,8 @@ parallel "echo {}; cd {}; more *2022*/run*/*/out.txt > ../{}_out.txt" ::: *20220
 python3 tools/make_mdpp_codepy_docs.py best_candidate column_list cross_product list random uqpipeline csv_column csv_row custom > codepy_docs.mdpp
 markdown-pp codepy_docs.mdpp -o codepy_docs.md
 
+# edit markdown file to remove extra newlines
+
 # first 6 examples were converted from maestro to codepy
 ../codepy_config_best_candidate.yaml  ../codepy_config_cross_product.yaml  ../codepy_config_random.yaml
 ../codepy_config_column_list.yaml     ../codepy_config_list.yaml	   ../codepy_config_uqpipeline.yaml
