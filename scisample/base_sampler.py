@@ -218,12 +218,12 @@ class BaseSampler(SamplerInterface):
     def parameter_block(self):
         """
         Converts samples to parameter dictionary in a format convenient for ``maestrowf``
-        
+
         The keys are the labels and the values are a string version of the
         list, so it can be easily passed to Jinja.
-        
+
         Given the following sampler:
-        
+
         | type: list
         | constants:
         |     X1: 20
@@ -234,14 +234,14 @@ class BaseSampler(SamplerInterface):
 
         ``get_samples`` returns a list of dictionaries:
 
-        | [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5}, 
+        | [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5},
         |  {'X1': 20, 'X2': 10, 'X3': 10, 'X4': 10}]
 
         and ``parameter_block`` returns a dictionary of dictionaries:
 
-        | {'X1': {'values': [20, 20], 'label': 'X1.%%'}, 
-        |  'X2': {'values': [5, 10], 'label': 'X2.%%'}, 
-        |  'X3': {'values': [5, 10], 'label': 'X3.%%'}, 
+        | {'X1': {'values': [20, 20], 'label': 'X1.%%'},
+        |  'X2': {'values': [5, 10], 'label': 'X2.%%'},
+        |  'X3': {'values': [5, 10], 'label': 'X3.%%'},
         |  'X4': {'values': [5, 10], 'label': 'X4.%%'}}
         """ # noqa
         if self._parameter_block is None:
@@ -372,9 +372,7 @@ class BaseSampler(SamplerInterface):
                 new_sample_points.append(candidates[j])
                 sample_points.append(candidates[j])
                 new_sample_ids.append(j)
-
-        new_samples_df = pd.DataFrame(columns=df.keys().tolist())
-        for new_sample_id in new_sample_ids:
-            new_samples_df = new_samples_df.append(df.iloc[new_sample_id])
-
+        new_samples_df = pd.concat([
+            df.iloc[new_sample_id] for new_sample_id in new_sample_ids],
+            axis=1).transpose()
         self._samples = new_samples_df.to_dict(orient='records')

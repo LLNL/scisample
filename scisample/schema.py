@@ -141,7 +141,6 @@ RANDOM_SCHEMA = {
     'properties': {
         'type': {'type': 'string'},
         'num_samples': {'type': 'integer'},
-        'previous_samples': {'type': 'string'},
         'constants': {'type': 'object'},
         'parameters': {
             'type': 'object'
@@ -150,8 +149,22 @@ RANDOM_SCHEMA = {
     'required': ['type', 'num_samples'],
 }
 
-BEST_CANDIDATE_SCHEMA = RANDOM_SCHEMA
-
+BEST_CANDIDATE_SCHEMA = {
+    'type': 'object',
+    'properties': {
+        'type': {'type': 'string'},
+        'num_samples': {'type': 'integer'},
+        'previous_samples': {'type': 'string'},
+        'cost_variable': {'type': 'string'},
+        'downselect_ratio': {'type': 'number'},
+        'voxel_overlap': {'type': 'number'},
+        'constants': {'type': 'object'},
+        'parameters': {
+            'type': 'object'
+        },
+    },
+    'required': ['type', 'num_samples'],
+}
 
 UQPIPELINE_SCHEMA = {
     'type': 'object',

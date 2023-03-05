@@ -229,3 +229,13 @@ def parameter_list(start, stop, step=None, num_points=None):
         return_list = list(numpy.linspace(start, stop, num_points))
 
     return return_list
+
+def manhattan_distance(x, y):
+    """
+    Calculate the Manhattan distance between two points.
+
+    :param x: First point
+    :param y: Second point
+    :returns: Manhattan distance between the two points
+    """
+    return sum(abs(a - b) for a, b in zip(x, y))    # pylint: disable=invalid-name
