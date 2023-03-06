@@ -660,19 +660,17 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
     sampler:
         type: best_candidate
         num_samples: 30
-        previous_samples: samples.csv
+        previous_samples: {path}/samples.csv
         cost_variable: cost
         downselect_ratio: 0.3
         voxel_overlap: 1.0 # voxel just touches nearest neighbor
-        constants:
-            X1: 20
         parameters:
+            X1:
+                min: -2
+                max: 2
             X2:
-                min: 5
-                max: 10
-            X3:
-                min: 5
-                max: 10
+                min: -1
+                max: 3
     """
     # Note: the csv reader does not ignore blank lines
     CSV1 = """,X1,X2,cost

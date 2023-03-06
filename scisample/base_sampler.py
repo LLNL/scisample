@@ -281,7 +281,7 @@ class BaseSampler(SamplerInterface):
     # R0914 - Too many local variables (27/15) (too-many-locals)
     # R0912 - Too many branches (14/12) (too-many-branches)
     # R0915 - Too many statements (56/50) (too-many-statements)
-    def downselect(self, samples):
+    def downselect(self, samples, previous_samples=None):
         """
         Downselect samples based on specification in sampling_dict.
 
@@ -307,21 +307,22 @@ class BaseSampler(SamplerInterface):
         ndims = len(columns)
         candidates = df[columns].values.tolist()
         num_points = samples
-
-        if not('previous_samples' in self.data.keys()):
-            sample_points = []
-            sample_points.append(candidates[0])
-            new_sample_points = []
-            new_sample_points.append(candidates[0])
-            new_sample_ids = []
-            new_sample_ids.append(0)
-            n0 = 1
+        if (type(previous_samples) != pd.core.frame.DataFrame
+            and not('previous_samples' in self.data.keys())):
+                sample_points = []
+                sample_points.append(candidates[0])
+                new_sample_points = []
+                new_sample_points.append(candidates[0])
+                new_sample_ids = []
+                new_sample_ids.append(0)
+                n0 = 1
         else:
-            try:
-                previous_samples = pd.read_csv(self.data["previous_samples"])
-            except ValueError:
-                raise Exception("Error opening previous_samples datafile:" +
-                                self.data["previous_samples"])
+            if type(previous_samples) != pd.core.frame.DataFrame:
+                try:
+                    previous_samples = pd.read_csv(self.data["previous_samples"])
+                except ValueError:
+                    raise Exception("Error opening previous_samples datafile:" +
+                                    self.data["previous_samples"])
             sample_points = previous_samples[columns].values.tolist()
             new_sample_points = []
             new_sample_ids = []

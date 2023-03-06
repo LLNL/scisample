@@ -2,7 +2,14 @@
 Module defining the custom sampler object.
 """
 
+# @TODO: support more parameters than in previous_samples
+
 import logging
+import os
+import copy
+from pathlib import Path
+import pandas as pd
+from collections import defaultdict
 
 from scisample.random_sampler import RandomSampler
 from scisample.utils import (log_and_raise_exception, read_csv,
@@ -98,6 +105,9 @@ class BestCandidateSampler(RandomSampler):
     # W0221 - Parameters differ from overridden 'get_samples' method
     #         (arguments-differ)
 
+    def distance(self, a, b):
+        return manhattan_distance(a, b)
+
     def get_samples_with_previous(self, over_sample_rate=10):
         """
         Get samples from the sampler.
@@ -113,35 +123,88 @@ class BestCandidateSampler(RandomSampler):
             return self._samples
 
         self._samples = []
-
-        # read in previous samples
-        previous_samples = read_csv(self.data["previous_samples"])
-        if not previous_samples:
-            log_and_raise_exception(
-                "No samples found in 'previous_samples' file.")
-        if self.data["cost_variable"] not in previous_samples[0]:
-            log_and_raise_exception(
-                f"Cost variable '{self.data['cost_variable']}' not found "
-                "in 'previous_samples' file.")
+        previous_samples = pd.read_csv(Path(self.data["previous_samples"]))
+        previous_headers = list(previous_samples.columns)
 
         # sort previous samples by cost
-        previous_samples.sort(
-            key=lambda sample: sample[self.data["cost_variable"]])
+        previous_samples = previous_samples.sort_values(
+            by=self.data["cost_variable"])
 
         # downselect previous samples
         num_previous_samples = len(previous_samples)
         num_samples_to_keep = int(num_previous_samples * self.data["downselect_ratio"])
         previous_samples = previous_samples[:num_samples_to_keep]
+        # print(self.data["parameters"])
+        downselect_parameters = [
+            parameter
+            for parameter in self.data["parameters"].keys()
+            if parameter in previous_headers]
+        if not downselect_parameters:
+            return self.get_samples_no_previous(over_sample_rate)
+        previous_samples_inputs = previous_samples[downselect_parameters]
+        # create distance map
+        distance_map = defaultdict(list)
+        for i in range(len(previous_samples)):
+            a = previous_samples.iloc[i][downselect_parameters]
+            for j in range(i+1, len(previous_samples)):
+                b = previous_samples.iloc[j][downselect_parameters]
+                distance_map[i].append([self.distance(a,b),j])
+                distance_map[j].append([self.distance(a,b),i])
+        for value in distance_map.values():
+            value.sort(key=lambda x: x[0])
+        num_samples = self.data["num_samples"]
+        num_samples *= over_sample_rate * 1.0
+        num_samples /= num_samples_to_keep
+        num_samples = int(num_samples + 0.5)
+        sampler_list = []
+        print(distance_map[5][:7])
+        for i, value in distance_map.items():
+            j = value[0][1]
+            new_sampling_dict = copy.deepcopy(self.data)
+            for parameter in downselect_parameters:
+                half_width = self.data["voxel_overlap"] * abs(
+                    previous_samples.iloc[i][parameter]
+                    - previous_samples.iloc[j][parameter])
+                new_sampling_dict["parameters"][parameter]["min"] = (
+                    previous_samples.iloc[i][parameter] - half_width)
+                new_sampling_dict["parameters"][parameter]["max"] = (
+                    previous_samples.iloc[i][parameter] + half_width)
+                if (new_sampling_dict["parameters"][parameter]["min"]
+                    < self.data["parameters"][parameter]["min"]):
+                    new_sampling_dict["parameters"][parameter]["min"] = (
+                        self.data["parameters"][parameter]["min"])
+                if (new_sampling_dict["parameters"][parameter]["max"]
+                    > self.data["parameters"][parameter]["max"]):
+                    new_sampling_dict["parameters"][parameter]["max"] = (
+                        self.data["parameters"][parameter]["max"])
+            new_sampling_dict["num_samples"] = num_samples
+            sampler_list.append(RandomSampler(new_sampling_dict))
+        new_samples = []
+        for sampler in sampler_list:
+            new_samples.extend(sampler.get_samples())
+        # create dataframe from list of dicts
+        for sample in new_samples[:5]:
+            print("sample:", sample)
+            print('sample["X1"]', sample["X1"])
+        self._samples = new_samples
+        # try:
+        if True:
+            self.downselect(
+                self.data["num_samples"],
+                previous_samples=previous_samples)
+        # except Exception as exception:
+        #     log_and_raise_exception(
+        #         f"Error during 'downselect' in 'best_candidate' "
+        #         f"sampling: {exception}")
 
-        # #
-        # distance_map = {}
+        def rosenbrock(x, y):
+            return (1 - x)**2 + 100*(y - x**2)**2
+        df = pd.DataFrame(self._samples)
+        df['cost'] = df.apply(lambda row: rosenbrock(row['X1'], row['X2']), axis=1)
+        df.to_csv("best_candidate_2.csv")
+        # raise Exception("stop")
 
-
-        # # get the voxel size
-        # voxel_size = self._get_voxel_size(previous_samples)
-
-        # # get the voxel grid
-        # voxel_grid = self._get_voxel_grid(previous_samples, voxel_size)
+        return self._samples
 
         # # get the samples
         # self._samples = self._get_samples(
@@ -199,6 +262,5 @@ class BestCandidateSampler(RandomSampler):
 
         if not "previous_samples" in self.data:
             return self.get_samples_no_previous(over_sample_rate)
-        self._samples = []
 
-        return None
+        return self.get_samples_with_previous(over_sample_rate)
