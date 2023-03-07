@@ -19,7 +19,6 @@ import tempfile
 import unittest
 from contextlib import suppress
 
-import pytest
 import yaml
 
 from scisample.best_candidate_sampler import BestCandidateSampler
@@ -30,7 +29,7 @@ from scisample.random_sampler import RandomSampler
 from scisample.custom_sampler import CustomSampler
 from scisample.csv_sampler import CsvSampler
 from scisample.samplers import new_sampler
-from scisample.utils import SamplingError, read_yaml #, new_sampler_from_yaml
+from scisample.utils import SamplingError, read_yaml
 
 PANDAS_PLUS = False
 with suppress(ModuleNotFoundError):
@@ -39,12 +38,18 @@ with suppress(ModuleNotFoundError):
     import scipy.spatial as spatial
     PANDAS_PLUS = True
 
+if PANDAS_PLUS:
+    dir(np)
+    dir(spatial)
+
 # @TODO: improve coverage
+
 
 def new_sampler_from_yaml(yaml_text):
     """Returns sampler from yaml text"""
     return new_sampler(
         yaml.safe_load(yaml_text))
+
 
 class TestScisampleExceptions(unittest.TestCase):
     """
@@ -230,10 +235,12 @@ class TestScisampleList(unittest.TestCase):
             self.assertEqual(samples[0][f'X{i}'], 5)
             self.assertEqual(samples[1][f'X{i}'], 10)
         sampler
-        self.assertEqual(samples,
+        self.assertEqual(
+            samples,
             [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5, 'X5': 5, 'X6': 5},
              {'X1': 20, 'X2': 10, 'X3': 10, 'X4': 10, 'X5': 10, 'X6': 10}])
-        self.assertEqual(sampler.parameter_block,
+        self.assertEqual(
+            sampler.parameter_block,
             {'X1': {'values': [20, 20], 'label': 'X1.%%'},
              'X2': {'values': [5, 10], 'label': 'X2.%%'},
              'X3': {'values': [5, 10], 'label': 'X3.%%'},
@@ -393,6 +400,7 @@ class TestScisampleColumnList(unittest.TestCase):
             "All rows must have the same number of values"
             in str(context.exception))
 
+
 class TestScisampleRandomSampler(unittest.TestCase):
     """
     Scenario: normal and abnormal tests for RandomSampler
@@ -432,6 +440,7 @@ class TestScisampleRandomSampler(unittest.TestCase):
             self.assertTrue(sample['X4'] > 5)
             self.assertTrue(sample['X3'] < 10)
             self.assertTrue(sample['X4'] < 10)
+
     def test_normal2(self):
         """
         Given a random specification
@@ -517,6 +526,7 @@ class TestScisampleRandomSampler(unittest.TestCase):
         self.assertTrue(
             "must have a numeric maximum"
             in str(context.exception))
+
 
 class TestScisampleBestCandidate(unittest.TestCase):
     """
@@ -612,10 +622,10 @@ class TestScisampleBestCandidate(unittest.TestCase):
         with self.assertRaises(SamplingError) as context:
             new_sampler_from_yaml(yaml_text)
         self.assertTrue(
-            "The 'downselect_ratio' must be less than or equal to 1.0"
+            "The 'downselect_ratio' must be <= 1.0"
             in str(context.exception))
 
-    def test_error2(self):
+    def test_error3(self):
         """
         Given an invalid best_candidate specification
         And I request a new sampler
@@ -643,6 +653,7 @@ class TestScisampleBestCandidate(unittest.TestCase):
         self.assertTrue(
             "The 'voxel_overlap' must be greater than 0.0"
             in str(context.exception))
+
 
 class TestScisampleBestCandidateResample(unittest.TestCase):
     """
@@ -1026,6 +1037,8 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
             self.assertTrue(sample['X3'] < 1)
             self.assertEqual(sample['X4'], 20)
             self.assertEqual(sample['X5'], "foo")
+
+
 class TestCsvRowSampler(unittest.TestCase):
     """Unit test for testing the csv sampler."""
     CSV_SAMPLER = """
@@ -1076,6 +1089,7 @@ class TestCsvRowSampler(unittest.TestCase):
         self.assertEqual(samples[1]['X2'], 10)
         self.assertEqual(samples[1]['X3'], 10)
 
+
 class TestCsvColumnSampler(unittest.TestCase):
     """Unit test for testing the csv sampler."""
     CSV_SAMPLER = """
@@ -1125,6 +1139,7 @@ class TestCsvColumnSampler(unittest.TestCase):
         self.assertEqual(samples[0]['X3'], 5)
         self.assertEqual(samples[1]['X2'], 10)
         self.assertEqual(samples[1]['X3'], 10)
+
 
 class TestCustomSampler(unittest.TestCase):
     """Unit test for testing the custom sampler."""

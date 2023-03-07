@@ -5,16 +5,14 @@ Module defining the custom sampler object.
 # @TODO: support more parameters than in previous_samples
 
 import logging
-import os
 import copy
-from pathlib import Path
-import pandas as pd
 from collections import defaultdict
+from pathlib import Path
+
+import pandas as pd
 
 from scisample.random_sampler import RandomSampler
-from scisample.utils import (log_and_raise_exception, read_csv,
-                             manhattan_distance)
-
+from scisample.utils import (log_and_raise_exception, manhattan_distance)
 LOG = logging.getLogger(__name__)
 
 
@@ -78,16 +76,17 @@ class BestCandidateSampler(RandomSampler):
         if "downselect_ratio" in self.data:
             if self.data["downselect_ratio"] <= 0.0:
                 log_and_raise_exception(
-                    "The 'downselect_ratio' must be greater than 0.0.")
+                    "The 'downselect_ratio' must be > 0.0.")
             if self.data["downselect_ratio"] > 1.0:
                 log_and_raise_exception(
-                    "The 'downselect_ratio' must be less than or equal to 1.0.")
+                    "The 'downselect_ratio' must be <= 1.0.")
         if "voxel_overlap" in self.data:
             if self.data["voxel_overlap"] <= 0.0:
                 log_and_raise_exception(
                     "The 'voxel_overlap' must be greater than 0.0.")
         if "previous_samples" in self.data:
-            required_fields = ["cost_variable", "downselect_ratio", "voxel_overlap"]
+            required_fields = [
+                "cost_variable", "downselect_ratio", "voxel_overlap"]
             missing_fields = []
             for field in required_fields:
                 if field not in self.data:
@@ -103,12 +102,13 @@ class BestCandidateSampler(RandomSampler):
     #     pass
 
     # @TODO: what is the more correct way to do this?
-    # pylint: warning
+    # pylint warning
     # W0221 - Parameters differ from overridden 'get_samples' method
     #         (arguments-differ)
 
-    def distance(self, a, b):
-        return manhattan_distance(a, b)
+    def distance(self, point_1, point_2):
+        """ Calculate the distance between two points. """
+        return manhattan_distance(point_1, point_2)
 
     def get_samples_with_previous(self, over_sample_rate=10):
         """
@@ -124,7 +124,7 @@ class BestCandidateSampler(RandomSampler):
         if self._samples is not None:
             return self._samples
 
-        if self.data["over_sample_rate"] != None:
+        if self.data["over_sample_rate"] is not None:
             over_sample_rate = self.data["over_sample_rate"]
 
         self._samples = []
@@ -137,12 +137,13 @@ class BestCandidateSampler(RandomSampler):
 
         # downselect previous samples
         num_previous_samples = len(previous_samples)
-        num_samples_to_keep = int(num_previous_samples * self.data["downselect_ratio"])
+        num_samples_to_keep = int(
+            num_previous_samples * self.data["downselect_ratio"])
         if num_samples_to_keep > self.data["num_samples"]:
             LOG.warning("The number of samples to keep is greater than the "
                         "number of samples to generate. The number of samples "
-                        "to generate will be increased to the number of samples to "
-                        "keep.")
+                        "to generate will be increased to the number of "
+                        "samples to keep.")
             self.data["num_samples"] = num_samples_to_keep
         previous_samples = previous_samples[:num_samples_to_keep]
         downselect_parameters = [
@@ -154,11 +155,11 @@ class BestCandidateSampler(RandomSampler):
         # create distance map
         distance_map = defaultdict(list)
         for i in range(len(previous_samples)):
-            a = previous_samples.iloc[i][downselect_parameters]
+            point_1 = previous_samples.iloc[i][downselect_parameters]
             for j in range(i+1, len(previous_samples)):
-                b = previous_samples.iloc[j][downselect_parameters]
-                distance_map[i].append([self.distance(a,b),j])
-                distance_map[j].append([self.distance(a,b),i])
+                point_2 = previous_samples.iloc[j][downselect_parameters]
+                distance_map[i].append([self.distance(point_1, point_2), j])
+                distance_map[j].append([self.distance(point_1, point_2), i])
         for value in distance_map.values():
             value.sort(key=lambda x: x[0])
         num_samples = self.data["num_samples"]
@@ -178,11 +179,11 @@ class BestCandidateSampler(RandomSampler):
                 new_sampling_dict["parameters"][parameter]["max"] = (
                     previous_samples.iloc[i][parameter] + half_width)
                 if (new_sampling_dict["parameters"][parameter]["min"]
-                    < self.data["parameters"][parameter]["min"]):
+                        < self.data["parameters"][parameter]["min"]):
                     new_sampling_dict["parameters"][parameter]["min"] = (
                         self.data["parameters"][parameter]["min"])
                 if (new_sampling_dict["parameters"][parameter]["max"]
-                    > self.data["parameters"][parameter]["max"]):
+                        > self.data["parameters"][parameter]["max"]):
                     new_sampling_dict["parameters"][parameter]["max"] = (
                         self.data["parameters"][parameter]["max"])
             new_sampling_dict["num_samples"] = num_samples
@@ -201,7 +202,7 @@ class BestCandidateSampler(RandomSampler):
                 self.data["num_samples"],
                 previous_samples=previous_samples,
                 return_indices=True)
-        except Exception as exception:
+        except Exception as exception:  # pylint: disable=broad-except
             log_and_raise_exception(
                 f"Error during 'downselect' in 'best_candidate' "
                 f"sampling: {exception}")
@@ -222,7 +223,7 @@ class BestCandidateSampler(RandomSampler):
         if self._samples is not None:
             return self._samples
 
-        if self.data["over_sample_rate"] != None:
+        if self.data["over_sample_rate"] is not None:
             over_sample_rate = self.data["over_sample_rate"]
 
         self._samples = []
@@ -238,11 +239,11 @@ class BestCandidateSampler(RandomSampler):
         new_random_sample.get_samples()
         try:
             new_random_sample.downselect(self.data["num_samples"])
-        except Exception as exception:
+        except Exception as exception:  # pylint: disable=broad-except
             log_and_raise_exception(
                 f"Error during 'downselect' in 'best_candidate' "
                 f"sampling: {exception}")
-        self._samples = new_random_sample._samples
+        self._samples = new_random_sample.get_samples()
 
         return self._samples
 
@@ -260,7 +261,7 @@ class BestCandidateSampler(RandomSampler):
         if self._samples is not None:
             return self._samples
 
-        if not "previous_samples" in self.data:
+        if "previous_samples" not in self.data:
             return self.get_samples_no_previous(over_sample_rate)
 
         return self.get_samples_with_previous(over_sample_rate)

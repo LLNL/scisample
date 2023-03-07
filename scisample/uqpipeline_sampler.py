@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 from contextlib import suppress
+from pathlib import Path
 
 from scisample.base_sampler import BaseSampler
 from scisample.utils import log_and_raise_exception, read_yaml
@@ -14,7 +15,6 @@ from scisample.utils import log_and_raise_exception, read_yaml
 # import os
 # import sys
 # from scisample.utils import read_yaml
-from pathlib import Path
 import pkg_resources
 
 UQPIPELINE_SAMPLE_IMPORT = False
@@ -188,7 +188,7 @@ class UQPipelineSampler(BaseSampler):
         LOG.info("generating uqpipeline samples")
         try:
             exec(self.data['uq_code'])
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             log_and_raise_exception(
                 "unknown error when executing 'uq_code':"
                 f"{self.data['uq_code']}")
@@ -207,7 +207,7 @@ class UQPipelineSampler(BaseSampler):
                     "Unknown error when attempting to use"
                     "uq_pipeline code with scisample."
                     "Please contact a developer.")
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             log_and_raise_exception(
                 "unknown error when evaluating 'uq_samples':"
                 f"{self.data['uq_samples']}")

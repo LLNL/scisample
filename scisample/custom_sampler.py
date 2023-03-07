@@ -112,6 +112,7 @@ class CustomSampler(BaseSampler):
         if self._samples is not None:
             return self._samples
 
-        self._samples = self.sample_function(**self.data['args'])
+        sample_function = self.sample_function
+        self._samples = sample_function(**self.data['args'])
 
         return self._samples

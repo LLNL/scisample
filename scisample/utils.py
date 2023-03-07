@@ -66,7 +66,7 @@ def read_yaml(filename):
     :param filename: Name of file to read.
     :returns: Dictionary of file contents.
     """
-    with open(filename, 'r') as _file:
+    with open(filename, 'r', encoding='utf-8') as _file:
         content = yaml.safe_load(_file)
     return content
 
@@ -76,7 +76,7 @@ def read_csv(filename):
     Reads csv files and returns them as a list of lists.
     """
     results = []
-    with open(filename, newline='') as _file:
+    with open(filename, newline='', encoding='utf-8') as _file:
         csvreader = csv.reader(
             _file,
             skipinitialspace=True,
@@ -230,12 +230,13 @@ def parameter_list(start, stop, step=None, num_points=None):
 
     return return_list
 
-def manhattan_distance(x, y):
+
+def manhattan_distance(point_1, point_2):
     """
     Calculate the Manhattan distance between two points.
 
-    :param x: First point
-    :param y: Second point
+    :param point_1: First point
+    :param point_2: Second point
     :returns: Manhattan distance between the two points
     """
-    return sum(abs(a - b) for a, b in zip(x, y))    # pylint: disable=invalid-name
+    return sum(abs(a - b) for a, b in zip(point_1, point_2))  # noqa: E501 pylint: disable=invalid-name
