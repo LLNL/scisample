@@ -281,7 +281,7 @@ class BaseSampler(SamplerInterface):
     # R0914 - Too many local variables (27/15) (too-many-locals)
     # R0912 - Too many branches (14/12) (too-many-branches)
     # R0915 - Too many statements (56/50) (too-many-statements)
-    def downselect(self, samples, previous_samples=None):
+    def downselect(self, samples, previous_samples=None, return_indices=False):
         """
         Downselect samples based on specification in sampling_dict.
 
@@ -303,7 +303,7 @@ class BaseSampler(SamplerInterface):
                 "This function requires pandas, numpy & scipy packages")
 
         df = pd.DataFrame.from_dict(self._samples)
-        columns = self.parameters
+        columns = df.columns.tolist()
         ndims = len(columns)
         candidates = df[columns].values.tolist()
         num_points = samples
@@ -377,3 +377,5 @@ class BaseSampler(SamplerInterface):
             df.iloc[new_sample_id] for new_sample_id in new_sample_ids],
             axis=1).transpose()
         self._samples = new_samples_df.to_dict(orient='records')
+        if return_indices:
+            return new_sample_ids

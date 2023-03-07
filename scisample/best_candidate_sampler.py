@@ -69,6 +69,8 @@ class BestCandidateSampler(RandomSampler):
         """
         super().__init__(data)
         self.check_validity()
+        if "over_sample_rate" not in self.data:
+            self.data["over_sample_rate"] = None
 
     def check_validity(self):
         super().check_validity()
@@ -122,6 +124,9 @@ class BestCandidateSampler(RandomSampler):
         if self._samples is not None:
             return self._samples
 
+        if self.data["over_sample_rate"] != None:
+            over_sample_rate = self.data["over_sample_rate"]
+
         self._samples = []
         previous_samples = pd.read_csv(Path(self.data["previous_samples"]))
         previous_headers = list(previous_samples.columns)
@@ -133,15 +138,19 @@ class BestCandidateSampler(RandomSampler):
         # downselect previous samples
         num_previous_samples = len(previous_samples)
         num_samples_to_keep = int(num_previous_samples * self.data["downselect_ratio"])
+        if num_samples_to_keep > self.data["num_samples"]:
+            LOG.warning("The number of samples to keep is greater than the "
+                        "number of samples to generate. The number of samples "
+                        "to generate will be increased to the number of samples to "
+                        "keep.")
+            self.data["num_samples"] = num_samples_to_keep
         previous_samples = previous_samples[:num_samples_to_keep]
-        # print(self.data["parameters"])
         downselect_parameters = [
             parameter
             for parameter in self.data["parameters"].keys()
             if parameter in previous_headers]
         if not downselect_parameters:
             return self.get_samples_no_previous(over_sample_rate)
-        previous_samples_inputs = previous_samples[downselect_parameters]
         # create distance map
         distance_map = defaultdict(list)
         for i in range(len(previous_samples)):
@@ -157,7 +166,6 @@ class BestCandidateSampler(RandomSampler):
         num_samples /= num_samples_to_keep
         num_samples = int(num_samples + 0.5)
         sampler_list = []
-        print(distance_map[5][:7])
         for i, value in distance_map.items():
             j = value[0][1]
             new_sampling_dict = copy.deepcopy(self.data)
@@ -182,35 +190,23 @@ class BestCandidateSampler(RandomSampler):
         new_samples = []
         for sampler in sampler_list:
             new_samples.extend(sampler.get_samples())
-        # create dataframe from list of dicts
-        for sample in new_samples[:5]:
-            print("sample:", sample)
-            print('sample["X1"]', sample["X1"])
-        self._samples = new_samples
-        # try:
-        if True:
-            self.downselect(
+        self._samples = []
+        for sample in new_samples:
+            _sample = {}
+            for parameter in downselect_parameters:
+                _sample[parameter] = sample[parameter]
+            self._samples.append(_sample)
+        try:
+            new_indices = self.downselect(
                 self.data["num_samples"],
-                previous_samples=previous_samples)
-        # except Exception as exception:
-        #     log_and_raise_exception(
-        #         f"Error during 'downselect' in 'best_candidate' "
-        #         f"sampling: {exception}")
-
-        def rosenbrock(x, y):
-            return (1 - x)**2 + 100*(y - x**2)**2
-        df = pd.DataFrame(self._samples)
-        df['cost'] = df.apply(lambda row: rosenbrock(row['X1'], row['X2']), axis=1)
-        df.to_csv("best_candidate_2.csv")
-        # raise Exception("stop")
-
+                previous_samples=previous_samples,
+                return_indices=True)
+        except Exception as exception:
+            log_and_raise_exception(
+                f"Error during 'downselect' in 'best_candidate' "
+                f"sampling: {exception}")
+        self._samples = [new_samples[i] for i in new_indices]
         return self._samples
-
-        # # get the samples
-        # self._samples = self._get_samples(
-        #     previous_samples, voxel_grid, voxel_size, over_sample_rate)
-
-        # return self._samples
 
     def get_samples_no_previous(self, over_sample_rate=10):
         """
@@ -226,12 +222,16 @@ class BestCandidateSampler(RandomSampler):
         if self._samples is not None:
             return self._samples
 
+        if self.data["over_sample_rate"] != None:
+            over_sample_rate = self.data["over_sample_rate"]
+
         self._samples = []
 
         new_sampling_dict = {}
         records_to_copy = ["num_samples", "constants", "parameters"]
         for record in records_to_copy:
-            new_sampling_dict[record] = self.data[record]
+            if record in self.data:
+                new_sampling_dict[record] = self.data[record]
         new_sampling_dict["num_samples"] *= over_sample_rate
         new_sampling_dict["type"] = "random"
         new_random_sample = RandomSampler(new_sampling_dict)

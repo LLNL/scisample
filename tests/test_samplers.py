@@ -648,22 +648,18 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
     """
     Scenario: resample tests for BestCandidate
     """
-# class TestCsvRowSampler(unittest.TestCase):
-    # """Unit test for testing the csv sampler."""
-    # CSV_SAMPLER = """
-    # sampler:
-    #     type: csv
-    #     csv_file: {path}/test.csv
-    #     row_headers: True
-    # """
     RESAMPLE_SAMPLER = """
     sampler:
         type: best_candidate
         num_samples: 30
         previous_samples: {path}/samples.csv
         cost_variable: cost
-        downselect_ratio: 0.3
+        over_sample_rate: 2
+        downselect_ratio: 0.1
         voxel_overlap: 1.0 # voxel just touches nearest neighbor
+        constants:
+            X4: 20
+            X5: foo
         parameters:
             X1:
                 min: -2
@@ -671,9 +667,12 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
             X2:
                 min: -1
                 max: 3
+            X3:
+                min: -1
+                max: 1
     """
     # Note: the csv reader does not ignore blank lines
-    CSV1 = """,X1,X2,cost
+    PREVIOUS_DATA = """,X1,X2,cost
     0,1.0381277436778031,-0.7096193757574083,319.4558018555205
     1,-1.9927519079161806,2.9587244608100054,111.43892208454632
     2,1.9460293475881927,2.9749499087596765,66.84241498888628
@@ -980,16 +979,15 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
             self.skipTest("Pandas not installed")
         self.tmp_dir = tempfile.mkdtemp()
         self.definitions = self.RESAMPLE_SAMPLER.format(path=self.tmp_dir)
-        self.csv_data = self.CSV1
+        self.csv_data = self.PREVIOUS_DATA
         self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
         self.csv_file = os.path.join(self.tmp_dir, "samples.csv")
         with open(self.sampler_file, 'w') as _file:
             _file.write(self.definitions)
         with open(self.csv_file, 'w') as _file:
             _file.write(self.csv_data)
-
+        self.previous_data = pd.read_csv(self.csv_file)
         self.sample_data = read_yaml(self.sampler_file)
-
         self.sampler = new_sampler(self.sample_data['sampler'])
 
     def tearDown(self):
@@ -1003,20 +1001,31 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
     def test_dispatch(self):
         self.assertTrue(isinstance(self.sampler, BestCandidateSampler))
 
+    def rosenbrock(self, x, y):
+        return (1 - x)**2 + 100*(y - x**2)**2
+
     def test_samples(self):
-        # sampler = new_sampler_from_yaml(yaml_text)
-        # self.assertTrue(isinstance(sampler, BestCandidateSampler))
         samples = self.sampler.get_samples()
-        # self.assertEqual(len(samples), 5)
-        # for sample in samples:
-        #     self.assertEqual(sample['X1'], 20)
-        #     self.assertEqual(sample['X2'], "foo")
-        #     self.assertTrue(sample['X3'] > 5)
-        #     self.assertTrue(sample['X4'] > 5)
-        #     self.assertTrue(sample['X3'] < 10)
-        #     self.assertTrue(sample['X4'] < 10)
-
-
+        df_samples = pd.DataFrame(samples)
+        df_previous = self.previous_data
+        df_samples['cost'] = df_samples.apply(
+            lambda row: self.rosenbrock(row['X1'], row['X2']), axis=1)
+        max_cost_previous = df_previous['cost'].max()
+        avg_cost_previous = df_previous['cost'].mean()
+        max_cost_samples = df_samples['cost'].max()
+        avg_cost_samples = df_samples['cost'].mean()
+        self.assertEqual(len(samples), 30)
+        self.assertTrue(max_cost_samples < max_cost_previous)
+        self.assertTrue(avg_cost_samples < avg_cost_previous)
+        for sample in samples:
+            self.assertTrue(sample['X1'] > -2)
+            self.assertTrue(sample['X1'] < 2)
+            self.assertTrue(sample['X2'] > -1)
+            self.assertTrue(sample['X2'] < 3)
+            self.assertTrue(sample['X3'] > -1)
+            self.assertTrue(sample['X3'] < 1)
+            self.assertEqual(sample['X4'], 20)
+            self.assertEqual(sample['X5'], "foo")
 class TestCsvRowSampler(unittest.TestCase):
     """Unit test for testing the csv sampler."""
     CSV_SAMPLER = """
