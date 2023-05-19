@@ -6,26 +6,21 @@ Unit tests for  UQPipeline sampler objects:
 
 # @TODO: keep adding more samplers
 
-import os
-import sys
-# import shutil
-# import tempfile
 import unittest
-from contextlib import suppress
 
 import pytest
 import yaml
 
-from scisample.base_sampler import BaseSampler
-from scisample.utils import log_and_raise_exception
 from scisample.uqpipeline_sampler import UQPipelineSampler
 
 from scisample.samplers import new_sampler 
+
 
 def new_sampler_from_yaml(yaml_text):
     """Returns sampler from yaml text"""
     return new_sampler(
         yaml.safe_load(yaml_text))
+
 
 @pytest.mark.skipif(not UQPipelineSampler.UQPIPELINE_SAMPLE, reason="uqpipeline was not imported")
 class TestScisampleUQPipeline(unittest.TestCase):
@@ -59,14 +54,14 @@ class TestScisampleUQPipeline(unittest.TestCase):
 
         self.assertEqual(len(samples), 6)
 
-        self.assertEqual(samples, 
+        self.assertEqual(
+            samples, 
             [{'X1': -1.0, 'type': 'foo'}, 
              {'X1': -1.0, 'type': 'bar'}, 
              {'X1': 0.0, 'type': 'foo'}, 
              {'X1': 0.0, 'type': 'bar'}, 
              {'X1': 1.0, 'type': 'foo'}, 
              {'X1': 1.0, 'type': 'bar'}])
-
 
     def test_method_cartesian_cross(self):
         """

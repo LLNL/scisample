@@ -309,7 +309,7 @@ class BaseSampler(SamplerInterface):
         candidates = df[columns].values.tolist()
         num_points = samples
         if (not isinstance(previous_samples, pd.core.frame.DataFrame)
-                and not 'previous_samples' in self.data.keys()):
+                and 'previous_samples' not in self.data.keys()):
             sample_points = []
             sample_points.append(candidates[0])
             new_sample_points = []
