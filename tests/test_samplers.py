@@ -18,6 +18,7 @@ import shutil
 import tempfile
 import unittest
 import importlib
+import pandas as pd
 
 import yaml
 
@@ -36,12 +37,6 @@ if (not importlib.util.find_spec("pandas")
         or not importlib.util.find_spec("numpy")
         or not importlib.util.find_spec("scipy.spatial")):
     PANDAS_PLUS = False
-
-if PANDAS_PLUS:
-    dir(np)
-    dir(spatial)
-
-# @TODO: improve coverage
 
 
 def new_sampler_from_yaml(yaml_text):
@@ -563,9 +558,6 @@ class TestScisampleBestCandidate(unittest.TestCase):
                 self.assertTrue(sample['X4'] > 5)
                 self.assertTrue(sample['X3'] < 10)
                 self.assertTrue(sample['X4'] < 10)
-        else:
-            # test only works if pandas is installed
-            self.assertTrue(True)
 
     def test_error1(self):
         """
@@ -991,9 +983,9 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
         self.csv_data = self.PREVIOUS_DATA
         self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
         self.csv_file = os.path.join(self.tmp_dir, "samples.csv")
-        with open(self.sampler_file, 'w') as _file:
+        with open(self.sampler_file, 'w', encoding='utf-8') as _file:
             _file.write(self.definitions)
-        with open(self.csv_file, 'w') as _file:
+        with open(self.csv_file, 'w', encoding='utf-8') as _file:
             _file.write(self.csv_data)
         self.previous_data = pd.read_csv(self.csv_file)
         self.sample_data = read_yaml(self.sampler_file)
@@ -1003,17 +995,22 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def test_setup(self):
+        """ test setup """
         self.assertTrue(os.path.isdir(self.tmp_dir))
         self.assertTrue(os.path.isfile(self.sampler_file))
         self.assertTrue(os.path.isfile(self.csv_file))
 
     def test_dispatch(self):
+        """ test dispatch """
         self.assertTrue(isinstance(self.sampler, BestCandidateSampler))
 
-    def rosenbrock(self, x, y):
+    @staticmethod
+    def rosenbrock(x, y):
+        """ rosenbrock function 2D """
         return (1 - x)**2 + 100*(y - x**2)**2
 
     def test_samples(self):
+        """ test samples """
         samples = self.sampler.get_samples()
         df_samples = pd.DataFrame(samples)
         df_previous = self.previous_data
@@ -1110,9 +1107,9 @@ class TestCsvColumnSampler(unittest.TestCase):
         self.csv_data = self.CSV1
         self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
         self.csv_file = os.path.join(self.tmp_dir, "test.csv")
-        with open(self.sampler_file, 'w') as _file:
+        with open(self.sampler_file, 'w', encoding='utf-8') as _file:
             _file.write(self.definitions)
-        with open(self.csv_file, 'w') as _file:
+        with open(self.csv_file, 'w', encoding='utf-8') as _file:
             _file.write(self.csv_data)
 
         self.sample_data = read_yaml(self.sampler_file)
@@ -1123,14 +1120,17 @@ class TestCsvColumnSampler(unittest.TestCase):
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def test_setup(self):
+        """ test setup """
         self.assertTrue(os.path.isdir(self.tmp_dir))
         self.assertTrue(os.path.isfile(self.sampler_file))
         self.assertTrue(os.path.isfile(self.csv_file))
 
     def test_dispatch(self):
+        """ test dispatch """
         self.assertTrue(isinstance(self.sampler, CsvSampler))
 
     def test_samples(self):
+        """ test samples """
         samples = self.sampler.get_samples()
         self.assertEqual(len(samples), 2)
         for sample in samples:
