@@ -56,12 +56,6 @@ class RandomSampler(BaseSampler):
         super().check_validity()
         self._check_variables()
 
-        # @TODO: test that file exists and it contains the right parameters
-        # if 'previous_samples' in self.data.keys():
-        #     log_and_raise_exception(
-        #         "'previous_samples' is not yet supported.\n"
-        #         "  Please contact Chris Krenn or Brian Daub for assistance.")
-
         # @TODO: add error check to schema
         test_for_min_max(self.data["parameters"])
 
