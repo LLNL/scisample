@@ -9,3 +9,6 @@ docs/source/modules.rst
 docs/source/scisample.rst
 htmlcov
 scisample-*
+venv*
+__pycache__
+*~
