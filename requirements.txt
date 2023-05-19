@@ -26,3 +26,6 @@ twine
 tbump
 MarkdownPP
 build
+ipykernel
+plotly
+nbformat
