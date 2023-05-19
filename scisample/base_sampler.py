@@ -11,7 +11,7 @@ from jsonschema import ValidationError
 from scisample.interface import SamplerInterface
 from scisample.schema import validate_sampler
 from scisample.utils import (_convert_dict_to_maestro_params, find_duplicates,
-                             log_and_raise_exception)
+                             log_and_raise_exception, SamplingError)
 
 MAESTROWF = False
 with suppress(ModuleNotFoundError):
@@ -22,7 +22,7 @@ PANDAS_PLUS = False
 with suppress(ModuleNotFoundError):
     import pandas as pd
     import numpy as np
-    import scipy.spatial as spatial
+    from scipy import spatial
     PANDAS_PLUS = True
 
 LOG = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ class BaseSampler(SamplerInterface):
     Base sampler class.
     """
     # @TODO: define SAMPLE_FUNCTIONS_DICT automatically:
-    # https://stackoverflow.com/questions/3862310/how-to-find-all-the-subclasses-of-a-class-given-its-namedefine keywords # noqa
+    # https://stackoverflow.com/questions/3862310/how-to-find-all-the-subclasses-of-a-class-given-its-namedefine keywords # noqa: E501 pylint: disable=line-too-long
     #
     # def all_subclasses(cls):
     #     return set(cls.__subclasses__()).union(
@@ -218,12 +218,12 @@ class BaseSampler(SamplerInterface):
     def parameter_block(self):
         """
         Converts samples to parameter dictionary in a format convenient for ``maestrowf``
-        
+
         The keys are the labels and the values are a string version of the
         list, so it can be easily passed to Jinja.
-        
+
         Given the following sampler:
-        
+
         | type: list
         | constants:
         |     X1: 20
@@ -234,14 +234,14 @@ class BaseSampler(SamplerInterface):
 
         ``get_samples`` returns a list of dictionaries:
 
-        | [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5}, 
+        | [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5},
         |  {'X1': 20, 'X2': 10, 'X3': 10, 'X4': 10}]
 
         and ``parameter_block`` returns a dictionary of dictionaries:
 
-        | {'X1': {'values': [20, 20], 'label': 'X1.%%'}, 
-        |  'X2': {'values': [5, 10], 'label': 'X2.%%'}, 
-        |  'X3': {'values': [5, 10], 'label': 'X3.%%'}, 
+        | {'X1': {'values': [20, 20], 'label': 'X1.%%'},
+        |  'X2': {'values': [5, 10], 'label': 'X2.%%'},
+        |  'X3': {'values': [5, 10], 'label': 'X3.%%'},
         |  'X4': {'values': [5, 10], 'label': 'X4.%%'}}
         """ # noqa
         if self._parameter_block is None:
@@ -263,8 +263,9 @@ class BaseSampler(SamplerInterface):
         Returns a maestrowf Parameter Generator object containing samples
         """
         if not MAESTROWF:
-            raise Exception("maestrowf is not installed\n" +
-                            "the maestro_pgen is not supported")
+            raise SamplingError(
+                "maestrowf is not installed\n" +
+                "the maestro_pgen is not supported")
         if self._pgen is not None:
             return self._pgen
 
@@ -281,7 +282,7 @@ class BaseSampler(SamplerInterface):
     # R0914 - Too many local variables (27/15) (too-many-locals)
     # R0912 - Too many branches (14/12) (too-many-branches)
     # R0915 - Too many statements (56/50) (too-many-statements)
-    def downselect(self, samples):
+    def downselect(self, samples, previous_samples=None, return_indices=False):
         """
         Downselect samples based on specification in sampling_dict.
 
@@ -302,41 +303,45 @@ class BaseSampler(SamplerInterface):
             log_and_raise_exception(
                 "This function requires pandas, numpy & scipy packages")
 
-        df = pd.DataFrame.from_dict(self._samples)
-        columns = self.parameters
+        df = pd.DataFrame.from_dict(self._samples)  # noqa: E501 pylint: disable=invalid-name
+        columns = df.columns.tolist()
         ndims = len(columns)
         candidates = df[columns].values.tolist()
         num_points = samples
-
-        if not('previous_samples' in self.data.keys()):
+        if (not isinstance(previous_samples, pd.core.frame.DataFrame)
+                and 'previous_samples' not in self.data.keys()):
             sample_points = []
             sample_points.append(candidates[0])
             new_sample_points = []
             new_sample_points.append(candidates[0])
             new_sample_ids = []
             new_sample_ids.append(0)
-            n0 = 1
+            n0 = 1  # noqa: E501 pylint: disable=invalid-name
         else:
-            try:
-                previous_samples = pd.read_csv(self.data["previous_samples"])
-            except ValueError:
-                raise Exception("Error opening previous_samples datafile:" +
-                                self.data["previous_samples"])
+            if not isinstance(previous_samples, pd.core.frame.DataFrame):
+                try:
+                    previous_samples = pd.read_csv(
+                        self.data["previous_samples"])
+                except ValueError as exc:
+                    raise SamplingError(
+                        "Error opening previous_samples datafile:" +
+                        self.data["previous_samples"]) from exc
             sample_points = previous_samples[columns].values.tolist()
             new_sample_points = []
             new_sample_ids = []
-            n0 = 0
+            n0 = 0  # noqa: E501 pylint: disable=invalid-name
 
         mins = np.zeros(ndims)
         maxs = np.zeros(ndims)
 
         hashmap = {}
-        for j in range(len(candidates)):
-            for i in range(len(candidates[0])):
-                if type(candidates[j][i]) not in [int, float]:
-                    hashvalue = int(hashlib.sha224(candidates[j][i].encode()).hexdigest(),16)
-                    hashmap[hashvalue] = candidates[j][i]
-                    candidates[j][i] = hashvalue
+        for candidate_list in candidates:
+            for i, candidate in enumerate(candidate_list):
+                if type(candidate) not in [int, float]:
+                    hashvalue = int(hashlib.sha224(
+                        candidate.encode()).hexdigest(), 16)
+                    hashmap[hashvalue] = candidate
+                    candidate_list[i] = hashvalue
 
         first = True
         for i, candidate in enumerate(candidates):
@@ -349,32 +354,32 @@ class BaseSampler(SamplerInterface):
                     mins[j] = min(candidate[j], mins[j])
                     maxs[j] = max(candidate[j], maxs[j])
         print("extrema for new input_labels: ", mins, maxs)
-        print("down sampling to %d best candidates from %d total points." % (
-            num_points, len(candidates)))
+        print(f"down sampling to {num_points} best candidates "
+              f"from {len(candidates)} total points.")
         bign = len(candidates)
 
-        for n in range(n0, num_points):
-            px = np.asarray(sample_points)
+        for _ in range(n0, num_points):
+            px = np.asarray(sample_points)  # noqa: E501 pylint: disable=invalid-name
             tree = spatial.KDTree(px)
             j = bign
-            d = 0.0
+            d = 0.0  # noqa: E501 pylint: disable=invalid-name
             for i in range(1, bign):
                 pos = candidates[i]
                 dist = tree.query(pos)[0]
                 if dist > d:
                     j = i
-                    d = dist
+                    d = dist  # noqa: E501 pylint: disable=invalid-name
             if j == bign:
-                raise Exception(
+                raise SamplingError(
                     "During 'downselect', failed to find any "
                     "candidates in the tree.")
-            else:
-                new_sample_points.append(candidates[j])
-                sample_points.append(candidates[j])
-                new_sample_ids.append(j)
-
-        new_samples_df = pd.DataFrame(columns=df.keys().tolist())
-        for new_sample_id in new_sample_ids:
-            new_samples_df = new_samples_df.append(df.iloc[new_sample_id])
-
+            new_sample_points.append(candidates[j])
+            sample_points.append(candidates[j])
+            new_sample_ids.append(j)
+        new_samples_df = pd.concat([
+            df.iloc[new_sample_id] for new_sample_id in new_sample_ids],
+            axis=1).transpose()
         self._samples = new_samples_df.to_dict(orient='records')
+        if return_indices:
+            return new_sample_ids
+        return None

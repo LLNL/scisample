@@ -81,7 +81,7 @@ class ColumnListSampler(BaseSampler):
         self._check_variables_for_dups()
         # self.parameter_block must be called to check that
         # every row must have the same number of items
-        self.parameter_block
+        self.parameter_block  # pylint: disable=pointless-statement
 
     @property
     def parameters(self):
@@ -140,14 +140,14 @@ class ColumnListSampler(BaseSampler):
                     sample[header] = datum
                 parameter_samples.append(sample)
 
-        for i in range(len(parameter_samples)):
+        for parameter_sample in parameter_samples:
             new_sample = {}
 
             with suppress(KeyError):
                 new_sample.update(self.data['constants'])
 
             with suppress(KeyError):
-                for key, value in parameter_samples[i].items():
+                for key, value in parameter_sample.items():
                     new_sample[key] = value
 
             self._samples.append(new_sample)

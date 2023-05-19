@@ -2,10 +2,11 @@
 Tests for utility functions.
 """
 
-from scisample.utils import parse_parameters, parameter_list
-
+from scisample.utils import (
+    parse_parameters, parameter_list, manhattan_distance)
 
 mylist = [1.0, 2.0, 3.0, 4.0, 5.0]
+
 
 def test_parameter_list_step():
     """
@@ -44,7 +45,8 @@ def test_dict_num_points():
     Given a dict containing min, max, and num_points,
     parse_parameters should return the correct list.
     """
-    assert parse_parameters({'min': 1.0, 'max': 5.0, 'num_points': 5}) == mylist
+    assert (
+        parse_parameters({'min': 1.0, 'max': 5.0, 'num_points': 5}) == mylist)
 
 
 def test_str_range():
@@ -61,3 +63,15 @@ def test_str_by():
     parse_parameters should return the correct list.
     """
     assert parse_parameters("1.0 to 5.0 by 1.0") == mylist
+
+
+def test_manhattan_distance():
+    """
+    Given two points,
+    manhattan_distance should return the correct distance.
+    """
+    assert manhattan_distance((0, 0), (1, 1)) == 2
+    assert manhattan_distance((0, 0), (1, 2)) == 3
+    assert manhattan_distance((0, 0), (2, 1)) == 3
+    assert manhattan_distance((0, 0), (2, 2)) == 4
+    assert manhattan_distance((0, 0), (3, 3)) == 6

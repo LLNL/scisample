@@ -7,7 +7,7 @@ import random
 from contextlib import suppress
 
 from scisample.base_sampler import BaseSampler
-from scisample.utils import log_and_raise_exception, test_for_min_max
+from scisample.utils import test_for_min_max
 
 LOG = logging.getLogger(__name__)
 
@@ -56,12 +56,6 @@ class RandomSampler(BaseSampler):
         super().check_validity()
         self._check_variables()
 
-        # @TODO: test that file exists and it contains the right parameters
-        if 'previous_samples' in self.data.keys():
-            log_and_raise_exception(
-                "'previous_samples' is not yet supported.\n"
-                "  Please contact Chris Krenn or Brian Daub for assistance.")
-
         # @TODO: add error check to schema
         test_for_min_max(self.data["parameters"])
 
@@ -99,21 +93,21 @@ class RandomSampler(BaseSampler):
             range_dict[key] = value["max"] - value["min"]
             box.append([value["min"], value["max"]])
 
-        for i in range(self.data["num_samples"]):
+        for _ in range(self.data["num_samples"]):
             random_dictionary = {}
             for key, value in self.data["parameters"].items():
                 random_dictionary[key] = (
                     min_dict[key] + random.random() * range_dict[key])
             random_list.append(random_dictionary)
 
-        for i in range(len(random_list)):
+        for sample in random_list:
             new_sample = {}
 
             with suppress(KeyError):
                 new_sample.update(self.data['constants'])
 
             with suppress(KeyError):
-                for key, value in random_list[i].items():
+                for key, value in sample.items():
                     new_sample[key] = value
 
             self._samples.append(new_sample)

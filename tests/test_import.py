@@ -518,33 +518,6 @@ class TestScisampleRandomSampler(unittest.TestCase):
             "must have a numeric maximum"
             in str(context.exception))
 
-    def test_error3(self):
-        """
-        Given previous_samples
-        And I request a new sampler
-        Then I should get a SamplerException
-        """
-        yaml_text = """
-            type: random
-            num_samples: 5
-            previous_samples: samples.csv 
-            constants:
-                X1: 20
-            parameters:
-                X2:
-                    min: 1
-                    max: bar
-                X3:
-                    min: 5
-                    max: 10
-            """
-        with self.assertRaises(SamplingError) as context:
-            new_sampler_from_yaml(yaml_text)
-        self.assertTrue(
-            "'previous_samples' is not yet supported"
-            in str(context.exception))
-
-
 class TestScisampleBestCandidate(unittest.TestCase):
     """
     Scenario: normal and abnormal tests for BestCandidate
