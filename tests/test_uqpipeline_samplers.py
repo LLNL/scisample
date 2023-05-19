@@ -57,12 +57,12 @@ class TestScisampleUQPipeline(unittest.TestCase):
     #     self.assertEqual(len(samples), 6)
 
     #     self.assertEqual(
-    #         samples, 
-    #         [{'X1': -1.0, 'type': 'foo'}, 
-    #          {'X1': -1.0, 'type': 'bar'}, 
-    #          {'X1': 0.0, 'type': 'foo'}, 
-    #          {'X1': 0.0, 'type': 'bar'}, 
-    #          {'X1': 1.0, 'type': 'foo'}, 
+    #         samples,
+    #         [{'X1': -1.0, 'type': 'foo'},
+    #          {'X1': -1.0, 'type': 'bar'},
+    #          {'X1': 0.0, 'type': 'foo'},
+    #          {'X1': 0.0, 'type': 'bar'},
+    #          {'X1': 1.0, 'type': 'foo'},
     #          {'X1': 1.0, 'type': 'bar'}])
 
     # def test_method_cartesian_cross(self):
@@ -79,7 +79,7 @@ class TestScisampleUQPipeline(unittest.TestCase):
     #         uq_code: |
     #             points = sampler.CartesianCrossSampler.sample_points(
     #             num_divisions=[3,2],
-    #             box=[[-1,1],[]], 
+    #             box=[[-1,1],[]],
     #             values=[[],['foo', 'bar']])
     #         """
 
@@ -90,12 +90,12 @@ class TestScisampleUQPipeline(unittest.TestCase):
 
     #     self.assertEqual(len(samples), 6)
 
-    #     self.assertEqual(samples, 
-    #         [{'X1': -1.0, 'type': 'foo'}, 
-    #          {'X1': -1.0, 'type': 'bar'}, 
-    #          {'X1': 0.0, 'type': 'foo'}, 
-    #          {'X1': 0.0, 'type': 'bar'}, 
-    #          {'X1': 1.0, 'type': 'foo'}, 
+    #     self.assertEqual(samples,
+    #         [{'X1': -1.0, 'type': 'foo'},
+    #          {'X1': -1.0, 'type': 'bar'},
+    #          {'X1': 0.0, 'type': 'foo'},
+    #          {'X1': 0.0, 'type': 'bar'},
+    #          {'X1': 1.0, 'type': 'foo'},
     #          {'X1': 1.0, 'type': 'bar'}])
 
     def make_samples_test_results(self, method_call, expected_results):

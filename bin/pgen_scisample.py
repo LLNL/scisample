@@ -24,12 +24,15 @@ def get_custom_generator(env, **kwargs):
     except ValueError:
         raise Exception("this pgen code requires SAMPLE_DICTIONARY " +
                         "to be defined in the yaml specification")
-
     return new_sampler(SAMPLE_DICTIONARY).maestro_pgen
 
+
 def main():
+    """ main """
     print("This script needs to be used by maestrowf.")
-    print("Please visit https://github.com/LLNL/maestrowf for more information.")
+    print(
+        "Please visit https://github.com/LLNL/maestrowf for more information.")
+
 
 if __name__ == "__main__":
     # execute only if run as a script

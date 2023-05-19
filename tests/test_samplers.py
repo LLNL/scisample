@@ -17,7 +17,7 @@ import os
 import shutil
 import tempfile
 import unittest
-from contextlib import suppress
+import importlib
 
 import yaml
 
@@ -31,12 +31,11 @@ from scisample.csv_sampler import CsvSampler
 from scisample.samplers import new_sampler
 from scisample.utils import SamplingError, read_yaml
 
-PANDAS_PLUS = False
-with suppress(ModuleNotFoundError):
-    import pandas as pd
-    import numpy as np
-    import scipy.spatial as spatial
-    PANDAS_PLUS = True
+PANDAS_PLUS = True
+if (not importlib.util.find_spec("pandas")
+        or not importlib.util.find_spec("numpy")
+        or not importlib.util.find_spec("scipy.spatial")):
+    PANDAS_PLUS = False
 
 if PANDAS_PLUS:
     dir(np)
@@ -234,7 +233,6 @@ class TestScisampleList(unittest.TestCase):
         for i in range(2, 7):
             self.assertEqual(samples[0][f'X{i}'], 5)
             self.assertEqual(samples[1][f'X{i}'], 10)
-        sampler
         self.assertEqual(
             samples,
             [{'X1': 20, 'X2': 5, 'X3': 5, 'X4': 5, 'X5': 5, 'X6': 5},
@@ -1059,9 +1057,9 @@ class TestCsvRowSampler(unittest.TestCase):
         self.csv_data = self.CSV1
         self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
         self.csv_file = os.path.join(self.tmp_dir, "test.csv")
-        with open(self.sampler_file, 'w') as _file:
+        with open(self.sampler_file, 'w', encoding='utf-8') as _file:
             _file.write(self.definitions)
-        with open(self.csv_file, 'w') as _file:
+        with open(self.csv_file, 'w', encoding='utf-8') as _file:
             _file.write(self.csv_data)
 
         self.sample_data = read_yaml(self.sampler_file)
@@ -1072,11 +1070,13 @@ class TestCsvRowSampler(unittest.TestCase):
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def test_setup(self):
+        """ test setup"""
         self.assertTrue(os.path.isdir(self.tmp_dir))
         self.assertTrue(os.path.isfile(self.sampler_file))
         self.assertTrue(os.path.isfile(self.csv_file))
 
     def test_dispatch(self):
+        """ test dispatch"""
         self.assertTrue(isinstance(self.sampler, CsvSampler))
 
     def test_samples(self):
@@ -1167,9 +1167,9 @@ class TestCustomSampler(unittest.TestCase):
         self.sampler_file = os.path.join(self.tmp_dir, "config.yaml")
         self.function_file = os.path.join(self.tmp_dir,
                                           "codepy_sampler_test.py")
-        with open(self.sampler_file, 'w') as _file:
+        with open(self.sampler_file, 'w', encoding='utf-8') as _file:
             _file.write(self.definitions)
-        with open(self.function_file, 'w') as _file:
+        with open(self.function_file, 'w', encoding='utf-8') as _file:
             _file.write(self.function_data)
 
         self.sample_data = read_yaml(self.sampler_file)
@@ -1180,14 +1180,17 @@ class TestCustomSampler(unittest.TestCase):
         shutil.rmtree(self.tmp_dir, ignore_errors=True)
 
     def test_setup(self):
+        """ test setup """
         self.assertTrue(os.path.isdir(self.tmp_dir))
         self.assertTrue(os.path.isfile(self.sampler_file))
         self.assertTrue(os.path.isfile(self.function_file))
 
     def test_dispatch(self):
+        """ test dispatch """
         self.assertTrue(isinstance(self.sampler, CustomSampler))
 
     def test_samples(self):
+        """ test samples """
         samples = self.sampler.get_samples()
         self.assertEqual(len(samples), 2)
 
