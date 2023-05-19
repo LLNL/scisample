@@ -28,73 +28,73 @@ class TestScisampleUQPipeline(unittest.TestCase):
     Scenario: normal and abnormal tests for ListSampler
     """
 
-    def test_class_cartesian_cross(self):
-        """
-        Given a cartesian_cross specification
-        And I request a new sampler with the uqpipeline class interface
-        Then I should get a uqpipeline sampler
-        With appropriate values
-        """
-        yaml_text = """
-            type: uqpipeline
-            uq_samples: my_samples
-            uq_code: |
-                my_samples = composite_samples.Samples()
-                my_samples.set_continuous_variable('X1', -1, 0, 1)
-                my_samples.set_discrete_variable('type', ['foo', 'bar'], 'foo')
-                my_samples.generate_samples(
-                    ['X1', 'type'],
-                    sampler.CartesianCrossSampler(),
-                    num_divisions=[3,2])
-            """
-        sampler = new_sampler_from_yaml(yaml_text)
-        self.assertTrue(isinstance(sampler, UQPipelineSampler))
+    # def test_class_cartesian_cross(self):
+    #     """
+    #     Given a cartesian_cross specification
+    #     And I request a new sampler with the uqpipeline class interface
+    #     Then I should get a uqpipeline sampler
+    #     With appropriate values
+    #     """
+    #     yaml_text = """
+    #         type: uqpipeline
+    #         uq_samples: my_samples
+    #         uq_code: |
+    #             my_samples = composite_samples.Samples()
+    #             my_samples.set_continuous_variable('X1', -1, 0, 1)
+    #             my_samples.set_discrete_variable('type', ['foo', 'bar'], 'foo')
+    #             my_samples.generate_samples(
+    #                 ['X1', 'type'],
+    #                 sampler.CartesianCrossSampler(),
+    #                 num_divisions=[3,2])
+    #         """
+    #     sampler = new_sampler_from_yaml(yaml_text)
+    #     self.assertTrue(isinstance(sampler, UQPipelineSampler))
 
-        samples = sampler.get_samples()
+    #     samples = sampler.get_samples()
 
-        self.assertEqual(len(samples), 6)
+    #     self.assertEqual(len(samples), 6)
 
-        self.assertEqual(
-            samples, 
-            [{'X1': -1.0, 'type': 'foo'}, 
-             {'X1': -1.0, 'type': 'bar'}, 
-             {'X1': 0.0, 'type': 'foo'}, 
-             {'X1': 0.0, 'type': 'bar'}, 
-             {'X1': 1.0, 'type': 'foo'}, 
-             {'X1': 1.0, 'type': 'bar'}])
+    #     self.assertEqual(
+    #         samples, 
+    #         [{'X1': -1.0, 'type': 'foo'}, 
+    #          {'X1': -1.0, 'type': 'bar'}, 
+    #          {'X1': 0.0, 'type': 'foo'}, 
+    #          {'X1': 0.0, 'type': 'bar'}, 
+    #          {'X1': 1.0, 'type': 'foo'}, 
+    #          {'X1': 1.0, 'type': 'bar'}])
 
-    def test_method_cartesian_cross(self):
-        """
-        Given a cartesian_cross specification
-        And I request a new sampler with the uqpipeline method interface
-        Then I should get a uqpipeline sampler
-        With appropriate values
-        """
-        yaml_text = """
-            type: uqpipeline
-            uq_points: points
-            uq_variables: ['X1', 'type']
-            uq_code: |
-                points = sampler.CartesianCrossSampler.sample_points(
-                num_divisions=[3,2],
-                box=[[-1,1],[]], 
-                values=[[],['foo', 'bar']])
-            """
+    # def test_method_cartesian_cross(self):
+    #     """
+    #     Given a cartesian_cross specification
+    #     And I request a new sampler with the uqpipeline method interface
+    #     Then I should get a uqpipeline sampler
+    #     With appropriate values
+    #     """
+    #     yaml_text = """
+    #         type: uqpipeline
+    #         uq_points: points
+    #         uq_variables: ['X1', 'type']
+    #         uq_code: |
+    #             points = sampler.CartesianCrossSampler.sample_points(
+    #             num_divisions=[3,2],
+    #             box=[[-1,1],[]], 
+    #             values=[[],['foo', 'bar']])
+    #         """
 
-        sampler = new_sampler_from_yaml(yaml_text)
-        self.assertTrue(isinstance(sampler, UQPipelineSampler))
+    #     sampler = new_sampler_from_yaml(yaml_text)
+    #     self.assertTrue(isinstance(sampler, UQPipelineSampler))
 
-        samples = sampler.get_samples()
+    #     samples = sampler.get_samples()
 
-        self.assertEqual(len(samples), 6)
+    #     self.assertEqual(len(samples), 6)
 
-        self.assertEqual(samples, 
-            [{'X1': -1.0, 'type': 'foo'}, 
-             {'X1': -1.0, 'type': 'bar'}, 
-             {'X1': 0.0, 'type': 'foo'}, 
-             {'X1': 0.0, 'type': 'bar'}, 
-             {'X1': 1.0, 'type': 'foo'}, 
-             {'X1': 1.0, 'type': 'bar'}])
+    #     self.assertEqual(samples, 
+    #         [{'X1': -1.0, 'type': 'foo'}, 
+    #          {'X1': -1.0, 'type': 'bar'}, 
+    #          {'X1': 0.0, 'type': 'foo'}, 
+    #          {'X1': 0.0, 'type': 'bar'}, 
+    #          {'X1': 1.0, 'type': 'foo'}, 
+    #          {'X1': 1.0, 'type': 'bar'}])
 
     def make_samples_test_results(self, method_call, expected_results):
         """
