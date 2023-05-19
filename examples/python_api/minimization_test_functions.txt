@@ -1,0 +1,74 @@
+2D functions to test minimization routines on
+
+ChatGPT
+Certainly! Here are some commonly used 2D functions to test minimization routines:
+
+Booth's Function:
+python
+Copy code
+def booth(x):
+    """ Booth's function """
+    return (x[0] + 2*x[1] - 7)**2 + (2*x[0] + x[1] - 5)**2
+Himmelblau's Function:
+python
+Copy code
+def himmelblau(x):
+    """ Himmelblau's function """
+    return (x[0]**2 + x[1] - 11)**2 + (x[0] + x[1]**2 - 7)**2
+Beale's Function:
+python
+Copy code
+def beale(x):
+    """ Beale's function """
+    return (1.5 - x[0] + x[0]*x[1])**2 + (2.25 - x[0] + x[0]*x[1]**2)**2 + \
+           (2.625 - x[0] + x[0]*x[1]**3)**2
+Goldstein-Price Function:
+python
+Copy code
+def goldstein_price(x):
+    """ Goldstein-Price function """
+    return (1 + (x[0] + x[1] + 1)**2 *
+            (19 - 14*x[0] + 3*x[0]**2 - 14*x[1] + 6*x[0]*x[1] + 3*x[1]**2)) * \
+           (30 + (2*x[0] - 3*x[1])**2 *
+            (18 - 32*x[0] + 12*x[0]**2 + 48*x[1] - 36*x[0]*x[1] + 27*x[1]**2))
+These functions provide different optimization challenges such as multiple local minima, narrow valleys, and non-convex shapes. They can be used to evaluate the performance and behavior of minimization routines on 2D problems.
+
+Feel free to choose any of these functions or explore other 2D benchmark functions based on your specific needs.
+
+
+
+
+
+User
+which of these have global minima
+ChatGPT
+Among the functions mentioned:
+
+Booth's Function: It has a single global minimum at (1, 3), with a function value of 0.
+
+Himmelblau's Function: It has four symmetric global minima, each located at one of the four corners of the square: (3, 2), (-2.805118, 3.131312), (-3.779310, -3.283186), and (3.584428, -1.848126), with a function value of 0.
+
+Beale's Function: It has a global minimum at (3, 0.5), with a function value of 0.
+
+Goldstein-Price Function: It has a global minimum at (0, -1), with a function value of 3.
+
+These functions exhibit different global minima and can be used to test the ability of minimization routines to find the optimal solutions.
+
+
+
+
+
+User
+which have local minima
+ChatGPT
+Among the functions mentioned:
+
+Booth's Function: It does not have any local minima other than the global minimum at (1, 3).
+
+Himmelblau's Function: It has multiple local minima in addition to the global minima. These local minima are located in various regions of the function's landscape.
+
+Beale's Function: It does not have any local minima other than the global minimum at (3, 0.5).
+
+Goldstein-Price Function: It has multiple local minima in addition to the global minimum. These local minima are located in various regions of the function's landscape.
+
+Himmelblau's Function and Goldstein-Price Function are known for having multiple local minima, which can make the optimization process more challenging as the minimization routine needs to avoid getting trapped in these local minima and find the global minimum instead.

@@ -27,7 +27,8 @@ class BestCandidateSampler(RandomSampler):
             num_samples: 30
             previous_samples: samples.csv # optional
             cost_variable: cost   # required if previous_samples is provided
-            downselect_ratio: 0.3 # required if previous_samples is provided
+            downselect_ratio: 0.3 # downselect_ratio or downselect_number is required if previous_samples is provided
+            downselect_number: 10 # downselect_ratio or downselect_number is required if previous_samples is provided
             voxel_overlap: 1.0    # required if previous_samples is provided
             constants:
                 X1: 20
@@ -134,11 +135,12 @@ class BestCandidateSampler(RandomSampler):
         # sort previous samples by cost
         previous_samples = previous_samples.sort_values(
             by=self.data["cost_variable"])
-
+        LOG.warning(f"previous_samples: {previous_samples[self.data['cost_variable']][:5].to_list()}")
         # downselect previous samples
         num_previous_samples = len(previous_samples)
         num_samples_to_keep = int(
-            num_previous_samples * self.data["downselect_ratio"])
+            self.data["num_samples"] * self.data["downselect_ratio"])
+        # num_samples_to_keep = min(num_samples_to_keep, self.data["downselect_number"])
         if num_samples_to_keep > self.data["num_samples"]:
             LOG.warning("The number of samples to keep is greater than the "
                         "number of samples to generate. The number of samples "
