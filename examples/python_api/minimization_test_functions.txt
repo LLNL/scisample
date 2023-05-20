@@ -1,3 +1,6 @@
+
+https://en.wikipedia.org/wiki/Test_functions_for_optimization
+
 2D functions to test minimization routines on
 
 ChatGPT
