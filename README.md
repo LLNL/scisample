@@ -1,3 +1,7 @@
+# WIP
+1. add a threshold
+2. test with additional functions
+
 # scisample
 
 `scisample` is a Python 3 package that implements a number of parameter
@@ -25,7 +29,7 @@ are written in  the YAML markup language.
  1. `pytest tests`
  1. `pytest --cov=scisample tests/`
 
-# Community 
+# Community
 
 `scisample` is an open source project. Questions, discussion, and
 contributions are welcome. Contributions can be anything from new
@@ -40,7 +44,7 @@ branch on the scisample repository.
 Your PR must pass `scisamples`'s unit tests and documentation tests, and
 must pass most `flake8` and `pylint` tests. We enforce these guidelines
 with our CI process. Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for
-more information. 
+more information.
 
 # Code of Conduct
 

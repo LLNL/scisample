@@ -649,12 +649,36 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
     """
     Scenario: resample tests for BestCandidate
     """
+    # @TODO: make examples to test check_validity function
     RESAMPLE_SAMPLER = """
     sampler:
         type: best_candidate
         num_samples: 30
         previous_samples: {path}/samples.csv
         cost_variable: cost
+        over_sample_rate: 2
+        downselect_ratio: 0.1
+        voxel_overlap: 1.0 # voxel just touches nearest neighbor
+        constants:
+            X4: 20
+            X5: foo
+        parameters:
+            X1:
+                min: -2
+                max: 2
+            X2:
+                min: -1
+                max: 3
+            X3:
+                min: -1
+                max: 1
+    """
+    RESAMPLE_SAMPLER_BAD_COST_VARIABLE = """
+    sampler:
+        type: best_candidate
+        num_samples: 30
+        previous_samples: {path}/samples.csv
+        cost_variable: foo
         over_sample_rate: 2
         downselect_ratio: 0.1
         voxel_overlap: 1.0 # voxel just touches nearest neighbor
@@ -1032,7 +1056,6 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
             self.assertTrue(sample['X3'] < 1)
             self.assertEqual(sample['X4'], 20)
             self.assertEqual(sample['X5'], "foo")
-
 
 class TestCsvRowSampler(unittest.TestCase):
     """Unit test for testing the csv sampler."""
