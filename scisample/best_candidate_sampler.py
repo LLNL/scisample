@@ -227,11 +227,27 @@ class BestCandidateSampler(RandomSampler):
             num_samples *= over_sample_rate * 1.0
             num_samples /= num_samples_to_keep
             num_samples = int(num_samples + 0.5)
-            # add extra points to reduce spread in distances
-            print("distance_map", distance_map)
+            pair_set = set()
+            new_rows = []
+            for i, value in distance_map.items():
+                j = value[0][1]
+                if value[0][0] > 2.0 * min_distance:
+                    if (i, j) not in pair_set and (j, i) not in pair_set:
+                        pair_set.add((i, j))
+                        pair_set.add((j, i))
+                        row1 = previous_samples.iloc[i].copy()
+                        row2 = previous_samples.iloc[j]
+                        for column_name in previous_samples.columns:
+                            row1[column_name] = (row1[column_name] + row2[column_name]) / 2.0
+                        new_rows.append(row1)
+            if new_rows:
+                df_new = pd.DataFrame(new_rows)
+                # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+                previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
+
             # debug...
-            min_distance = 0.9
-            max_distance = 1.0
+            # min_distance = 0.9
+            # max_distance = 1.0
         sampler_list = []
         for i, value in distance_map.items():
             j = value[0][1]
