@@ -3,6 +3,7 @@ Module defining the best candidate sampler object.
 """
 
 # @TODO: support more parameters than in previous_samples
+# @TODO: remove_clustering: find nearest neighbors on all dimensions
 
 import logging
 import copy
@@ -31,6 +32,7 @@ class BestCandidateSampler(RandomSampler):
             cost_target_oversample_ratio: 2.0 # default = BestCandidateSampler.DEFAULT_COST_TARGET_OVERSAMPLE_RATIO
             downselect_ratio: 0.3  # default = BestCandidateSampler.DEFAULT_DOWNSELECT_RATIO
             voxel_overlap: 0.55 # default = BestCandidateSampler.DEFAULT_VOXEL_OVERLAP
+            remove_clustering: true # default = BestCandidateSampler.REMOVE_CLUSTERING
             constants:
                 X1: 20
             parameters:
@@ -68,6 +70,7 @@ class BestCandidateSampler(RandomSampler):
     DEFAULT_DOWNSELECT_RATIO = 0.3
     DEFAULT_VOXEL_OVERLAP = 0.55
     DEFAULT_COST_TARGET_OVERSAMPLE_RATIO = 2.0
+    DEFAULT_REMOVE_CLUSTERING = True
 
     def __init__(self, data):
         """
@@ -80,35 +83,12 @@ class BestCandidateSampler(RandomSampler):
         if "over_sample_rate" not in self.data:
             self.data["over_sample_rate"] = None
 
-    # def check_validity(self):
-    #     super().check_validity()
-    #     self._check_variables()
-    #     if "downselect_ratio" in self.data:
-    #         if self.data["downselect_ratio"] <= 0.0:
-    #             log_and_raise_exception(
-    #                 "The 'downselect_ratio' must be > 0.0.")
-    #         if self.data["downselect_ratio"] > 1.0:
-    #             log_and_raise_exception(
-    #                 "The 'downselect_ratio' must be <= 1.0.")
-    #     if "voxel_overlap" in self.data:
-    #         if self.data["voxel_overlap"] <= 0.0:
-    #             log_and_raise_exception(
-    #                 "The 'voxel_overlap' must be greater than 0.0.")
-    #     if "previous_samples" in self.data:
-    #         required_fields = [
-    #             "cost_variable", "downselect_ratio", "voxel_overlap"]
-    #         missing_fields = []
-    #         for field in required_fields:
-    #             if field not in self.data:
-    #                 missing_fields.append(field)
-    #         if missing_fields:
-    #             log_and_raise_exception(
-    #                 "When using 'previous_samples', best candidate "
-    #                 f"sampling requires '{missing_fields}' fields.")
-
     def check_validity(self):
         super().check_validity()
         self._check_variables()
+        if "remove_clustering" not in self.data:
+            self.data["remove_clustering"] = (
+                self.DEFAULT_REMOVE_CLUSTERING)
         if "cost_target_oversample_ratio" not in self.data:
             self.data["cost_target_oversample_ratio"] = (
                 self.DEFAULT_COST_TARGET_OVERSAMPLE_RATIO)
@@ -150,6 +130,123 @@ class BestCandidateSampler(RandomSampler):
     def distance(self, point_1, point_2):
         """ Calculate the distance between two points. """
         return manhattan_distance(point_1, point_2)
+
+    def interpolate_points_symmetrically(self, previous_samples_in, downselect_parameters):
+        # create distance map
+        min_distance = 0.0
+        max_distance = 1.0
+        all_new_rows = []
+        previous_samples = previous_samples_in.copy()
+        while min_distance < max_distance / 2.0:
+            min_distance = float("inf")
+            max_distance = 0.0
+            distance_map = defaultdict(list)
+            for i in range(len(previous_samples)):
+                point_1 = previous_samples.iloc[i][downselect_parameters]
+                for j in range(i+1, len(previous_samples)):
+                    point_2 = previous_samples.iloc[j][downselect_parameters]
+                    distance_map[i].append([self.distance(point_1, point_2), j])
+                    distance_map[j].append([self.distance(point_1, point_2), i])
+            for value in distance_map.values():
+                value.sort(key=lambda x: x[0])
+                min_distance = min(min_distance, value[0][0])
+                max_distance = max(max_distance, value[0][0])
+            pair_set = set()
+            new_rows = []
+            for i, value in distance_map.items():
+                j = value[0][1]
+                if value[0][0] > 2.0 * min_distance:
+                    if (i, j) not in pair_set and (j, i) not in pair_set:
+                        pair_set.add((i, j))
+                        pair_set.add((j, i))
+                        row1 = previous_samples.iloc[i].copy()
+                        row2 = previous_samples.iloc[j]
+                        for column_name in previous_samples.columns:
+                            row1[column_name] = (row1[column_name] + row2[column_name]) / 2.0
+                        new_rows.append(row1)
+            if new_rows:
+                all_new_rows.extend(new_rows)
+                df_new = pd.DataFrame(new_rows)
+                # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+                previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
+                previous_samples.reset_index(drop=True)
+        return all_new_rows
+
+    def interpolate_points_assymmetrically(
+            self, previous_samples_in, downselect_parameters):
+        # create distance map
+        all_new_rows = []
+        previous_samples = previous_samples_in.copy()
+        interpolated_points = set()
+        for sign in [-1, 1]:
+            for downselect_parameter in downselect_parameters:
+                min_distance = 0.0
+                max_distance = 1.0
+                while min_distance < max_distance / 2.0:
+                    min_distance = float("inf")
+                    max_distance = 0.0
+                    distance_map = defaultdict(list)
+                    previous_samples.reset_index(drop=True)
+                    for i in range(len(previous_samples)):
+                        try:
+                            point_1 = previous_samples[downselect_parameter].get(i, None)
+                            if point_1 is None:
+                                print(f"ERROR: Key not found - i={i}, p={downselect_parameter}, len={len(previous_samples)}, {previous_samples.columns}")
+                                continue
+                    # for i in range(len(previous_samples)):
+                    #     try:
+                    #         point_1 = previous_samples.loc[i,downselect_parameter]
+                        except KeyError as exception:
+                            print(
+                                f"ERROR: {exception}, i={i}, p={downselect_parameter}, "
+                                f"len={len(previous_samples)}, {previous_samples.columns}")
+                            # raise
+                            continue
+                        for j in range(len(previous_samples)):
+                            if i == j:
+                                continue
+                            try:
+                                point_2 = previous_samples.loc[j,downselect_parameter]
+                            except KeyError as exception:
+                                print(
+                                    f"ERROR: {exception}, i={i}, p={downselect_parameter}, "
+                                    f"len={len(previous_samples)}, {previous_samples.columns}")
+                                # raise
+                                continue
+                            if point_1 * sign > point_2 * sign:
+                                distance = float("inf")
+                            else:
+                                distance = point_2 * sign - point_1 * sign
+                            distance_map[i].append([distance, j])
+                    for value in distance_map.values():
+                        value.sort(key=lambda x: x[0])
+                        distance = value[0][0]
+                        if distance < float("inf"):
+                            min_distance = min(min_distance, distance)
+                            max_distance = max(max_distance, distance)
+                    print(f"sign={sign}, downselect_parameter={downselect_parameter}")
+                    print(f"min_distance={min_distance}, max_distance={max_distance}")
+                    new_rows = []
+                    for i, value in distance_map.items():
+                        distance = value[0][0]
+                        j = value[0][1]
+                        if distance < float('inf') and distance > 2.0 * min_distance:
+                            if ((i, j) not in interpolated_points
+                                and (j, i) not in interpolated_points):
+                                interpolated_points.add((i, j))
+                                interpolated_points.add((j, i))
+                                row1 = previous_samples.iloc[i].copy()
+                                row2 = previous_samples.iloc[j]
+                                for column_name in previous_samples.columns:
+                                    row1[column_name] = (row1[column_name] + row2[column_name]) / 2.0
+                                new_rows.append(row1)
+                    if new_rows:
+                        all_new_rows.extend(new_rows)
+                        df_new = pd.DataFrame(new_rows)
+                        # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+                        previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
+                        previous_samples.reset_index(drop=True)
+        return all_new_rows
 
     def get_samples_with_previous(self, over_sample_rate=10):
         """
@@ -206,48 +303,36 @@ class BestCandidateSampler(RandomSampler):
             if parameter in previous_headers]
         if not downselect_parameters:
             return self.get_samples_no_previous(over_sample_rate)
-        # create distance map
-        min_distance = 0.0
-        max_distance = 1.0
-        while min_distance < max_distance / 2.0:
-            min_distance = float("inf")
-            max_distance = 0.0
-            distance_map = defaultdict(list)
-            for i in range(len(previous_samples)):
-                point_1 = previous_samples.iloc[i][downselect_parameters]
-                for j in range(i+1, len(previous_samples)):
-                    point_2 = previous_samples.iloc[j][downselect_parameters]
-                    distance_map[i].append([self.distance(point_1, point_2), j])
-                    distance_map[j].append([self.distance(point_1, point_2), i])
-            for value in distance_map.values():
-                value.sort(key=lambda x: x[0])
-                min_distance = min(min_distance, value[0][0])
-                max_distance = max(max_distance, value[0][0])
-            num_samples = self.data["num_samples"]
-            num_samples *= over_sample_rate * 1.0
-            num_samples /= num_samples_to_keep
-            num_samples = int(num_samples + 0.5)
-            pair_set = set()
-            new_rows = []
-            for i, value in distance_map.items():
-                j = value[0][1]
-                if value[0][0] > 2.0 * min_distance:
-                    if (i, j) not in pair_set and (j, i) not in pair_set:
-                        pair_set.add((i, j))
-                        pair_set.add((j, i))
-                        row1 = previous_samples.iloc[i].copy()
-                        row2 = previous_samples.iloc[j]
-                        for column_name in previous_samples.columns:
-                            row1[column_name] = (row1[column_name] + row2[column_name]) / 2.0
-                        new_rows.append(row1)
-            if new_rows:
-                df_new = pd.DataFrame(new_rows)
-                # previous_samples = previous_samples.append(new_rows, ignore_index=True)
-                previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
+        new_rows = self.interpolate_points_symmetrically(
+            previous_samples, downselect_parameters)
+        if new_rows:
+            print(f"symmetrically interpolated {len(new_rows)} points")
+            df_new = pd.DataFrame(new_rows)
+            # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+            previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
+        new_rows = self.interpolate_points_assymmetrically(
+            previous_samples, downselect_parameters)
+        if new_rows:
+            print(f"assymmetrically interpolated {len(new_rows)} points")
+            df_new = pd.DataFrame(new_rows)
+            # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+            previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
 
-            # debug...
-            # min_distance = 0.9
-            # max_distance = 1.0
+        distance_map = defaultdict(list)
+        for i in range(len(previous_samples)):
+            point_1 = previous_samples.iloc[i][downselect_parameters]
+            for j in range(i+1, len(previous_samples)):
+                point_2 = previous_samples.iloc[j][downselect_parameters]
+                distance_map[i].append([self.distance(point_1, point_2), j])
+                distance_map[j].append([self.distance(point_1, point_2), i])
+        for value in distance_map.values():
+            value.sort(key=lambda x: x[0])
+            # min_distance = min(min_distance, value[0][0])
+            # max_distance = max(max_distance, value[0][0])
+        num_samples = self.data["num_samples"]
+        num_samples *= over_sample_rate * 1.0
+        num_samples /= num_samples_to_keep
+        num_samples = int(num_samples + 0.5)
         sampler_list = []
         for i, value in distance_map.items():
             j = value[0][1]
