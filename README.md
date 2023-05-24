@@ -1,6 +1,7 @@
 # WIP
 1. add a threshold
 2. test with additional functions
+3. continue test driven development of best_candidate...
 
 # scisample
 

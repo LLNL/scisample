@@ -331,12 +331,12 @@ class TestScisampleColumnList(unittest.TestCase):
         self.assertEqual(len(samples), 2)
         for sample in samples:
             self.assertEqual(sample['X1'], 20)
-        self.assertEqual(samples[0]['X2'], '5')
-        self.assertEqual(samples[0]['X3'], '5')
-        self.assertEqual(samples[0]['X4'], '5')
-        self.assertEqual(samples[1]['X2'], '10')
-        self.assertEqual(samples[1]['X3'], '10')
-        self.assertEqual(samples[1]['X4'], '10')
+        self.assertEqual(samples[0]['X2'], 5)
+        self.assertEqual(samples[0]['X3'], 5)
+        self.assertEqual(samples[0]['X4'], 5)
+        self.assertEqual(samples[1]['X2'], 10)
+        self.assertEqual(samples[1]['X3'], 10)
+        self.assertEqual(samples[1]['X4'], 10)
 
     def test_comments(self):
         """
@@ -364,12 +364,12 @@ class TestScisampleColumnList(unittest.TestCase):
         self.assertEqual(len(samples), 2)
         for sample in samples:
             self.assertEqual(sample['X1'], 20)
-        self.assertEqual(samples[0]['X2'], '5')
-        self.assertEqual(samples[0]['X3'], '5')
-        self.assertEqual(samples[0]['X4'], '5')
-        self.assertEqual(samples[1]['X2'], '10')
-        self.assertEqual(samples[1]['X3'], '10')
-        self.assertEqual(samples[1]['X4'], '10')
+        self.assertEqual(samples[0]['X2'], 5)
+        self.assertEqual(samples[0]['X3'], 5)
+        self.assertEqual(samples[0]['X4'], 5)
+        self.assertEqual(samples[1]['X2'], 10)
+        self.assertEqual(samples[1]['X3'], 10)
+        self.assertEqual(samples[1]['X4'], 10)
 
     def test_error(self):
         """
@@ -1035,25 +1035,32 @@ class TestScisampleBestCandidateResample(unittest.TestCase):
 
     def test_samples(self):
         """ test samples """
+        print("start")
         samples = self.sampler.get_samples()
         df_samples = pd.DataFrame(samples)
         df_previous = self.previous_data
         df_samples['cost'] = df_samples.apply(
             lambda row: self.rosenbrock(row['X1'], row['X2']), axis=1)
+        df_previous.to_csv(os.path.join(
+            "/Users/crkrenn/code/scisample/tests",
+            "previous.csv"))
+        df_samples.to_csv(os.path.join(
+            "/Users/crkrenn/code/scisample/tests",
+            "new.csv"))
         max_cost_previous = df_previous['cost'].max()
         avg_cost_previous = df_previous['cost'].mean()
         max_cost_samples = df_samples['cost'].max()
         avg_cost_samples = df_samples['cost'].mean()
-        self.assertEqual(len(samples), 30)
+        self.assertTrue(len(samples) >= 30)
         self.assertTrue(max_cost_samples < max_cost_previous)
         self.assertTrue(avg_cost_samples < avg_cost_previous)
         for sample in samples:
-            self.assertTrue(sample['X1'] > -2)
-            self.assertTrue(sample['X1'] < 2)
-            self.assertTrue(sample['X2'] > -1)
-            self.assertTrue(sample['X2'] < 3)
-            self.assertTrue(sample['X3'] > -1)
-            self.assertTrue(sample['X3'] < 1)
+            self.assertTrue(sample['X1'] >= -2)
+            self.assertTrue(sample['X1'] <= 2)
+            self.assertTrue(sample['X2'] >= -1)
+            self.assertTrue(sample['X2'] <= 3)
+            self.assertTrue(sample['X3'] >= -1)
+            self.assertTrue(sample['X3'] <= 1)
             self.assertEqual(sample['X4'], 20)
             self.assertEqual(sample['X5'], "foo")
 

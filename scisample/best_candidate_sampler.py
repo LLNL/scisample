@@ -131,26 +131,48 @@ class BestCandidateSampler(RandomSampler):
         """ Calculate the distance between two points. """
         return manhattan_distance(point_1, point_2)
 
-    def interpolate_points_symmetrically(self, previous_samples_in, downselect_parameters):
+    def make_distance_map(self, previous_samples, downselect_parameters):
+        distance_map = defaultdict(list)
+        min_distance = float("inf")
+        max_distance = 0.0
+        for i in range(len(previous_samples)):
+            point_1 = previous_samples.iloc[i][downselect_parameters]
+            for j in range(i+1, len(previous_samples)):
+                point_2 = previous_samples.iloc[j][downselect_parameters]
+                distance_map[i].append([self.distance(point_1, point_2), j])
+                distance_map[j].append([self.distance(point_1, point_2), i])
+        for value in distance_map.values():
+            value.sort(key=lambda x: x[0])
+            min_distance = min(min_distance, value[0][0])
+            max_distance = max(max_distance, value[0][0])
+        return distance_map, min_distance, max_distance
+
+    def average_rows(self, row1_in, row2_in):
+        row1 = row1_in.copy()
+        column_names = row1.keys().tolist()
+        for column_name in column_names:
+            try:
+                row1[column_name] = (row1[column_name] + row2_in[column_name]) / 2.0
+            except TypeError:
+                if not row1[column_name] == row2_in[column_name]:
+                    raise SampleError(f"can't average {row1[column_name]} and {row2_in[column_name]}")
+        return row1
+
+    def interpolate_points_symmetrically(
+            self, previous_samples_in, downselect_parameters):
         # create distance map
         min_distance = 0.0
         max_distance = 1.0
         all_new_rows = []
         previous_samples = previous_samples_in.copy()
-        while min_distance < max_distance / 2.0:
-            min_distance = float("inf")
-            max_distance = 0.0
-            distance_map = defaultdict(list)
-            for i in range(len(previous_samples)):
-                point_1 = previous_samples.iloc[i][downselect_parameters]
-                for j in range(i+1, len(previous_samples)):
-                    point_2 = previous_samples.iloc[j][downselect_parameters]
-                    distance_map[i].append([self.distance(point_1, point_2), j])
-                    distance_map[j].append([self.distance(point_1, point_2), i])
-            for value in distance_map.values():
-                value.sort(key=lambda x: x[0])
-                min_distance = min(min_distance, value[0][0])
-                max_distance = max(max_distance, value[0][0])
+        previous_samples = previous_samples.reset_index(drop=True)
+        max_count = 2
+        count = 0
+        while count < max_count and min_distance < max_distance / 2.0:
+            count += 1
+            print("symmetric count: ", count)
+            distance_map, min_distance, max_distance = self.make_distance_map(
+                previous_samples, downselect_parameters)
             pair_set = set()
             new_rows = []
             for i, value in distance_map.items():
@@ -159,43 +181,47 @@ class BestCandidateSampler(RandomSampler):
                     if (i, j) not in pair_set and (j, i) not in pair_set:
                         pair_set.add((i, j))
                         pair_set.add((j, i))
-                        row1 = previous_samples.iloc[i].copy()
+                        row1 = previous_samples.iloc[i]
                         row2 = previous_samples.iloc[j]
-                        for column_name in previous_samples.columns:
-                            row1[column_name] = (row1[column_name] + row2[column_name]) / 2.0
-                        new_rows.append(row1)
+                        new_rows.append(self.average_rows(row1, row2))
+            df_new = pd.DataFrame()
             if new_rows:
                 all_new_rows.extend(new_rows)
-                df_new = pd.DataFrame(new_rows)
-                # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+                df_new = pd.DataFrame(all_new_rows)
                 previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
-                previous_samples.reset_index(drop=True)
-        return all_new_rows
+                previous_samples = previous_samples.drop_duplicates()
+                previous_samples = previous_samples.reset_index(drop=True)
+                distance_map, min_distance, max_distance = self.make_distance_map(
+                    previous_samples, downselect_parameters)
+        print(f"df_new symmetric: {len(df_new)}; min_distance: {min_distance}; max_distance: {max_distance}")
+        return df_new
 
-    def interpolate_points_assymmetrically(
+    def interpolate_points_asymmetrically(
             self, previous_samples_in, downselect_parameters):
-        # create distance map
         all_new_rows = []
+        new_edges = []
         previous_samples = previous_samples_in.copy()
+        previous_samples = previous_samples.drop_duplicates()
+        previous_samples = previous_samples.reset_index(drop=True)
         interpolated_points = set()
         for sign in [-1, 1]:
             for downselect_parameter in downselect_parameters:
                 min_distance = 0.0
                 max_distance = 1.0
-                while min_distance < max_distance / 2.0:
+                max_count = 2
+                count = 0
+                while count < max_count and min_distance < max_distance / 2.0:
+                    count += 1
+                    print("asymmetric count: ", count, len(previous_samples), downselect_parameter, sign)
                     min_distance = float("inf")
                     max_distance = 0.0
                     distance_map = defaultdict(list)
-                    previous_samples.reset_index(drop=True)
                     for i in range(len(previous_samples)):
                         try:
                             point_1 = previous_samples[downselect_parameter].get(i, None)
                             if point_1 is None:
                                 print(f"ERROR: Key not found - i={i}, p={downselect_parameter}, len={len(previous_samples)}, {previous_samples.columns}")
                                 continue
-                    # for i in range(len(previous_samples)):
-                    #     try:
-                    #         point_1 = previous_samples.loc[i,downselect_parameter]
                         except KeyError as exception:
                             print(
                                 f"ERROR: {exception}, i={i}, p={downselect_parameter}, "
@@ -224,29 +250,257 @@ class BestCandidateSampler(RandomSampler):
                         if distance < float("inf"):
                             min_distance = min(min_distance, distance)
                             max_distance = max(max_distance, distance)
-                    print(f"sign={sign}, downselect_parameter={downselect_parameter}")
-                    print(f"min_distance={min_distance}, max_distance={max_distance}")
+                    _, min_distance2, _ = (
+                        self.make_distance_map(
+                            previous_samples, downselect_parameters))
+                    min_distance = min_distance2
                     new_rows = []
                     for i, value in distance_map.items():
                         distance = value[0][0]
                         j = value[0][1]
+                        if distance == float('inf'):
+                            row1 = previous_samples.iloc[i].copy()
+                            old_value = row1[downselect_parameter]
+                            new_value = old_value + sign * min_distance
+                            new_value = min(
+                                new_value,
+                                self.data[
+                                    "parameters"][
+                                        downselect_parameter]["max"])
+                            new_value = max(
+                                new_value,
+                                self.data[
+                                    "parameters"][
+                                        downselect_parameter]["min"])
+                            row1[downselect_parameter] = new_value
+                            if new_value != old_value:
+                                new_edges.append(row1)
                         if distance < float('inf') and distance > 2.0 * min_distance:
                             if ((i, j) not in interpolated_points
                                 and (j, i) not in interpolated_points):
                                 interpolated_points.add((i, j))
                                 interpolated_points.add((j, i))
-                                row1 = previous_samples.iloc[i].copy()
+                                row1 = previous_samples.iloc[i]
                                 row2 = previous_samples.iloc[j]
-                                for column_name in previous_samples.columns:
-                                    row1[column_name] = (row1[column_name] + row2[column_name]) / 2.0
-                                new_rows.append(row1)
+                                new_rows.append(self.average_rows(row1, row2))
+                    df_new = pd.DataFrame()
                     if new_rows:
                         all_new_rows.extend(new_rows)
-                        df_new = pd.DataFrame(new_rows)
-                        # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+                        df_new = pd.DataFrame(all_new_rows)
+                        df_new = df_new.drop_duplicates()
+                        df_new = df_new.reset_index(drop=True)
                         previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
-                        previous_samples.reset_index(drop=True)
-        return all_new_rows
+                        previous_samples = previous_samples.drop_duplicates()
+                        previous_samples = previous_samples.reset_index(drop=True)
+        # print(df_new)
+        df_edges = pd.DataFrame(new_edges)
+        merged = pd.merge(df_edges, previous_samples_in, how='left', indicator=True)
+        result = merged[merged['_merge'] == 'left_only']
+        result = result.drop('_merge', axis=1)
+        df_new = pd.concat([df_new, result], ignore_index=True)
+        df_new = df_new.drop_duplicates()
+        df_new = df_new.reset_index(drop=True)
+        print(f"df_new asymmetric: {len(df_new)}; min_distance: {min_distance}; max_distance: {max_distance}")
+        return df_new
+
+    # def new_samples_near_previous_samples(
+    #         self, num_samples, previous_samples, downselect_parameters):
+    #     """
+    #     Given a set of previous samples, generate a new set of samples
+    #     near the previous samples.
+    #     """
+    #     distance_map, min_distance, max_distance = self.make_distance_map(
+    #         previous_samples, downselect_parameters)
+    #     new_rows = []
+    #     for i, value in distance_map.items():
+    #         j = value[0][1]
+    #         new_row = {}
+    #         for parameter in downselect_parameters:
+    #             new_row[parameter] = (
+    #                 previous_samples.iloc[i][parameter]
+    #                 + previous_samples.iloc[j][parameter]) / 2.0
+    #         new_rows.append(new_row)
+    #     return new_rows
+
+    def add_missing_data_to_df(self, df):
+        df_dict_list = df.to_dict(orient='records')
+        df_dict_list = [self.add_missing_data(row) for row in df_dict_list]
+        return pd.DataFrame(df_dict_list)
+
+    def add_missing_data(self, new_row):
+        new_sampling_dict = copy.deepcopy(self.data)
+        new_sampling_dict["type"] = "random"
+        new_sampling_dict["num_samples"] = 1
+        sampler = RandomSampler(new_sampling_dict)
+        new_sample = sampler.get_samples()[0]
+        for key, value in new_row.items():
+            new_sample[key] = value
+        return new_sample
+
+    def get_nearby_candidates(
+            self, combined_samples, downselect_parameters, over_sample_rate=10):
+        """
+        Get nearby candidates.
+
+        """
+        if self.data["over_sample_rate"] is not None:
+            over_sample_rate = self.data["over_sample_rate"]
+
+        distance_map, _, _ = self.make_distance_map(
+            combined_samples, downselect_parameters)
+
+        num_samples = self.data["num_samples"]
+        num_samples *= over_sample_rate * 1.0
+        num_samples /= len(combined_samples)
+        num_samples = int(num_samples + 0.5)
+        sampler_list = []
+        for i, value in distance_map.items():
+            j = value[0][1]
+            new_sampling_dict = copy.deepcopy(self.data)
+            for parameter in downselect_parameters:
+                half_width = 0.5 * abs(
+                    combined_samples.iloc[i][parameter]
+                    - combined_samples.iloc[j][parameter])
+                new_sampling_dict["parameters"][parameter]["min"] = (
+                    combined_samples.iloc[i][parameter] - half_width)
+                new_sampling_dict["parameters"][parameter]["max"] = (
+                    combined_samples.iloc[i][parameter] + half_width)
+                if (new_sampling_dict["parameters"][parameter]["min"]
+                        < self.data["parameters"][parameter]["min"]):
+                    new_sampling_dict["parameters"][parameter]["min"] = (
+                        self.data["parameters"][parameter]["min"])
+                if (new_sampling_dict["parameters"][parameter]["max"]
+                        > self.data["parameters"][parameter]["max"]):
+                    new_sampling_dict["parameters"][parameter]["max"] = (
+                        self.data["parameters"][parameter]["max"])
+            new_sampling_dict["num_samples"] = num_samples
+            sampler_list.append(RandomSampler(new_sampling_dict))
+        new_samples = []
+        for sampler in sampler_list:
+            new_samples.extend(sampler.get_samples())
+        return pd.DataFrame(new_samples)
+
+    # def get_samples_with_previous_old(self, over_sample_rate=10):
+    #     """
+    #     Get samples from the sampler.
+
+    #     This returns samples as a list of dictionaries, with the
+    #     sample variables as the keys:
+
+    #     .. code:: python
+
+    #         [{'b': 0.89856, 'a': 1}, {'b': 0.923223, 'a': 1}, ... ]
+    #     """
+    #     if self._samples is not None:
+    #         return self._samples
+
+    #     if self.data["over_sample_rate"] is not None:
+    #         over_sample_rate = self.data["over_sample_rate"]
+
+    #     self._samples = []
+    #     previous_samples = pd.read_csv(Path(self.data["previous_samples"]))
+    #     num_samples_less_than_overtarget = 0
+    #     if "cost_target" in self.data:
+    #         num_samples_less_than_target = len(
+    #             previous_samples[
+    #                 previous_samples[self.data["cost_variable"]]
+    #                 < self.data["cost_target"]])
+    #         if num_samples_less_than_target >= self.data["num_samples"]:
+    #             self._samples = []
+    #             return self._samples
+    #         else:
+    #             num_samples_less_than_overtarget = len(
+    #                 previous_samples[
+    #                     previous_samples[self.data["cost_variable"]]
+    #                     < self.data["cost_target"]
+    #                     * self.data["cost_target_oversample_ratio"]])
+    #     previous_headers = list(previous_samples.columns)
+    #     # sort previous samples by cost
+    #     previous_samples = previous_samples.sort_values(
+    #         by=self.data["cost_variable"])
+    #     LOG.warning(f"previous_samples: {previous_samples[self.data['cost_variable']][:5].to_list()}")
+    #     num_samples_to_keep = int(
+    #         self.data["num_samples"] * self.data["downselect_ratio"])
+    #     num_samples_to_keep = max(num_samples_to_keep, num_samples_less_than_overtarget)
+    #     if num_samples_to_keep > self.data["num_samples"]:
+    #         LOG.warning("The number of samples to keep is greater than the "
+    #                     "number of samples to generate. The number of samples "
+    #                     "to generate will be increased to the number of "
+    #                     "samples to keep.")
+    #         self.data["num_samples"] = num_samples_to_keep
+    #     previous_samples = previous_samples[:num_samples_to_keep]
+    #     downselect_parameters = [
+    #         parameter
+    #         for parameter in self.data["parameters"].keys()
+    #         if parameter in previous_headers]
+    #     if not downselect_parameters:
+    #         return self.get_samples_no_previous(over_sample_rate)
+    #     new_rows = self.interpolate_points_symmetrically(
+    #         previous_samples, downselect_parameters)
+    #     if new_rows:
+    #         print(f"symmetrically interpolated {len(new_rows)} points")
+    #         df_new = pd.DataFrame(new_rows)
+    #         # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+    #         previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
+    #     new_rows = self.interpolate_points_asymmetrically(
+    #         previous_samples, downselect_parameters)
+    #     if new_rows:
+    #         print(f"<assymmetrically interpolated {len(new_rows)} points")
+    #         print(f"new_rows: {new_rows}")
+    #         df_new = pd.DataFrame(new_rows)
+    #         # previous_samples = previous_samples.append(new_rows, ignore_index=True)
+    #         previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
+
+    #     distance_map, min_distance, max_distance = self.make_distance_map(
+    #         previous_samples, downselect_parameters)
+    #     defaultdict(list)
+
+    #     num_samples = self.data["num_samples"]
+    #     num_samples *= over_sample_rate * 1.0
+    #     num_samples /= num_samples_to_keep
+    #     num_samples = int(num_samples + 0.5)
+    #     sampler_list = []
+    #     for i, value in distance_map.items():
+    #         j = value[0][1]
+    #         new_sampling_dict = copy.deepcopy(self.data)
+    #         for parameter in downselect_parameters:
+    #             half_width = self.data["voxel_overlap"] * abs(
+    #                 previous_samples.iloc[i][parameter]
+    #                 - previous_samples.iloc[j][parameter])
+    #             new_sampling_dict["parameters"][parameter]["min"] = (
+    #                 previous_samples.iloc[i][parameter] - half_width)
+    #             new_sampling_dict["parameters"][parameter]["max"] = (
+    #                 previous_samples.iloc[i][parameter] + half_width)
+    #             if (new_sampling_dict["parameters"][parameter]["min"]
+    #                     < self.data["parameters"][parameter]["min"]):
+    #                 new_sampling_dict["parameters"][parameter]["min"] = (
+    #                     self.data["parameters"][parameter]["min"])
+    #             if (new_sampling_dict["parameters"][parameter]["max"]
+    #                     > self.data["parameters"][parameter]["max"]):
+    #                 new_sampling_dict["parameters"][parameter]["max"] = (
+    #                     self.data["parameters"][parameter]["max"])
+    #         new_sampling_dict["num_samples"] = num_samples
+    #         sampler_list.append(RandomSampler(new_sampling_dict))
+    #     new_samples = []
+    #     for sampler in sampler_list:
+    #         new_samples.extend(sampler.get_samples())
+    #     self._samples = []
+    #     for sample in new_samples:
+    #         _sample = {}
+    #         for parameter in downselect_parameters:
+    #             _sample[parameter] = sample[parameter]
+    #         self._samples.append(_sample)
+    #     try:
+    #         new_indices = self.downselect(
+    #             self.data["num_samples"],
+    #             previous_samples=previous_samples,
+    #             return_indices=True)
+    #     except Exception as exception:  # pylint: disable=broad-except
+    #         log_and_raise_exception(
+    #             f"Error during 'downselect' in 'best_candidate' "
+    #             f"sampling: {exception}")
+    #     self._samples = [new_samples[i] for i in new_indices]
+    #     return self._samples
 
     def get_samples_with_previous(self, over_sample_rate=10):
         """
@@ -267,6 +521,8 @@ class BestCandidateSampler(RandomSampler):
 
         self._samples = []
         previous_samples = pd.read_csv(Path(self.data["previous_samples"]))
+        previous_samples = self.add_missing_data_to_df(previous_samples)
+
         num_samples_less_than_overtarget = 0
         if "cost_target" in self.data:
             num_samples_less_than_target = len(
@@ -282,98 +538,72 @@ class BestCandidateSampler(RandomSampler):
                         previous_samples[self.data["cost_variable"]]
                         < self.data["cost_target"]
                         * self.data["cost_target_oversample_ratio"]])
-        previous_headers = list(previous_samples.columns)
+
         # sort previous samples by cost
         previous_samples = previous_samples.sort_values(
             by=self.data["cost_variable"])
-        LOG.warning(f"previous_samples: {previous_samples[self.data['cost_variable']][:5].to_list()}")
         num_samples_to_keep = int(
             self.data["num_samples"] * self.data["downselect_ratio"])
         num_samples_to_keep = max(num_samples_to_keep, num_samples_less_than_overtarget)
-        if num_samples_to_keep > self.data["num_samples"]:
-            LOG.warning("The number of samples to keep is greater than the "
-                        "number of samples to generate. The number of samples "
-                        "to generate will be increased to the number of "
-                        "samples to keep.")
-            self.data["num_samples"] = num_samples_to_keep
         previous_samples = previous_samples[:num_samples_to_keep]
+
+        previous_headers = list(previous_samples.columns)
         downselect_parameters = [
             parameter
             for parameter in self.data["parameters"].keys()
             if parameter in previous_headers]
         if not downselect_parameters:
             return self.get_samples_no_previous(over_sample_rate)
-        new_rows = self.interpolate_points_symmetrically(
-            previous_samples, downselect_parameters)
-        if new_rows:
-            print(f"symmetrically interpolated {len(new_rows)} points")
-            df_new = pd.DataFrame(new_rows)
-            # previous_samples = previous_samples.append(new_rows, ignore_index=True)
-            previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
-        new_rows = self.interpolate_points_assymmetrically(
-            previous_samples, downselect_parameters)
-        if new_rows:
-            print(f"assymmetrically interpolated {len(new_rows)} points")
-            df_new = pd.DataFrame(new_rows)
-            # previous_samples = previous_samples.append(new_rows, ignore_index=True)
-            previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
-
-        distance_map = defaultdict(list)
-        for i in range(len(previous_samples)):
-            point_1 = previous_samples.iloc[i][downselect_parameters]
-            for j in range(i+1, len(previous_samples)):
-                point_2 = previous_samples.iloc[j][downselect_parameters]
-                distance_map[i].append([self.distance(point_1, point_2), j])
-                distance_map[j].append([self.distance(point_1, point_2), i])
-        for value in distance_map.values():
-            value.sort(key=lambda x: x[0])
-            # min_distance = min(min_distance, value[0][0])
-            # max_distance = max(max_distance, value[0][0])
-        num_samples = self.data["num_samples"]
-        num_samples *= over_sample_rate * 1.0
-        num_samples /= num_samples_to_keep
-        num_samples = int(num_samples + 0.5)
-        sampler_list = []
-        for i, value in distance_map.items():
-            j = value[0][1]
-            new_sampling_dict = copy.deepcopy(self.data)
-            for parameter in downselect_parameters:
-                half_width = self.data["voxel_overlap"] * abs(
-                    previous_samples.iloc[i][parameter]
-                    - previous_samples.iloc[j][parameter])
-                new_sampling_dict["parameters"][parameter]["min"] = (
-                    previous_samples.iloc[i][parameter] - half_width)
-                new_sampling_dict["parameters"][parameter]["max"] = (
-                    previous_samples.iloc[i][parameter] + half_width)
-                if (new_sampling_dict["parameters"][parameter]["min"]
-                        < self.data["parameters"][parameter]["min"]):
-                    new_sampling_dict["parameters"][parameter]["min"] = (
-                        self.data["parameters"][parameter]["min"])
-                if (new_sampling_dict["parameters"][parameter]["max"]
-                        > self.data["parameters"][parameter]["max"]):
-                    new_sampling_dict["parameters"][parameter]["max"] = (
-                        self.data["parameters"][parameter]["max"])
-            new_sampling_dict["num_samples"] = num_samples
-            sampler_list.append(RandomSampler(new_sampling_dict))
-        new_samples = []
-        for sampler in sampler_list:
-            new_samples.extend(sampler.get_samples())
+        if self.data["remove_clustering"]:
+            new_rows_1 = self.interpolate_points_asymmetrically(
+                previous_samples, downselect_parameters)
+            new_rows_2 = self.interpolate_points_symmetrically(
+                previous_samples, downselect_parameters)
+            new_rows = pd.concat([new_rows_1, new_rows_2], ignore_index=True)
+            new_rows = new_rows.drop_duplicates()
+            combined_samples = pd.concat(
+                [previous_samples, new_rows], ignore_index=True)
+            combined_samples = combined_samples.drop_duplicates()
+            combined_samples = combined_samples.reset_index(drop=True)
+        else:
+            combined_samples = previous_samples
+        new_candidates = self.get_nearby_candidates(
+            combined_samples, downselect_parameters, over_sample_rate)
+        if self.data["remove_clustering"]:
+            new_candidates = pd.concat(
+                [new_candidates, new_rows], ignore_index=True)
+        new_candidates = new_candidates.drop_duplicates()
+        new_candidates = new_candidates.reset_index(drop=True)
         self._samples = []
-        for sample in new_samples:
+        new_candidates_dict_list = new_candidates.to_dict(orient='records')
+        for sample in new_candidates_dict_list:
             _sample = {}
             for parameter in downselect_parameters:
                 _sample[parameter] = sample[parameter]
+            _sample = self.add_missing_data(_sample)
             self._samples.append(_sample)
         try:
             new_indices = self.downselect(
                 self.data["num_samples"],
                 previous_samples=previous_samples,
+                downselect_parameters=downselect_parameters,
                 return_indices=True)
         except Exception as exception:  # pylint: disable=broad-except
             log_and_raise_exception(
                 f"Error during 'downselect' in 'best_candidate' "
                 f"sampling: {exception}")
-        self._samples = [new_samples[i] for i in new_indices]
+        self._samples = [new_candidates_dict_list[i] for i in new_indices]
+        new_rows_dict_list = new_rows.to_dict(orient='records')
+        count = 0
+        for new_row in new_rows_dict_list:
+            if new_row not in self._samples:
+                count += 1
+                self._samples.append(new_row)
+        if count:
+            print(f"added {count} new rows from interpolation")
+        # self._samples = [
+        #     self.add_missing_data(_sample)
+        #     for _sample in self._samples]
         return self._samples
 
     def get_samples_no_previous(self, over_sample_rate=10):

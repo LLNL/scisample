@@ -282,7 +282,12 @@ class BaseSampler(SamplerInterface):
     # R0914 - Too many local variables (27/15) (too-many-locals)
     # R0912 - Too many branches (14/12) (too-many-branches)
     # R0915 - Too many statements (56/50) (too-many-statements)
-    def downselect(self, samples, previous_samples=None, return_indices=False):
+    def downselect(
+            self,
+            samples,
+            previous_samples=None,
+            downselect_parameters=None,
+            return_indices=False):
         """
         Downselect samples based on specification in sampling_dict.
 
@@ -304,7 +309,10 @@ class BaseSampler(SamplerInterface):
                 "This function requires pandas, numpy & scipy packages")
 
         df = pd.DataFrame.from_dict(self._samples)  # noqa: E501 pylint: disable=invalid-name
-        columns = df.columns.tolist()
+        if downselect_parameters:
+            columns = downselect_parameters
+        else:
+            columns = df.columns.tolist()
         ndims = len(columns)
         candidates = df[columns].values.tolist()
         num_points = samples
@@ -326,6 +334,9 @@ class BaseSampler(SamplerInterface):
                     raise SamplingError(
                         "Error opening previous_samples datafile:" +
                         self.data["previous_samples"]) from exc
+            # for column in columns:
+            #     if column not in previous_samples.columns:
+            #         previous_samples[column] = np.nan
             sample_points = previous_samples[columns].values.tolist()
             new_sample_points = []
             new_sample_ids = []

@@ -137,6 +137,10 @@ class ColumnListSampler(BaseSampler):
                     return False
                 sample = {}
                 for header, datum in zip(headers, data):
+                    try:
+                        datum = float(datum)
+                    except ValueError:
+                        pass
                     sample[header] = datum
                 parameter_samples.append(sample)
 
