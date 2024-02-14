@@ -373,8 +373,5 @@ class BaseSampler(SamplerInterface):
                 sample_points.append(candidates[j])
                 new_sample_ids.append(j)
 
-        new_samples_df = pd.DataFrame(columns=df.keys().tolist())
-        for new_sample_id in new_sample_ids:
-            new_samples_df = new_samples_df.append(df.iloc[new_sample_id])
-
+        new_samples_df = df.iloc[new_sample_ids]
         self._samples = new_samples_df.to_dict(orient='records')
