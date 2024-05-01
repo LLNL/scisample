@@ -63,6 +63,39 @@ class TestBestCandidateUnits(unittest.TestCase):
         assert self.sampler.distance((0, 0), (2, 2)) == 4
         assert self.sampler.distance((0, 0), (3, 3)) == 6
 
+    def test_logarithmic_interpolation(self):
+        """
+        Given a set of points,
+        make_distance_map should return the correct distance map.
+        """
+    # def logarithmic_interpolation(self, point1, point2, min_distance):
+
+        # Sample list of points 1
+        points = [
+            {'x': 0, 'y': 0},
+            {'x': 8, 'y': 8},
+        ]
+        # Create DataFrame
+        df = pd.DataFrame(points)
+        new_rows = self.sampler.logarithmic_interpolation(
+            df.iloc[0], df.iloc[1], 1)
+        print(new_rows)
+        print(len(new_rows))
+        assert len(new_rows) == 7
+        points = [
+            [4, 4],
+            [2, 2],
+            [6, 6],
+            [1, 1],
+            [7, 7],
+            [0.5, 0.5],
+            [7.5, 7.5],
+        ]
+        for point in points:
+            subset = new_rows[new_rows['x'] == point[0]]
+            assert point[1] in subset['y'].values
+
+
     def test_make_distance_map(self):
         """
         Given a set of points,
@@ -287,7 +320,7 @@ class TestInterpolatePointsAsymmetrically(unittest.TestCase):
 
     def test_interpolate_points_asymmetrically_1(self):
         """
-        Given 4 points, test_interpolate_points_ssymmetrically
+        Given 4 points, test_interpolate_points_asymmetrically
         should add 1 point
         """
         yaml_text = """

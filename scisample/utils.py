@@ -10,6 +10,7 @@ from cached_property import cached_property
 import yaml
 import numpy
 import parse
+import numpy as np
 
 LOG = logging.getLogger(__name__)
 
@@ -239,4 +240,11 @@ def manhattan_distance(point_1, point_2):
     :param point_2: Second point
     :returns: Manhattan distance between the two points
     """
-    return sum(abs(a - b) for a, b in zip(point_1, point_2))  # noqa: E501 pylint: disable=invalid-name
+    sum = 0
+    for a, b in zip(point_1, point_2):
+        try:
+            if not np.isnan(a) and not np.isnan(b):
+                sum += abs(a - b)
+        except TypeError:
+            pass
+    return sum

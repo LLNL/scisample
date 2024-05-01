@@ -4,6 +4,8 @@ Tests for utility functions.
 
 from scisample.utils import (
     parse_parameters, parameter_list, manhattan_distance)
+import numpy as np
+import pandas as pd
 
 mylist = [1.0, 2.0, 3.0, 4.0, 5.0]
 
@@ -75,3 +77,25 @@ def test_manhattan_distance():
     assert manhattan_distance((0, 0), (2, 1)) == 3
     assert manhattan_distance((0, 0), (2, 2)) == 4
     assert manhattan_distance((0, 0), (3, 3)) == 6
+
+    point1 = {
+        'X': 1.2276834976629671,
+        'Y': 1.5256709542398117,
+        'Unnamed: 0.3': 127.0,
+        'Z': 0.0859323834696076,
+        'Unnamed: 0': np.nan,
+        'Unnamed: 0.1': np.nan,
+        'Unnamed: 0.2': np.nan
+        }
+    point2 = {
+        'X': 2.2276834976629671,
+        'Y': 1.5256709542398117,
+        'Unnamed: 0.3': 127.0,
+        'Z': 0.0859323834696076,
+        'Unnamed: 0': np.nan,
+        'Unnamed: 0.1': np.nan,
+        'Unnamed: 0.2': np.nan
+        }
+    df = pd.DataFrame([point1, point2])
+    assert manhattan_distance(df.iloc[0], df.iloc[1]) == 1.0
+

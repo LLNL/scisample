@@ -22,6 +22,8 @@ class RandomSampler(BaseSampler):
             type: random
             num_samples: 5
             previous_samples: samples.csv # not supported yet
+            on_sphere: False # constrain points to a sphere
+            sphere_radius: 0.5 # radius of sphere
             constants:
                 X1: 20
             parameters:
@@ -42,6 +44,8 @@ class RandomSampler(BaseSampler):
         [{X1: 20, X2: 5.632222227306036, X3: 6.633392173916806},
          {X1: 20, X2: 7.44369755967992, X3: 8.941266067294213}]
     """
+    DEFAULT_ON_SPHERE = False
+    DEFAULT_SPHERE_RADIUS = 0.5
 
     def __init__(self, data):
         """
@@ -55,9 +59,12 @@ class RandomSampler(BaseSampler):
     def check_validity(self):
         super().check_validity()
         self._check_variables()
-
         # @TODO: add error check to schema
         test_for_min_max(self.data["parameters"])
+        if "on_sphere" not in self.data:
+            self.data["on_sphere"] = self.DEFAULT_ON_SPHERE
+        if "sphere_radius" not in self.data:
+            self.data["sphere_radius"] = self.DEFAULT_SPHERE_RADIUS
 
     @property
     def parameters(self):
@@ -85,31 +92,46 @@ class RandomSampler(BaseSampler):
 
         random_list = []
         min_dict = {}
+        mean_dict = {}
         range_dict = {}
         box = []
+
+        if self.data["on_sphere"]:
+            normalized_random_list = []
+            for _ in range(self.data["num_samples"]):
+                rand_point = []
+                for _ in range(len(self.data["parameters"])):
+                    rand_point.append(random.random() - 0.5)
+                norm = sum([x ** 2 for x in rand_point]) ** 0.5
+                rand_point = [
+                    self.data["sphere_radius"] * x / norm for x in rand_point]
+                normalized_random_list.append(rand_point)
+        else:
+            normalized_random_list = [
+                [random.random() - 0.5 for _ in range(len(self.data["parameters"]))]
+                for _ in range(self.data["num_samples"])]
 
         for key, value in self.data["parameters"].items():
             min_dict[key] = value["min"]
             range_dict[key] = value["max"] - value["min"]
+            mean_dict[key] = value["min"] + range_dict[key]/2
             box.append([value["min"], value["max"]])
 
-        for _ in range(self.data["num_samples"]):
+        for normalized_random_point in normalized_random_list:
             random_dictionary = {}
-            for key, value in self.data["parameters"].items():
+            for key in self.data["parameters"]:
                 random_dictionary[key] = (
-                    min_dict[key] + random.random() * range_dict[key])
+                    mean_dict[key]
+                    + normalized_random_point.pop()
+                    * range_dict[key])
             random_list.append(random_dictionary)
 
         for sample in random_list:
             new_sample = {}
-
             with suppress(KeyError):
                 new_sample.update(self.data['constants'])
-
             with suppress(KeyError):
                 for key, value in sample.items():
                     new_sample[key] = value
-
             self._samples.append(new_sample)
-
         return self._samples

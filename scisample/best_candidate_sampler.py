@@ -147,12 +147,14 @@ class BestCandidateSampler(RandomSampler):
             max_distance = max(max_distance, value[0][0])
         return distance_map, min_distance, max_distance
 
-    def average_rows(self, row1_in, row2_in):
+    def average_rows(self, row1_in, row2_in, factor=0.5):
         row1 = row1_in.copy()
         column_names = row1.keys().tolist()
         for column_name in column_names:
             try:
-                row1[column_name] = (row1[column_name] + row2_in[column_name]) / 2.0
+                row1[column_name] = (
+                    factor * row1[column_name]
+                    + (1 - factor) * row2_in[column_name])
             except TypeError:
                 if not row1[column_name] == row2_in[column_name]:
                     raise SampleError(f"can't average {row1[column_name]} and {row2_in[column_name]}")
@@ -196,11 +198,44 @@ class BestCandidateSampler(RandomSampler):
         print(f"df_new symmetric: {len(df_new)}; min_distance: {min_distance}; max_distance: {max_distance}")
         return df_new
 
+    def logarithmic_interpolation(self, point1, point2, min_distance):
+        print(f"logarithmic_interpolation: {min_distance}")
+        if 'X' in point1.keys() and 'Y' in point1.keys():
+            print(f"type(point1): {point1[['X', 'Y']].tolist()}")
+            print(f"type(point2): {point2[['X', 'Y']].tolist()}")
+        # print(f"dict(point1): {point1.to_dict()}")
+        result = []
+        distance = self.distance(point1, point2)
+        print(f"distance0: {distance}")
+        factor = 0.5
+        first_loop = True
+        while distance > min_distance:
+            new_point = self.average_rows(point1, point2, factor)
+            # if 'X' in point1 and 'Y' in point1:
+            #     print(f"new_point: {new_point[['X', 'Y']].tolist()}")
+            result.append(new_point)
+            if not first_loop:
+                new_point = self.average_rows(point1, point2, 1 - factor)
+                result.append(new_point)
+            first_loop = False
+            distance /= 2.0
+            factor /= 2.0
+        df_new = pd.DataFrame(result)
+        print(f"df_new logarithmic: {len(df_new)}; target_distance: {min_distance}; distance: {distance}")
+        # print(f"type(df_new): {type(df_new)}")
+        if 'X' in point1.keys() and 'Y' in point1.keys():
+            print(f"type(df_new): {df_new[['X', 'Y']]}")
+        return df_new
+
     def interpolate_points_asymmetrically(
             self, previous_samples_in, downselect_parameters):
-        all_new_rows = []
+        all_new_dfs = []
         new_edges = []
         previous_samples = previous_samples_in.copy()
+        # print(f"len(previous_samples): {len(previous_samples)} ", end="")
+        # print(f"len(all_new_dfs): {len(all_new_dfs)} ", end="")
+        # print(f"len(new_edges): {len(new_edges)} ", end="")
+        # print()
         previous_samples = previous_samples.drop_duplicates()
         previous_samples = previous_samples.reset_index(drop=True)
         interpolated_points = set()
@@ -210,9 +245,11 @@ class BestCandidateSampler(RandomSampler):
                 max_distance = 1.0
                 max_count = 2
                 count = 0
-                while count < max_count and min_distance < max_distance / 2.0:
+                # while count < max_count and min_distance < max_distance / 2.0:
+                if True:
                     count += 1
-                    print("asymmetric count: ", count, len(previous_samples), downselect_parameter, sign)
+                    new_dfs = []
+                    # print("asymmetric_loop:", len(previous_samples), downselect_parameter, sign)
                     min_distance = float("inf")
                     max_distance = 0.0
                     distance_map = defaultdict(list)
@@ -250,11 +287,10 @@ class BestCandidateSampler(RandomSampler):
                         if distance < float("inf"):
                             min_distance = min(min_distance, distance)
                             max_distance = max(max_distance, distance)
-                    _, min_distance2, _ = (
+                    _, _, max_distance2 = (
                         self.make_distance_map(
                             previous_samples, downselect_parameters))
-                    min_distance = min_distance2
-                    new_rows = []
+                    min_distance = max_distance2
                     for i, value in distance_map.items():
                         distance = value[0][0]
                         j = value[0][1]
@@ -276,22 +312,42 @@ class BestCandidateSampler(RandomSampler):
                             if new_value != old_value:
                                 new_edges.append(row1)
                         if distance < float('inf') and distance > 2.0 * min_distance:
+                            # call logarithmic interpolation
+                            # logarithmic_interpolation(point1, point2, min_distance)
                             if ((i, j) not in interpolated_points
                                 and (j, i) not in interpolated_points):
+                                new_dfs.append(self.logarithmic_interpolation(
+                                    previous_samples.iloc[i],
+                                    previous_samples.iloc[j],
+                                    min_distance))
+                                print(f"type(new_dfs): "
+                                      f"{[type(df) for df in new_dfs]}")
                                 interpolated_points.add((i, j))
                                 interpolated_points.add((j, i))
-                                row1 = previous_samples.iloc[i]
-                                row2 = previous_samples.iloc[j]
-                                new_rows.append(self.average_rows(row1, row2))
+                                # row1 = previous_samples.iloc[i]
+                                # row2 = previous_samples.iloc[j]
+                                # new_rows.append(self.average_rows(row1, row2))
+                    # print(f"len(previous_samples): {len(previous_samples)} ", end="")
+                    # print(f"len(all_new_dfs): {len(all_new_dfs)} ", end="")
+                    # print(f"len(new_edges): {len(new_edges)} ", end="")
+                    # print(f"len(new_dfs): {len(new_dfs)} ", end="")
+                    # print()
                     df_new = pd.DataFrame()
-                    if new_rows:
-                        all_new_rows.extend(new_rows)
-                        df_new = pd.DataFrame(all_new_rows)
+                    if new_dfs:
+                        all_new_dfs.extend(new_dfs)
+                        df_new = pd.concat(all_new_dfs, ignore_index=True)
+                        # print(f"asymmetric_new:",
+                        #       len(new_dfs), len(all_new_dfs), len(df_new))
                         df_new = df_new.drop_duplicates()
                         df_new = df_new.reset_index(drop=True)
                         previous_samples = pd.concat([previous_samples, df_new], ignore_index=True)
                         previous_samples = previous_samples.drop_duplicates()
                         previous_samples = previous_samples.reset_index(drop=True)
+                    # print(f"len(previous_samples): {len(previous_samples)} ", end="")
+                    # print(f"len(all_new_dfs): {len(all_new_dfs)} ", end="")
+                    # print(f"len(new_edges): {len(new_edges)} ", end="")
+                    # print(f"len(new_dfs): {len(new_dfs)} ", end="")
+                    # print()
         # print(df_new)
         df_edges = pd.DataFrame(new_edges)
         merged = pd.merge(df_edges, previous_samples_in, how='left', indicator=True)
@@ -300,7 +356,15 @@ class BestCandidateSampler(RandomSampler):
         df_new = pd.concat([df_new, result], ignore_index=True)
         df_new = df_new.drop_duplicates()
         df_new = df_new.reset_index(drop=True)
-        print(f"df_new asymmetric: {len(df_new)}; min_distance: {min_distance}; max_distance: {max_distance}")
+        # print(f"len(previous_samples): {len(previous_samples)} ", end="")
+        # print(f"len(all_new_dfs): {len(all_new_dfs)} ", end="")
+        # print(f"len(new_edges): {len(new_edges)} ", end="")
+        # print(f"len(new_dfs): {len(new_dfs)} ", end="")
+        # print(f"len(merged): {len(merged)} ", end="")
+        # print(f"len(result): {len(result)} ", end="")
+        # print(f"len(df_new): {len(df_new)} ", end="")
+        # print()
+        # print(f"df_new asymmetric: {len(df_new)}; min_distance: {min_distance}; max_distance: {max_distance}")
         return df_new
 
     # def new_samples_near_previous_samples(
@@ -373,6 +437,7 @@ class BestCandidateSampler(RandomSampler):
                         > self.data["parameters"][parameter]["max"]):
                     new_sampling_dict["parameters"][parameter]["max"] = (
                         self.data["parameters"][parameter]["max"])
+            new_sampling_dict["on_sphere"] = True
             new_sampling_dict["num_samples"] = num_samples
             sampler_list.append(RandomSampler(new_sampling_dict))
         new_samples = []
@@ -557,13 +622,27 @@ class BestCandidateSampler(RandomSampler):
         if self.data["remove_clustering"]:
             new_rows_1 = self.interpolate_points_asymmetrically(
                 previous_samples, downselect_parameters)
-            new_rows_2 = self.interpolate_points_symmetrically(
-                previous_samples, downselect_parameters)
-            new_rows = pd.concat([new_rows_1, new_rows_2], ignore_index=True)
+            print(f"new_rows_1 interpolate_points_asymmetrically: {len(new_rows_1)}")
+            # new_rows_1 = self.interpolate_points_symmetrically(
+            #     previous_samples, downselect_parameters)
+            # new_rows_2 = self.interpolate_points_symmetrically(
+            #     previous_samples, downselect_parameters)
+            # print(f"new_rows_2 interpolate_points_symmetrically: {len(new_rows_2)}")
+            # new_rows = pd.concat([new_rows_1, new_rows_2], ignore_index=True)
+            new_rows = new_rows_1
+            print(f"new_rows: {len(new_rows)}")
             new_rows = new_rows.drop_duplicates()
+            print(f"new_rows: {len(new_rows)}")
+
+            if 'X' in new_rows.columns and 'Y' in new_rows.columns:
+                new_rows = new_rows.sort_values(['X', 'Y'])
+                print("new_rows:")
+                print(new_rows[['X', 'Y']])
             combined_samples = pd.concat(
                 [previous_samples, new_rows], ignore_index=True)
+            print(f"combined_samples: {len(combined_samples)}")
             combined_samples = combined_samples.drop_duplicates()
+            print(f"combined_samples: {len(combined_samples)}")
             combined_samples = combined_samples.reset_index(drop=True)
         else:
             combined_samples = previous_samples
@@ -572,7 +651,9 @@ class BestCandidateSampler(RandomSampler):
         if self.data["remove_clustering"]:
             new_candidates = pd.concat(
                 [new_candidates, new_rows], ignore_index=True)
+            print(f"new_candidates: {len(new_candidates)}")
         new_candidates = new_candidates.drop_duplicates()
+        print(f"new_candidates: {len(new_candidates)}")
         new_candidates = new_candidates.reset_index(drop=True)
         self._samples = []
         new_candidates_dict_list = new_candidates.to_dict(orient='records')
@@ -582,6 +663,7 @@ class BestCandidateSampler(RandomSampler):
                 _sample[parameter] = sample[parameter]
             _sample = self.add_missing_data(_sample)
             self._samples.append(_sample)
+        print(f"self._samples: {len(self._samples)}")
         try:
             new_indices = self.downselect(
                 self.data["num_samples"],
@@ -593,14 +675,23 @@ class BestCandidateSampler(RandomSampler):
                 f"Error during 'downselect' in 'best_candidate' "
                 f"sampling: {exception}")
         self._samples = [new_candidates_dict_list[i] for i in new_indices]
+        print(f"self._samples: {len(self._samples)}")
         new_rows_dict_list = new_rows.to_dict(orient='records')
         count = 0
         for new_row in new_rows_dict_list:
             if new_row not in self._samples:
                 count += 1
                 self._samples.append(new_row)
+        print(f"self._samples: {len(self._samples)}")
+        # if 'X' in self._samples[0] and 'Y' in self._samples[0]:
+        #     df_temp = pd.DataFrame(self._samples)
+        #     df_temp = df_temp.sort_values(['X', 'Y'])
+        #     print("new samples:")
+        #     print(df_temp[['X', 'Y']])
         if count:
-            print(f"added {count} new rows from interpolation")
+            print(
+                f"added {count} new rows from interpolation "
+                f"({len(new_rows)-count} already in self._samples)")
         # self._samples = [
         #     self.add_missing_data(_sample)
         #     for _sample in self._samples]

@@ -468,6 +468,45 @@ class TestScisampleRandomSampler(unittest.TestCase):
             self.assertTrue(sample['X2'] < 0.8)
             self.assertTrue(sample['X3'] < 0.8)
 
+    def test_sphere1(self):
+        """
+        Given a random specification with a sphere constraint
+        And I request a new sampler
+        Then I should get a RandomSampler
+        With appropriate values
+        """
+        yaml_text = """
+            type: random
+            num_samples: 5
+            on_sphere: true
+            #previous_samples: samples.csv # optional
+            constants:
+                X1: 0.5
+            parameters:
+                X2:
+                    min: -0.5
+                    max: 0.5
+                X3:
+                    min: -0.5
+                    max: 0.5
+            """
+        sampler = new_sampler_from_yaml(yaml_text)
+        self.assertTrue(isinstance(sampler, RandomSampler))
+
+        samples = sampler.get_samples()
+
+        self.assertEqual(len(samples), 5)
+        for sample in samples:
+            self.assertEqual(sample['X1'], 0.5)
+            self.assertTrue(sample['X2'] > -0.5)
+            self.assertTrue(sample['X3'] > -0.5)
+            self.assertTrue(sample['X2'] < 0.5)
+            self.assertTrue(sample['X3'] < 0.5)
+            self.assertAlmostEqual(
+                sample['X2']**2 + sample['X3']**2,
+                0.5**2,
+                places=6)
+
     def test_error1(self):
         """
         Given an invalid random specification
@@ -519,7 +558,6 @@ class TestScisampleRandomSampler(unittest.TestCase):
         self.assertTrue(
             "must have a numeric maximum"
             in str(context.exception))
-
 
 class TestScisampleBestCandidate(unittest.TestCase):
     """
